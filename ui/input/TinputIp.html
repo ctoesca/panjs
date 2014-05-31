@@ -1,0 +1,71 @@
+<html>        
+<head>
+
+<style type="text/less">	
+.TinputIp
+{
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("TinputIp", "ui.input.TmaskInput.html", { 
+
+	/* PROPRIETES */
+	errorText: "Adresse Ip incorrecte",
+	mask: /^[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?$/,
+	placeholder: "Ex: 10.119.3.12",
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+	
+	},
+	
+	isCharAccepted: function(evt)
+	{
+		var k = evt.which;
+		var accepted = this.isNumberKey(evt) || (k == 110);
+		return accepted || this._super.isCharAccepted.call(this,  evt);
+	},
+
+	isCorrectValue: function()
+	{
+		var isOk = this._super.isCorrectValue.call(this);
+		
+		if (isOk) 
+		{
+			var parts =  this.input.val().split(".");
+			for (var i=0; i<parts.length; i++)
+				if (parts[i]>255)
+				{
+					isOk = false;
+					break;
+				}
+		}
+		/*   if (/[0-9]/.test(number.charAt(i))) {  } */
+		return isOk;
+	},
+	getFormatedVal: function()
+	{
+		var r = this.input.val();
+		
+		if (this.isCorrectValue() && (r!=""))
+		{
+			r = "";
+			var parts = this.input.val().split(".");
+			for (var i=0; i<parts.length; i++)
+			{
+				r = r+ parseInt(parts[i]);
+				if (i < parts.length-1) r += ".";
+			}
+		}
+		return r;
+	}
+});
+//]]>
+</script>
+
+</head>
+
+</html> 

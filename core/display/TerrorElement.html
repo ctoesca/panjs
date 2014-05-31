@@ -1,0 +1,80 @@
+<html>        
+<head>
+
+<style type="text/less">	
+.TerrorElement
+{
+	.message
+	{
+		font-family:Consolas;
+	}
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+
+defineClass("TerrorElement", "core.display.Telement",
+{ 
+    baseElement: "div",
+    compoClassName: '?',
+    
+    constructor: function(args) { 
+        
+        TerrorElement._super.constructor.call(this,args);
+        if (typeof args.message != "undefined"){
+        
+            var mess = "?";
+            var path = "?";
+            var url = "?";
+            
+                   
+            if (typeof args.message == "string")
+                mess =  args.message;
+            else
+            if (typeof args.message == "object")
+                mess =  args.message.message;
+
+            mess = mess.replace("\n", "<br/>");
+
+            if (typeof args.path == "string")
+                path = args.path;
+
+            if (typeof args.url == "string")
+                url = args.url;
+
+             if (typeof args.className == "string")
+                this.compoClassName = args.className;
+
+            mess += "<br/>Emplacement: "+path;
+            mess += "<br/>URL: "+url;
+
+            this.titre.html (this.titre.html().replace("{compoClassName}", this.compoClassName));
+            this.message.html(mess);
+        }
+                
+
+      },
+      init: function(){
+        
+      }
+});
+
+
+//]]>
+</script>
+
+</head>
+
+<body>	 
+	
+	<div class="alert alert-danger fade in">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h4 id="titre">Impossible d'afficher le composant "{compoClassName}" !</h4>
+        <p id="message" class="message">
+        </p>
+    </div>
+
+ 	
+</body>
+</html>

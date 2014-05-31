@@ -1,0 +1,6 @@
+﻿prise en charge IE8 (et < ?)
+
+les pb crossdomain restent identiques. 
+
+
+

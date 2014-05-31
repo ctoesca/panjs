@@ -1,0 +1,140 @@
+<html>        
+<head>
+
+<link href="./bootstrap-combobox-master/css/bootstrap-combobox.css" rel="stylesheet"/>
+<script type="text/javascript" src="./bootstrap-combobox-master/js/bootstrap-combobox.js"></script>
+
+<style type="text/less">
+.TsearchCombobox
+{
+    .input-append .btn.dropdown-toggle {
+        float: none;
+    }
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+
+uses("core.collections.TarrayCollection");
+             
+defineClass("TsearchCombobox", "core.display.Telement", { 
+
+    baseElement:"div",
+    labelField: null,
+    defaultTexte: "",
+    _dataProvider: null,
+    _combo: null,
+    selectingItem: null,
+
+    constructor: function(args){
+        this._super.constructor.call(this,args); 
+        this.waitingIcon = $('<i class="fa fa-spinner fa-2x fa-spin" id="waitingIcon" style="color:#0099CC;"></i>');
+        this.container.append(this.waitingIcon);
+    },
+
+    getDataProvider: function(dp)
+    {
+        return this._dataProvider;
+    },
+    setDataProvider: function(dp)
+    {
+        var dataProviderWasNull = (this._dataProvider == null);
+        this._dataProvider = dp;
+        this._populate();
+        this._combo.clearTarget();
+        this._combo.clearElement();
+        this._combo.refresh();
+
+        if ((this.selectingItem != null)&& (dataProviderWasNull == true))
+            this.val(this.selectingItem);
+        this.selectingItem = null;
+    },
+    
+    _populate: function()
+    {
+        
+
+        this.select.html("");
+        //var el = this.container.getElement("div.input-group");
+
+        if (this._dataProvider != null)
+        {
+            for (var i = 0; i< this._dataProvider.length; i++){
+
+                this._addItem(this._dataProvider._source[i]);
+            }
+        }
+        this.waitingIcon.hide();
+        this._combo = this.select.combobox().data('combobox') ;
+        this._combo.$source.on("change", this.onChange.bind(this));
+        
+    },
+    onChange: function(e)
+    {
+        var v = this.val();
+        
+        if ($(e.target).val() == null)
+        v = null;
+        
+        this.dispatchEvent( new Tevent(Tevent.CHANGE, v));
+    },
+    setStyle: function(css)
+    {
+        this.container.attr("style", css);
+    },
+    _addItem: function(item)
+    {
+        if (item == null)
+        {
+            var s = $('<option value=""></options>');
+        }else
+        {
+            var s = $('<option value="'+item.id+'">'+item[this.labelField]+'</options>');
+            s[0].data = item;
+        }
+        this.select.append(s);
+    },
+        
+    val: function(item)
+    {
+        if (arguments.length == 0)
+        {
+            var label = this._combo.getValue();
+            if (label.trim() == "")
+                return null;
+            
+            var r = null;
+            
+            if (this._dataProvider != null) 
+            r = this._dataProvider.getByProp(this.labelField, label);
+
+            return r;
+        }
+        else
+        {
+            if (this._dataProvider != null)
+            {        
+                if (item != null)
+                    this._combo.select(item[this.labelField]);
+                else
+                    this._combo.select(null);
+                
+                
+            }
+            else
+            {
+                this.selectingItem = item;
+            }
+        }
+    }
+});
+
+//]]>
+</script>
+</head>
+<body>
+<select class="combobox form-control" id="select" style="display:none">
+</select>
+</body>
+</html>

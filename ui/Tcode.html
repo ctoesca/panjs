@@ -1,0 +1,146 @@
+<html>        
+<head>
+
+
+<script src="/libs/js-beautify/1.4.2/js/lib/beautify-css.js"></script>
+<script src="/libs/js-beautify/1.4.2/js/lib/beautify-html.js"></script>
+<script src="/libs/js-beautify/1.4.2/js/lib/beautify.js"></script>
+<link rel="stylesheet" href="/libs/CodeMirror/3.19/lib/codemirror.css"/>
+
+
+<link rel="stylesheet" href="/libs/CodeMirror/3.19/theme/ambiance.css"/>
+
+<script src="/libs/CodeMirror/3.19/lib/codemirror.js"></script>
+<script src="/libs/CodeMirror/3.19/mode/javascript/javascript.js"></script>
+<script src="/libs/CodeMirror/3.19/mode/xml/xml.js"></script>
+
+
+<style type="text/less">
+.Tcode{
+	/*.CodeMirror-linenumber{
+		color:white;
+	}*/
+	font-size:0.8em;
+	.CodeMirror {
+	  border: 1px solid #eee;
+	 /* height: auto;*/
+	  /*max-height:500px;*/
+	}
+	.CodeMirror-scroll {
+	  overflow-y: auto;
+	  overflow-x: auto;
+	}
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+    
+defineClass("Tcode", "core.display.Telement", { 
+
+	baseElement: "div",	
+	render: false,
+	titleResult: "Result:",
+	codeMirror: null,
+	readOnly: false,
+	mode: "javascript",
+	height: null,
+
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+     
+     	if (defined(args, "height"))
+     		this.height = args.height;
+
+     	if (defined(args, "mode"))
+     		this.mode = args.mode;
+
+		if (this.mode == "html")
+			this.mode = "xml";
+
+		if (defined(args, "style"))
+			this.container.attr("style", args.style);
+
+		var source = this.content[0].innerHTML.trim();	
+		source = source.droite("<!--");
+		source = source.removeEnd("-->");
+
+		source = source.replace(/&lt;!--/g, "<!--");
+		source = source.replace(/--&gt;/g, "-->");
+		
+		source = source.replace(/<commentaire>/g, "<!--");
+		source = source.replace(/<\/commentaire>/g, "-->");
+		
+
+		source = html_beautify(source);
+
+
+		this.codeMirror = CodeMirror.fromTextArea(this.editor1[0], {
+				mode:  this.mode,
+				theme: "ambiance",
+				lineNumbers: true,
+				indent: true,
+				readOnly: this.readOnly
+			}
+  		);
+
+		setTimeout(	function(){
+			this.codeMirror.setValue( source);
+			if (this.height == null)
+			{
+				var n = source.nbsouschaine("\n", source);
+				//logger.info("this.codeMirror.defaultTextHeight = "+this.codeMirror.defaultTextHeight());
+				var h = n* this.codeMirror.defaultTextHeight() + 43;
+				//if (h>500) h=500;
+				this.codeMirror.setSize("100%", h+"px");
+			}
+			else
+			{
+				this.codeMirror.setSize("100%", this.height);	
+			}
+		}.bind(this),200);
+
+		
+
+		
+
+		var code = source.htmlEntities();
+		code = code.replace(/\t/g, '<span class="tabulation">	</span>');
+	
+		//this.content.html(code);
+		
+	
+		if (this.render){
+			this.labelRendu.html(this.titleresult);
+			this.rendu.html(source);
+			this.rendu.show();
+			this.labelRendu.show();
+			panjs.load(this.rendu);
+		}
+	}
+
+	
+});
+
+//]]>
+</script>
+
+</head>
+
+<body>	 
+
+<textarea id="editor1">
+	
+</textarea>
+
+	 <pre id="codeContainer" class="prettyprint linenums" style="display:none"><content id="content"></content></pre>
+	 <p class="labelRendu" id="labelRendu" style="display:none">Result:</p>
+	 <div id="rendu" class="rendu" style="display:none">
+
+	 </div>
+
+
+</body>
+</html>
+

@@ -1,0 +1,111 @@
+<html>        
+<head>
+
+<style type="text/less">	
+.TradioGroup{
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("TradioGroup", "core.display.Telement", { 
+	baseElement: "div",
+	labelField: null,
+	selectedField: null,
+	dp: null,
+	radios: null,
+	constructor: function(args){
+		this._super.constructor.call(this,args);	
+		this.radios = [];	
+		this.labelField = "os";
+		this.selectedField = "actif";
+		this.test();
+	},
+
+	setDataProvider: function(dp){
+		
+		if (this.dp != null)
+		{
+			this.container.html("");
+			this.radios = [];
+		}
+
+		this.dp = dp;
+		if (this.dp != null){
+			for (var i = 0; i < dp.length; i++) {
+				var radio = panjs.createComponent("ui.fuelUx.Tradiobutton.html",{parent:this});
+				var data = dp._source[i];
+				radio.setLabel( data[this.labelField]);
+				radio.setSelected( data[this.selectedField]);
+				radio.container.css("display", "table");
+				radio.container.css("margin-bottom", "20px");
+				radio.appendTo(this.container);
+				radio.on("click", this.onRadioClick.bind(this));
+				radio.on(Tevent.CHANGE, this.onRadioChanged.bind(this));
+				radio.data = data;
+				this.radios.push(radio);
+
+			};
+		}	
+	},
+	test: function(){
+		var i = Math.round(Math.random()*16)%4;
+
+		this.setDataProvider( new TarrayCollection( [
+			{os: "AIX"+i, actif:true},
+			{os: "Linux"+i, actif:false},
+			{os: "Windows"+i, actif:false},
+			{os: "VMWare"+i, actif:false},
+
+		] ));
+		
+		this.selectItem(this.dp.getItemAt(i));
+		//setTimeout(this.test.bind(this), 1000);
+	},
+	onRadioChanged: function(e){
+
+	},
+	
+	val: function(v){
+		if (arguments.length >0){
+			this.selectRadio(v);
+		}else
+		{
+			for (var i = 0; i < this.radios.length; i++) 
+				if ( this.radios[i].data[this.selectedField] == true)
+					return this.radios[i].data;	
+			return null;
+		}
+	},
+
+	selectItem: function(item){
+		for (var i = 0; i < this.radios.length; i++) {
+			var radio = this.radios[i];
+	
+			if (radio.data == item){
+				radio.setSelected(true);
+				radio.data[this.selectedField] = true;
+			}else
+			{
+				radio.setSelected(false);
+				radio.data[this.selectedField] = false;
+			}
+		};
+	},
+	onRadioClick: function(e){
+		this.selectItem(e.currentTarget.data);
+	},
+
+	refreshStates: function(){
+		
+	}
+});
+//]]>
+</script>
+
+</head>
+<body>
+     
+</body>
+</html> 

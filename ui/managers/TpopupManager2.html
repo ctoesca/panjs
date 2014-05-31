@@ -1,0 +1,190 @@
+<html>        
+<head>
+
+<style>
+.TpopupManager2.mask {
+	  position:fixed;
+	  top:0;
+	  left:0;
+	  z-index:9000;
+	  background-color:#000;
+	  display:none;
+	  opacity:0;
+	}
+.TpopupManager2.window {
+	  /*position:fixed;	*/
+	  position:absolute;
+	  /*display:table;
+	 width:100%;
+	 */
+	  margin: auto;
+	  z-index:9999;
+	 
+	  width:100%;
+	  display:none;
+	 	
+	}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+defineClass("TpopupManager2", "core.events.TeventDispatcher", { 
+
+	popups: null,
+	mask: null,
+	maskIsVisible: false,
+	winH: null,
+	winW: null,
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);		
+
+		this.popups = [];
+		this.mask =  $('<div class="mask TpopupManager2"></div>');
+		$(document.body).append( this.mask);
+		this.mask.on("click", this._onMaskClick.bind(this)); 
+
+		$(window).resize(function () {
+	        if (this.popups.length ==0)	return;
+               
+	        this.winH = $(window).height();
+	        this.winW = $(window).width();
+
+			this._refreshMaskSize();  
+
+			//centrage des modales ouvertes
+	        for (var i=0; i<this.popups.length; i++)
+	        	this._positionnerModal( this.popups[i].window );
+	        
+		}.bind(this));
+	},
+
+	addPopup: function(instance, options)
+	{			
+		var ctn = $('<div class="window TpopupManager2" ></div>');
+		ctn.on("click", function(e){
+			if ( $(e.target).hasClass("window"))
+				this._onMaskClick(e);
+		}.bind(this));
+
+		ctn.append(instance.container);
+		
+		var obj = {
+			window: ctn, 
+			compo: instance, 
+			closeOnMaskClick: false
+		};
+
+		if (defined(options, "closeOnMaskClick"))
+			obj.closeOnMaskClick = options.closeOnMaskClick;
+
+
+		instance.on(Tevent.CLOSE, this._onCompoClose, null ,this);
+	
+		this.popups.push( obj );
+
+		this._showMask();
+
+		$(document.body).append(ctn);
+		this._positionnerModal(ctn);
+		ctn.show();
+        //ctn.fadeIn(500); 
+
+		this.dispatchEvent(new Tevent(Tevent.SHOW, instance));	
+		return instance;
+	},
+	createPopup: function(className, options, args )
+	{	
+		if (defined(args))
+			var compo = panjs.createComponent(className,args); 
+		else	
+			var compo = panjs.createComponent(className); 	
+
+		this.addPopup(compo, options);
+		return compo;
+	},
+	removePopup: function(compo)
+	{
+		for (var i=0; i< this.popups.length; i++)
+		{
+			if (this.popups[i].compo == compo)
+			{
+				this.popups[i].window.detach();
+				compo.off(Tevent.CLOSE, this._onCompoClose);
+			
+				this.popups.splice(i,1);	
+					
+				if (this._getLastModal() == null)
+					this._hideMask();
+								
+				this.dispatchEvent(new Tevent(Tevent.CLOSE, compo));
+				break;
+			}
+		}
+	},
+
+	_hideMask: function()
+	{   
+        this.mask.fadeTo("fast",0, function(e){
+        	this.mask.css("display", "none");
+        	if (this.maskIsVisible)
+        		this._showMask();
+        }.bind(this));
+        this.maskIsVisible = false;
+	},
+	_showMask: function()
+	{
+		this._refreshMaskSize();       
+        this.mask.fadeTo("fast",0.8,function(e){}); 
+        this.maskIsVisible = true;
+	},
+	_positionnerModal: function(ctn)
+	{
+		if (this.winH == null){
+			this.winH = $(window).height();
+        	this.winW = window.innerWidth;//$(window).width();
+        }
+        var top = $(window).scrollTop();
+        if (top<0)
+        	top=0;
+
+        /*var left = (this.winW-ctn.width())/2;*/
+		var left = 0;
+
+        ctn.css('top', top );
+        ctn.css('left',left);
+	},
+	_refreshMaskSize: function()
+	{
+		var maskHeight = $(document).height();
+        var maskWidth = $(window).width();     	
+        this.mask.css({'width':maskWidth,'height':maskHeight});  
+	},
+	_onMaskClick: function()
+	{
+		//Fermeture de la dernière modale si closeOnMaskClick=true
+		var lastModal = this._getLastModal();
+		if ((lastModal!=null) && (lastModal.closeOnMaskClick))
+			this.removePopup(lastModal.compo);
+	},
+	
+	_onCompoClose: function(e)
+	{
+		this.removePopup(e.currentTarget);
+	},
+
+	_getLastModal: function()
+	{
+		var r = null;
+		if (this.popups.length > 0)
+			r = this.popups[this.popups.length-1];
+		return r;
+	}
+	
+});
+
+panjs.PopupManager2 = new TpopupManager2();
+//]]>
+</script>
+</head>
+</html>

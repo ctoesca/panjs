@@ -1,0 +1,202 @@
+<html>        
+<head>
+  <link href="./css/bootstrap-select.css" rel="stylesheet"/>
+  <script type="text/javascript" src="./js/bootstrap-select.js"></script>
+
+<style>	
+.bootstrap-select .btn:focus {
+	outline:0 none !important;
+}
+.Tselect
+{
+margin-left: 10px;
+}
+.Tselect .btn{
+	width:70px;
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("Tselect", "core.display.Telement", { 
+	/* PROPRIETES */
+	baseElement: "select",
+	labelField: "nom",
+	selectedField: "visible",
+ 	_dataProvider: null,
+	selectpicker: null, //compo jquery
+	selectpickerElem:null,
+   	initialized :false,
+	opened: false,
+
+	constructor: function(args){
+		
+		this._super.constructor.call(this,args);
+
+		this.select = this.container;
+		this.select.addClass("selectpicker");
+		this.select.attr("multiple", "multiple");
+		this._setEvents();
+		this.container.hide();//Le composant bootstrap "Select" utilise ce conteneur qui est un SELECT mais le cache à l'init: on le voit apparaitre un court instant
+							  //Il ajoute un div à côté du select.
+							  //!! pour cacher ce composant réellement, il faut overrider  hide() et show()
+
+	},
+	setDataProvider: function(dp)
+	{
+		this._dataProvider = dp;
+		this.refresh();
+	},
+
+	refresh: function() {
+
+		if (this.selectpicker == null)
+			return;
+
+		this.container.html("");
+
+		if (this._dataProvider == null)
+		{
+			this.setSelectItems(null);
+
+			if(this.selectpicker)
+			this.selectpicker.refresh();
+			return;
+		}
+		
+		for (var i=0; i< this._dataProvider._source.length; i++)
+		{
+			var it = this._dataProvider._source[i];
+			if ( it[this.labelField] != ""){
+				var opt = $('<option>'+ it[this.labelField]+'</option>');
+				if (it[this.selectedField] === true)
+					opt.prop("selected", true);
+			}
+			this.container.append(opt);
+		}	
+		this.selectpicker.refresh();	
+	},
+
+	setSelectItems: function(arr)
+	{
+		var items = [];
+		if ((this.selectpicker != null)&& ((arr==null)||(arr.length == 0)) )
+		{
+			this.selectpicker.val([]);
+		}
+		else
+		{
+			if (this._dataProvider != null)
+			{
+				for (var i=0; i< arr.length; i++)
+				{
+					//on récupère l'item dans le dataprovider (pour s'assurer que l'item sélectionnée est référencé ans la liste,car après on sélectionne par le labelField)
+					var itemIndex = this._dataProvider.getItemIndex(arr[i]);
+					//Selection par le nom
+					if (itemIndex >= 0)
+						items.push(this._dataProvider.getItemAt(itemIndex)[this.labelField]);
+
+				}
+				this.selectpicker.val(items);
+			}
+		}
+	},
+
+	getSelectItems: function()
+	{
+		var r = [];
+		var sel = this.selectpicker.val();
+
+		if ((sel != null) && (this._dataProvider != null))
+		{
+			for (var i=0; i< sel.length; i++)
+			{
+				var item = this._dataProvider.getByProp(this.labelField, sel[i]);
+
+				if (item != null)
+					r.push(item);
+			}
+		}
+		return r;
+	},
+
+	_onInitialized: function()
+	{
+		/*ici this.container a un parent.
+		le composant select ajoute des élement après l'élément <select>: si cet élément n'a pas de parent, ça ne fonctionne pas
+		*/
+		setTimeout(function(){
+			this.initialized = true;
+			this.selectpickerElem = this.select.selectpicker({title: "Aucune sélection", hideDisabled:false, filterOptionsHtml:'<img src="/libs/icons/24/column.png" style="margin-top: -1px"/>'});
+			this.selectpicker = this.selectpickerElem.data().selectpicker;
+			
+			this.refresh();
+			this.selectpickerElem.on("change",this._onChanged.bind(this));
+			this.selectpickerElem.on("open",this._onOpen.bind(this));
+			this.selectpickerElem.on("close",this._onClose.bind(this));
+
+			this._setStyle();
+
+		}.bind(this), 10);
+	},
+	_setStyle: function()
+	{
+		var s = this.sourceElementStyle;
+		if (s == null)
+			return;
+
+		s = s.split(";");
+	
+		for (var i=0; i< s.length; i++)
+		{
+			var v= s[i].split(":");
+				
+
+			if ((v[0] != "")&&(v[1] != ""))
+			this.selectpicker.$newElement.css(v[0],v[1]);		
+		}
+
+	},
+	toggle: function()
+	{
+		if (this.selectpicker)		
+		this.selectpicker.toggle();
+	},
+	_onOpen: function(e)
+	{
+		if (this.opened == false)
+		this.dispatchEvent( new Tevent(Tevent.OPEN));
+		this.opened = true;
+	},
+	_onClose: function(e)
+	{
+		if (this.opened == true)
+		this.dispatchEvent( new Tevent(Tevent.CLOSE));
+		this.opened = false;
+	},
+	_onChanged: function(e, data)
+	{
+		var item = null;
+		if (this._dataProvider != null)
+		{
+			var item = this._dataProvider.getByProp(this.labelField, data.itemLabel);
+			if (item != null)
+			{
+				var evtData = {"item": item, "selected": data.selected};
+				this.dispatchEvent( new Tevent(Tevent.ITEM_CLICKED, evtData));
+			}
+		}
+	},
+	_setEvents: function()
+	{
+	}
+});
+//]]>
+</script>
+
+</head>
+<body>		 	
+	
+</body>
+</html> 

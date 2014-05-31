@@ -1,0 +1,602 @@
+<html>        
+<head>
+<!--
+Attention, le fait de valoriser "cellClass" sur une colonne est consommateur de CPU:
+la classe est ajoutée sur chaque TD correspondante.
+Il est préférable parfois d'utiliser un item renderer.
+
+Pour affecter un style sur toutes les cellules, valoriser "tableClass" sur le composant.
+Exemple: 
+
+.classe_de_la_grille
+{	
+		//Toutes les cellules de la grille: */
+		td{
+			color: #FF0000;
+		}
+		/* cellClass="classe_cellules_colonne_3" affecté sur une colonne seulement:
+		cette classe écrase le style "td" car il est mis sur les cellules directement */
+		.classe_cellules_colonne_3{
+			color: #00CC00;
+		}
+}
+
+
+-->
+<style>
+
+.TsimpleGrid .imgWait
+{
+	/*overflow: auto;
+	height:500px;*/
+
+	display:none;
+	left:25%;
+	text-align:center;
+	padding:20px;
+	width:50%;
+	position:fixed;
+	bottom:0;
+	color:white;
+	background-color: #222222;
+	opacity:0.7;
+
+}
+
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+
+
+defineClass("TsimpleGrid", "core.display.Telement", { 
+
+	/* PROPRIETES */
+
+	baseElement: "div",	
+	_cols:[],
+	_dataProvider: null,
+	_isEmpty: true,
+	_tableClass: null, //Style affecté sut la table
+	loaded: false,
+	sectionRecordsCount: 100,
+	linesCount: 0,
+	onBeforeRenderLine: null,
+	progressiveLoad: true,
+	_progressiveLoadHandledIsSet: false,
+
+	/* METHODES */	
+	constructor: function(args){
+		this._super.constructor.call(this,args);	
+		TsimpleGrid.ON_SORT_CHANGED = "ON_SORT_CHANGED";
+		TsimpleGrid.ON_CELL_CLICK = "ON_CELL_CLICK";
+
+		this._tableClass = args["class"] || this._tableClass;
+	
+
+		
+
+		/*
+		Récup des colonnes définies dans <CONTENT>
+		*/
+		this._cols = [];
+		
+		if (this.content != null){
+			var listeCol = this.content.getElements("div");
+			
+			for (var i=0; i< listeCol.length; i++)
+			{
+				var el = listeCol[i];
+				var datafield = el.attr("field");
+				var title = el.html();
+				var itemRenderer = el.attr("itemRenderer")||null;
+				var visible = el.attr("visible")||true;
+			
+				
+				var col = {
+
+					"index": i,
+					"sortable": el.attr("sortable")||false,
+					"sorted": false, 
+					"sortField": el.attr("sortField")||datafield,
+					"visible": visible,
+					"field": datafield,
+					"title": title,
+					"nullLabel": "",
+					"headerClass": el.attr("headerClass")||null,
+					"cellClass": el.attr("cellClass")||null,
+					"itemRenderer": itemRenderer,
+					"functionRenderer": el.attr("functionRenderer")||null,
+					"titleInfo": el.attr("titleInfo")||null,
+			
+				};
+				
+				
+				this._cols.push(col);
+			}
+
+			this.content.remove();			
+		}
+
+		if (this._tableClass != null)
+		this.table.addClass(this._tableClass);
+
+		
+		this._setEvents();
+	},
+	_onHide: function()
+	{
+		logger.debug("_onHide table");
+	},
+	_onBottom:function(e)
+	{
+
+		if($(window).scrollTop() + $(window).height() == getDocHeight()) {
+			
+			if (this._dataProvider == null)
+			return;
+
+			if (this.linesCount == this._dataProvider.length)
+				return;
+
+			if ( this.container.is(":visible") == false)
+				return;
+						
+			this.imgWait.show();
+			setTimeout(this.showMore.bind(this),500);		
+       	}
+	},
+
+	showMore: function()
+	{	
+		var start = this.linesCount;
+
+		var end = this.linesCount+this.sectionRecordsCount-1;
+		
+		if (end >= this._dataProvider.length)
+			end = this._dataProvider.length-1;
+		if (end<start){
+			this.imgWait.hide();
+			return;
+		}
+		var debut = new Date();
+			
+		var docFragment = document.createDocumentFragment();
+		for (var i=start; i<= end; i++)
+		{
+			var d = this._dataProvider.getItemAt(i);	
+			this._addLine(d, docFragment);
+		}
+
+		this.tbody[0].appendChild(docFragment);
+		this.imgWait.hide();
+		logger.debug("Temps exécution showMore : "+(new Date() - debut)+" ms");
+	},
+
+	getColByField: function(field)
+	{
+		var r = [];
+		for (var i=0; i< this._cols.length; i++)
+		{
+			var c = this._cols[i];
+			if (c.field == field)
+				r.push(c);
+		}
+		return r;
+	},
+	
+	hideCol: function(col)
+	{
+		col.visible = false;
+		this._createTable();
+	},
+
+	showCol: function(col)
+	{
+		col.visible = true;
+		this._createTable();
+	},
+	getColAt: function(indx)
+	{
+		if (!this._cols)
+			return null;
+		return this._cols[indx];
+	},
+	addCols : function(cols)
+	{
+		//Col exemple: { field: "warning" , searchable:false, title:"Warning", cellClass:"cellWarning",  headerClass:"cellWarning", itemRenderer:"TdateItemRenderer"}
+		for (var i=0; i< cols.length; i++)
+		{
+			var col = cols[i];
+			col.index = i;
+			var u = "undefined";
+			if (typeof col.sortable == u) col.sortable = false;
+			if (typeof col.nullLabel == u) col.nullLabel = "";
+			if (typeof col.visible == u) col.visible = true;
+			if (typeof col.sorted == u) col.sorted = false;
+			if (typeof col.field == u) col.field = null;
+			if (typeof col.title == u) col.title = null;
+			if (typeof col.cellClass == u) col.cellClass = null;
+			if (typeof col.headerClass == u) col.headerClass = null;
+			if (typeof col.itemRenderer == u) col.itemRenderer = null;
+			if (typeof col.titleInfo == u) col.titleInfo = null;	
+			if (typeof col.sortField == u) col.sortField = col.field;		
+			this._cols.push(col);
+		}
+	},
+	_onShow: function()
+	{
+	},
+
+	setDataProvider: function(dataProvider)
+	{
+		if (!this.progressiveLoad){
+			this.sectionRecordsCount = 100000;
+		}else{
+			if (!this._progressiveLoadHandledIsSet){
+      			$(window).scroll( this._onBottom.bind(this));
+      			this._progressiveLoadHandledIsSet = true;
+      		}
+		}
+
+		if (this._dataProvider != dataProvider)
+		{
+			this._dataProvider = dataProvider;
+			this._dataProvider.on(Tevent.UPDATE, this._onItemUpdated.bind(this));
+			this._dataProvider.on(Tevent.DELETE, this._onItemRemoved.bind(this));
+			this._dataProvider.on(Tevent.ADDED, this._onItemAdded.bind(this));
+			this._dataProvider.on(Tevent.REFRESH, this.refresh.bind(this));
+			this._dataProvider.on(Tevent.REPLACE, this._onItemReplaced.bind(this));
+		}
+		this._createTable();
+	},
+	getDataProvider: function()
+	{
+		return this._dataProvider;
+	},
+
+	_setEvents: function()
+	{
+
+	},
+	getTr: function(item)
+	{
+		var r = null;
+		if (typeof item.id != "undefined")
+		r = this.container.getElement('tr[itemId="'+item.id+'"]');
+	    if (r!= null)
+	    	r = r[0];
+		return r;
+	},
+	_onItemReplaced: function(e)
+	{
+		var item = e.data.item;
+		var newItem = e.data.newItem;	
+		this._setTr(this.getTr(item), newItem, false);
+	},
+	refreshItem: function( item )
+	{
+		var tr = this.getTr(item);
+		this._setTr(tr, item, false);
+	},
+	_removeItem:function(item)
+	{
+		var tr = this.getTr(item);
+		$(tr).remove();
+		this.linesCount --;
+	},
+
+	_onItemUpdated: function(e)
+	{
+		var item = e.data;
+		this.refreshItem(item);
+	},
+
+	_onItemAdded: function(e)
+	{
+		var item = e.data.item;
+		var indx = e.data.index;
+		this._insertLineAt(item, indx);
+	},
+
+	_onItemRemoved: function(e)
+	{
+		var item = e.data;
+		this._removeItem(item);
+	},
+	emptyTable: function()
+	{
+		if (this._isEmpty == false)
+		{			
+			this.tbody.html("");
+			this._isEmpty = true;
+		}
+
+	},
+	
+	_addHeader: function(col)
+	{
+		var th = $('<th colIndx="'+col.index+'"></th>');
+		if (col.headerClass) 
+			th.addClass(col.headerClass);
+
+		this._updateHeader(th, col);
+		
+		this.trHeader.append(th);
+		return th;
+	},
+	_updateHeader: function(th, col)
+	{
+		th.html("");
+		if (col.sortable == true)
+		{
+			var a = $('<a href="#">'+col.title+'</a>');
+
+			if (col.titleInfo != null)
+				a.attr("title", col.titleInfo);
+			
+			if (col.sorted !== false)
+			{
+				if (col.sorted == "ASC")
+					a.append('<i class="glyphicon glyphicon-chevron-up pull-right"></i>');
+				if (col.sorted == "DESC")
+					a.append('<i class="glyphicon glyphicon-chevron-down pull-right"></i>')
+				a.append($('<span style="margin-left:10px"></span>'));
+			}
+
+			a.on("click", this._onHeaderClick.bind(this));		
+			th.append(a);
+
+		}
+		else
+		{
+			th.html(col.title);
+		}
+
+		
+	},
+	_onHeaderClick: function(e)
+	{
+		var a = $(e.target);
+		if (a[0].nodeName != "A")
+			a = a.parent();
+		var th = a.parent();
+		col = this._cols[th.attr("colIndx")];
+
+		if (col.sorted == "ASC")
+			col.sorted = "DESC";
+		else
+			if (col.sorted == "DESC")
+				col.sorted = false;
+			else
+				if (col.sorted === false)
+					col.sorted = "ASC";
+
+		this._updateHeader(th, col);
+
+
+		for (var i=0; i< this._cols.length; i++)
+		{
+			var _col = this._cols[i];
+			var _th = this.table.getElement('th[colIndx="'+_col.index+'"]');
+
+			if (_th != null){
+				this._updateHeader(_th, _col);
+			}
+
+			if (_col != col){
+				_col.sorted = false;
+			}
+		}
+		this.dispatchEvent(new Tevent( TsimpleGrid.ON_SORT_CHANGED,col));
+		return false;
+	},
+	_createHeaders: function()
+	{			
+		this.trHeader = $('<tr>');
+		this.tbody.append(this.trHeader);
+		for (var i =0; i< this._cols.length; i++)
+		{
+			var col = this._cols[i];
+			var th = null;
+			if (col.visible)
+				var th = this._addHeader(col);
+
+			if ((i == 0)&&(th!=null))
+				th.addClass('topLeftCell');
+
+		}
+
+	},
+	refresh: function()
+	{
+		this._createTable();
+	},
+	
+	_createTable: function()
+	{		
+		if (this._dataProvider == null)
+			return;
+		
+		var renderTime = 0;
+		var s1 = new Date().getTime();
+		this.linesCount = 0;
+		this.emptyTable();
+		this.table.remove();
+
+		
+
+		//if (!this.loaded)
+			this._createHeaders();		
+		
+		var docFragment = document.createDocumentFragment();
+		for (var i =0; i< this._dataProvider.length; i++)
+		{
+			var d = this._dataProvider.getItemAt(i);	
+			if (i<this.sectionRecordsCount)
+			this._addLine(d, docFragment);
+		}	
+
+		this.tbody[0].appendChild(docFragment);
+
+		
+		this.tableContainer.append(this.table);
+		this.imgWait.remove();
+		this.container.append(this.imgWait);
+
+		this.loaded = true;  
+		this._isEmpty = false;
+
+		var s2 = new Date().getTime();
+		renderTime = renderTime + (s2 - s1);
+		logger.debug("table renderTime = "+renderTime+" ms");
+	},
+
+	
+	
+
+	_setTr: function( tr, obj , trIsEmpty)
+	{
+		if (tr == null) return;
+		
+		if (this.onBeforeRenderLine != null)
+			this.onBeforeRenderLine(tr, obj);
+
+		//tr.innerHTML = "";
+		if (!trIsEmpty)
+			$(tr).empty();
+
+		for (var i=0; i< this._cols.length; i++)
+		{
+			var html = "";
+			var col = this._cols[i];
+		
+			if (col.visible)
+			{	
+				if (col.field != null)
+				{					
+					if (col.itemRenderer){		
+						var compo = panjs.createComponent(col.itemRenderer,{datafield: col.field}); 										
+						var td = compo.container[0];
+						//$(td).append(compo.container);					
+						compo.container[0].owner = compo;
+						compo.owner = this;
+						//if (defined(compo, "init"))
+						compo.init();		
+						compo.setData(obj, col.field);
+						//html= itemRenderer.render(obj, col.field );
+					}
+					else
+					{
+						var td = document.createElement("td");
+						if (col.functionRenderer){
+						
+							html = col.functionRenderer(obj, col.field, this);
+							
+							if ((typeof html == 'object') && (html != null)){
+								td.appendChild(html)
+							}
+							else{
+								td.innerHTML = html;
+							}
+
+						}
+						else
+						{
+							html = obj[col.field];
+							if (html == null)
+								html = col.nullLabel;
+							
+							td.innerHTML = html;
+						}
+					}
+				
+				}
+				else
+				{
+					var td = document.createElement("td");
+					html = "Erreur: field = null";
+					td.innerHTML = html;
+				}
+
+				if (col.cellClass != null)
+					td.setAttribute("class", col.cellClass);
+
+				tr.setAttribute("itemId", obj.id);
+				$(td).on("click", this.onTdClick.bind(this));
+				tr.appendChild(td);
+			}
+		}
+	},
+	onTdClick: function(e)
+	{
+		var cell = $(e.target);	
+		var t = cell;
+		var td = null;
+		var tr = null;
+		for (var i = 0; i< 10; i++)
+		{
+			if (t[0].nodeName == "TD")
+				td = t;
+			if (t[0].nodeName == "TR")
+				tr = t;
+			if ((td != null) && (tr != null))
+				break;
+
+			t = t.parent();
+
+		}
+		//logger.debug("CLICK sur ligne "+tr.attr("itemid"));
+
+		this.dispatchEvent( new Tevent( TsimpleGrid.ON_CELL_CLICK, {"evt":e, "td": td, "tr": tr}) );
+	},
+	
+	_addLine:function(obj,docFragment)
+	{		
+		var tr = document.createElement("tr");
+		var temps = 0;
+		this._setTr(tr, obj,true);
+		docFragment.appendChild(tr);
+		this.linesCount ++;
+	},
+	_insertLineAt: function(obj, indx)
+	{
+		indx ++;
+		var tr = document.createElement("tr");
+		this._setTr(tr, obj, true);
+
+		var trList = this.tbody.getElements("tr");
+		var maxIndx = trList.length;
+
+		if (indx > trList.length)
+			indx = trList.length;
+
+		var trAfter = trList[indx];
+
+		$(tr).insertAfter(trAfter);
+		this.linesCount ++;
+	}
+
+});
+
+
+//]]>
+</script>
+
+</head>
+
+<body>	
+
+<div id="tableContainer" style="">
+	 <table class="table-responsive table-striped table-condensed table-bordered " id="table">
+          <tbody id="tbody">
+          	<tr id="trHeader">
+     
+			</tr>
+          </tbody>                 
+     </table>
+ </div>
+    <!--CONTENT-->
+     <h2 id="imgWait" class="imgWait">Chargement en cours...</h2>
+</body>
+</html> 
