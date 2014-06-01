@@ -103,7 +103,7 @@
 &lt;/script&gt;
 
 &lt;script src="../core/panjs_core.min.js">&lt;/script&gt;
-  
+&lt;!-- Use panjs_core_with_less.min.js if you want to enable LESS--&gt;
 </pre>
 
 
