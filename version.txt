@@ -1,6 +1,2 @@
-﻿prise en charge IE8 (et < ?)
-
-les pb crossdomain restent identiques. 
-
-
-
+﻿Panjs version 0.6.
+IE8 compatible
