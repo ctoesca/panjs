@@ -1,1 +1,1 @@
-<h2>36ko component framework</h2>
+<h2>35ko component framework</h2>
