@@ -49,7 +49,7 @@ defineClass("Tcode", "core.display.Telement", {
 
 	constructor: function(args){
 		this._super.constructor.call(this,args);
-     
+  
      	if (defined(args, "height"))
      		this.height = args.height;
 
@@ -69,12 +69,13 @@ defineClass("Tcode", "core.display.Telement", {
 		source = source.replace(/&lt;!--/g, "<!--");
 		source = source.replace(/--&gt;/g, "-->");
 		
-		source = source.replace(/<commentaire>/g, "<!--");
-		source = source.replace(/<\/commentaire>/g, "-->");
-		
+		source = source.replace(/\[COMMENT\]/gi, "<!--");
+		source = source.replace(/\[\/COMMENT\]/gi, "-->");
 
+		source = source.replace(/<commentaire>/gi, "<!--");
+		source = source.replace(/<\/commentaire>/gi, "-->");
 		source = html_beautify(source);
-
+ 
 
 		this.codeMirror = CodeMirror.fromTextArea(this.editor1[0], {
 				mode:  this.mode,
@@ -108,7 +109,7 @@ defineClass("Tcode", "core.display.Telement", {
 		var code = source.htmlEntities();
 		code = code.replace(/\t/g, '<span class="tabulation">	</span>');
 	
-		//this.content.html(code);
+		this.content.html(code);
 		
 	
 		if (this.render){
