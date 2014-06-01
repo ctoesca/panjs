@@ -28,14 +28,24 @@ defineClass("TerrorElement", "core.display.Telement",
             var path = "?";
             var url = "?";
             
-                   
+           
             if (typeof args.message == "string")
-                mess =  args.message;
-            else
-            if (typeof args.message == "object")
-                mess =  args.message.message;
+            {
+                mess = args.message;   
+            }
+            else{
+                if (defined( args, "message" ,"message"))
+                    mess =  args.message.message;
+                else
+                    mess = args.message;
+            }
 
-            mess = mess.replace("\n", "<br/>");
+            if (typeof mess == "string")
+            {
+                mess =  mess.htmlEntities();
+                mess = mess.replace(/\n/g, '<br/>');
+            }
+
 
             if (typeof args.path == "string")
                 path = args.path;
@@ -46,7 +56,7 @@ defineClass("TerrorElement", "core.display.Telement",
              if (typeof args.className == "string")
                 this.compoClassName = args.className;
 
-            mess += "<br/>Emplacement: "+path;
+            mess += "<br/>Fichier: "+path;
             mess += "<br/>URL: "+url;
 
             this.titre.html (this.titre.html().replace("{compoClassName}", this.compoClassName));
@@ -71,8 +81,8 @@ defineClass("TerrorElement", "core.display.Telement",
 	<div class="alert alert-danger fade in">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4 id="titre">Impossible d'afficher le composant "{compoClassName}" !</h4>
-        <p id="message" class="message">
-        </p>
+        <pre id="message" class="message">
+        </pre>
     </div>
 
  	

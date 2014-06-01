@@ -1,4 +1,5 @@
-﻿
+﻿window["MsxmlObject"] = null;
+
 function exec(s)
 {           
   if (s == "") return;  
@@ -59,47 +60,131 @@ function getDocHeight() {
 
 function getXml(xmlNode)
 {
-    var result;     
+    var r;     
+    
+    if (xmlNode.xml)
+      r = xmlNode.xml;
+    else
+      r = (new XMLSerializer()).serializeToString(xmlNode);  
 
-    try{     
-
-      if (xmlNode.xml)
-        result = xmlNode.xml;
-      else
-      result = (new XMLSerializer()).serializeToString(xmlNode);
-  }
-  catch(e)
-  {
-    alert("Erreur getXml: "+e);
-  }   
-  
-    return result;
+    return r;
 }
+
 function getText(xmlNode)
 {         
-  try{
   var r;
-    
+  
   if (typeof xmlNode.text != "undefined")                                    
       r = xmlNode.text;   
   else
       r = xmlNode.textContent;
     
-  return r;
-
-  }catch(err)
-  {
-    return err;
-  }    
+  return r;  
 }
 
-function getXmlDocument(txt)
+function CreateMSXMLDocumentObject () 
 {
-  /* transforme du texte  XML en object XMLDocument */
-  if (window.DOMParser)
+  if ( window["MsxmlObject"] == null)
+  {
+    if (typeof (ActiveXObject) != "undefined") 
     {
-    parser=new DOMParser();
-    xmlDoc=parser.parseFromString(txt,"text/xml");
+      var progIDs = [
+      "Msxml2.DOMDocument.6.0", 
+      "Msxml2.DOMDocument.5.0", 
+      "Msxml2.DOMDocument.4.0", 
+      "Msxml2.DOMDocument.3.0", 
+      "MSXML2.DOMDocument", 
+      "MSXML.DOMDocument"
+      ];
+      for (var i = 0; i < progIDs.length; i++) {
+        try { 
+          window["MsxmlObject"] = new ActiveXObject(progIDs[i]); 
+          return window["MsxmlObject"];
+        } catch(e) {};
+      }
+    }    
+  }
+  else
+  {
+      return window["MsxmlObject"];
+  }
+
+  return null;
+}
+
+function getXmlDocument (text) {
+
+      var message = "";
+
+      //On IE, if XML is malformed, ActiveXObject returns more infos than DOMParser
+      if ((window.DOMParser) && ((panjs.iever >= 11)||(panjs.iever ==-1)) )
+      { 
+          // all browsers, except IE before version 9
+          var parser = new DOMParser();
+          try 
+          {
+            xmlDoc = parser.parseFromString (text, "text/xml");
+          } 
+          catch (e) 
+          {
+                    // if text is not well-formed, 
+                    // it raises an exception in IE from version 9
+                    throw "XML parsing error.";
+          };
+      }
+      else 
+      {  // Internet Explorer before version 9
+        xmlDoc = CreateMSXMLDocumentObject ();
+        if (!xmlDoc) 
+        {
+          throw "Cannot create XMLDocument object";
+        }
+
+        xmlDoc.loadXML (text);
+      }
+
+      var errorMsg = null;
+      if (xmlDoc.parseError && xmlDoc.parseError.errorCode != 0) 
+      {
+        errorMsg = "XML Parsing Error: " + xmlDoc.parseError.reason
+        + " at line " + xmlDoc.parseError.line
+        + " at position " + xmlDoc.parseError.linepos;
+      }
+      else 
+      {
+        if (xmlDoc.documentElement) {
+          if (xmlDoc.documentElement.nodeName == "parsererror") {
+            errorMsg = xmlDoc.documentElement.childNodes[0].nodeValue;
+          }
+        }
+        else {
+          errorMsg = "XML Parsing Error!";
+        }
+      }
+
+      if (errorMsg) {
+        throw errorMsg;
+      }
+
+      return xmlDoc;
+}
+
+
+
+/*function getXmlDocument(txt)
+{
+  var xmlDoc = null;
+  if (window.DOMParser)
+    { 
+    var parser=new DOMParser();
+    
+      xmlDoc=parser.parseFromString(txt,"text/xml");
+      if (xmlDoc.documentElement.nodeName == "parsererror") 
+      {
+        var errStr = xmlDoc.documentElement.childNodes[0].nodeValue;
+        throw errStr;
+      }
+   
     }
   else 
     {
@@ -108,7 +193,7 @@ function getXmlDocument(txt)
     xmlDoc.loadXML(txt);
     } 
     return xmlDoc;
-}
+}*/
 
 
 /* 
@@ -169,7 +254,6 @@ if (!Number.toFixed) {
   }
 }
 
-
 String.prototype.contains = function(it) { 
   return this.indexOf(it) > -1; 
 };
@@ -201,12 +285,7 @@ String.prototype.capitalizeFirstLetter = function()
 
 String.prototype.htmlEntities = function()
 { 
-  try{
     return this.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }catch(e)
-  {   
-  }
-  return "ERREUR htmlEntities";
 }
 
 String.prototype.droite = function(souschaine)
@@ -221,35 +300,25 @@ String.prototype.droite = function(souschaine)
 
 String.prototype.droitedroite = function(souschaine)
 { 
- var index = this.lastIndexOf(souschaine);
- var r = "";
- if (index >0)
-    r = this.substr(index+souschaine.length);   
- return r;
+  var index = this.lastIndexOf(souschaine);
+  if (index >0)
+    return this.substr(index+souschaine.length);  
+  else 
+    return "";
 }
-
 
 String.prototype.isEmpty = function(){
    var s = this.trim();
-   return ((s == "")||(this == null));
+   return (s == "");
 };
+
 String.prototype.startsWith = function(s){
    return this.indexOf(s) == 0;
 };
 String.prototype.endsWith = function(s){
    return this.lastIndexOf(s) == (this.length - s.length);
 };
-String.prototype.removeEnd = function(s){
-  if (this.endsWith(s))
-  {
-    return this.substring(0, this.length - s.length);
-  }
-  else
-  {
-    return this;
-  }
-   
-};
+
 
 String.prototype.hashCode = function(){
     var hash = 0
@@ -261,6 +330,13 @@ String.prototype.hashCode = function(){
         hash = hash & hash; // Convert to 32bit integer
     }
     return hash;
+};
+
+String.prototype.removeEnd = function(s){
+  if (this.endsWith(s))
+    return this.substring(0, this.length - s.length);
+  else
+    return this;   
 };
 
 String.prototype.removeEndCaseInsensitive = function(end)
@@ -290,8 +366,6 @@ Array.prototype.remove=function(s){
   }
 }
 
-
-
 String.prototype.nbsouschaine = function(souschaine)
 {
   var tmp = this;
@@ -310,9 +384,6 @@ Array.prototype.pushArray = function (arr)
 	 for (var i=0; i<arr.length; i++)
 	    this.push(arr[i]);
 }
-
-
-//Bind() n'existe pas sur IE8
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function(obj, start) {
@@ -346,21 +417,6 @@ if (!Function.prototype.bind) {
     return fBound;
   };
 }
-
-function getInternetExplorerVersion() 
-{    
-  var rv = -1; // Return value assumes failure.   
-  if (navigator.appName == 'Microsoft Internet Explorer') 
-  {       
-   var ua = navigator.userAgent;        
-   var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");       
-   if (re.exec(ua) != null)            
-   rv = parseFloat(RegExp.$1);    
-   }    
-  return rv;
-}
-
-
 
 
 // Production steps of ECMA-262, Edition 5, 15.4.4.19

@@ -41,7 +41,7 @@ defineClass("Tmain", "core.display.Telement", {
     <p>In its original form, the pea is a giant amongst food products and a deity of the vegetable world. It is not an exaggeration to say that peas can be described as nothing less than perfect spheres of joy.</p>\
   </article>";
 
-    Talert.warn(mess, [Talert.YES, Talert.NO], null, null, null, "title", true)  ;
+    Talert.warn(mess, [Talert.OK], null, null, null, "title", true)  ;
   }
   
  
@@ -52,58 +52,149 @@ defineClass("Tmain", "core.display.Telement", {
 </head>
 <body>	
  <div class="container" role="main">
-  <div class="row">    
-    <div class="col-sm-10" >
-      
-      <h3>Simple button component</h3>  
-      <pre>&lt;div id="btn1" data-compo="app.TtestButton.html"/&gt; </pre>
-      <div id="btn1" data-compo="app.TtestButton.html">  </div> 
+  
+  <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>Simple button component</h3>  
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+              <pre>&lt;div id="btn1" data-compo="app.TtestButton.html"/&gt; </pre> 
+          </div>
+          <div class="col-sm-6" >
+              <div id="btn1" data-compo="app.TtestButton.html">  </div> 
+          </div>
+      </div>
+  </article>
+  <hr/>
 
-      <hr/>
 
-      <h3>Panel component</h3>
-      <pre>&lt;div id="panel1" data-compo="app.Tpanel.html"/&gt;</pre>
-      <div id="panel1" data-compo="app.Tpanel.html"/>  
-      <hr/>
+  <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>Panel component</h3>  
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+               <pre>&lt;div id="panel1" data-compo="app.Tpanel.html"/&gt;</pre>
+          </div>
+          <div class="col-sm-6" >
+              <div id="panel1" data-compo="app.Tpanel.html"/>  
+          </div>
+      </div>
+  </article>
+  <hr/>
 
 
-      <h3>Panel containing the simple button</h3>  
-      <pre>&lt;div id="panel2" data-compo="app.Tpanel.html"&gt;
+  <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>Panel containing the simple button</h3>  
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+               <pre>&lt;div id="panel2" data-compo="app.Tpanel.html"&gt;
   &lt;div id="btn2" data-compo="app.TtestButton.html"/&gt;
 &lt;/div&gt;</pre>
-      
-      <div id="panel2" data-compo="app.Tpanel.html">  
-        <div id="btn2" data-compo="app.TtestButton.html">  </div> 
-      </div> 
+          </div>
+          <div class="col-sm-6" >
+              <div id="panel2" data-compo="app.Tpanel.html">  
+                <div id="btn2" data-compo="app.TtestButton.html">  </div> 
+              </div> 
+          </div>
+      </div>
+  </article>
+  <hr/>
 
-      <hr/>
-      <h3>Extending Panel component</h3>
-      <pre>&lt;div id="panel3" data-compo="app.TpanelExt.html"/&gt;</pre>
-      <div id="panel3" data-compo="app.TpanelExt.html"/>  
-     
 
-      <hr/>
-      <h3>Extended Panel containing the simple button</h3>
-      <pre>&lt;div id="panel4" data-compo="app.TpanelExt.html"&gt;  
+
+  <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>Extending Panel component</h3>  
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+                <pre>&lt;div id="panel3" data-compo="app.TpanelExt.html"/&gt;</pre>
+          </div>
+          <div class="col-sm-6" >
+                <div id="panel3" data-compo="app.TpanelExt.html"/>    
+          </div>
+      </div>
+  </article>
+  <hr/>
+
+
+
+
+  <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>Extended Panel containing the simple button</h3>  
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+                <pre>&lt;div id="panel4" data-compo="app.TpanelExt.html"&gt;  
   &lt;div id="btn3" data-compo="app.TtestButton.html"/&gt;
 &lt;/div&gt;</pre>
-
-       <div id="panel4" data-compo="app.TpanelExt.html">  
-       <div id="btn3" data-compo="app.TtestButton.html"/>  </div> 
-
-
-       <hr/>
-       <h3>ui.TslideControl.html</h3>
-        <div id="slider1" data-compo="ui.TslideControl.html"/>  
-
-         <hr/>
-       <h3>ui.Talert.html</h3>
-        <button class="btn btn-success" id="btn4">Click here to show alert</button>
+          </div>
+          <div class="col-sm-6" >
+                <div id="panel4" data-compo="app.TpanelExt.html">  
+                  <div id="btn3" data-compo="app.TtestButton.html"/>  
+                </div>     
+          </div>
+      </div>
+  </article>
+  <hr/>
 
 
-        <br/><br/>
-    </div>
-  </div>
+  <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>ui.TslideControl.html</h3>
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+                <pre>&lt;div id="slider1" data-compo="ui.TslideControl.html"/&gt;</pre>
+          </div>
+          <div class="col-sm-6" >
+                <div id="slider1" data-compo="ui.TslideControl.html"/>    
+          </div>
+      </div>
+  </article>
+  <hr/>
+
+
+  <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>ui.Talert.html</h3>
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+                <pre>&lt;button class="btn btn-success" id="btn4">Click here to show alert&lt;/button&gt;</pre>
+                <p>Javascript:</p>
+                <pre>uses("ui.Talert.html");
+Talert.warn("the html to show....", [Talert.OK], null, null, null, "title", true);
+</pre>
+          </div>
+          <div class="col-sm-6" >
+                <button class="btn btn-success" id="btn4">Click here to show alert</button>  
+          </div>
+      </div>
+  </article>
+  <hr/>
+
+  <br/><br/>
+    
 </div>
 </body>
 </html>	

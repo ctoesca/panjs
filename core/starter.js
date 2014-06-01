@@ -4,7 +4,9 @@
   panjs.logger = null;
   panjs.root = {id:"root"};
   panjs.loader = null;
- 
+  panjs.iever = getIEVersion();
+
+     
   /*
     Remplacement variables panjs dans namespaces
   */
@@ -32,14 +34,8 @@
       panjs.namespaces[i].path = panjs.namespaces[i].path.replace("{version}", panjs.version);       
   }
 
-  /* 
-    Définition de la version de IE 
-  */
-  panjs.iever =-1;
-  var reg = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
-  if (reg.exec(navigator.userAgent) != null)            
-    panjs.iever = parseFloat(RegExp.$1); 
-
+ 
+ 
   /* 
     CreateCompoennt 
   */
@@ -602,7 +598,7 @@ defineClass("Tloader", "core.Tobject", {
           processData: false,
           context: this,
 
-          success: function(data, textStatus, jqXHR) {  
+          success: function(data, textStatus, jqXHR) { 
             this.onLoadFileSuccess(jqXHR, url);   
             result = {'result':true, 'data': data};   
           },
@@ -662,14 +658,22 @@ defineClass("Tloader", "core.Tobject", {
       this._count ++;
 
       path = panjs.getAbsoluteUrlFromClassPath(classPath);    
-        url = this.getUrlWithVersion(path)
+      url = this.getUrlWithVersion(path)
         
       var r = this.loadFile(url);
    
 
       if (r.result)
       {
-          var dom = getXmlDocument(r.data); 
+          try{
+            var dom = getXmlDocument(r.data);
+          }catch(err){
+            var m = "Le fichier est mal formé:\n"+err;
+            logger.error(m);
+           
+            return {result:false, message:m, className: className, classPath:classPath, url: url, path:path};
+          }
+
           var headNode = dom.getElementsByTagName("head")[0];
           var bodyNode = dom.getElementsByTagName("body")[0];
           var linkNodes = [];
@@ -706,7 +710,7 @@ defineClass("Tloader", "core.Tobject", {
               }
             }catch(err)
             {
-              var mess =  "Erreur chargement node "+nodeName+" => "+err;
+              var mess =  "Erreur chargement node <"+nodeName+"> => "+err;
               logger.error(path,mess+"\n"+err.stack);
               return {result:false, message: mess, className: className, classPath:classPath, url: url, path:path, stack:err.stack}; 
             }
@@ -1023,6 +1027,14 @@ defineClass("Tloader", "core.Tobject", {
 
 
 panjs.loader = new Tloader();
+
+/*if (panjs.iever == 8)
+{
+    var r = panjs.loader.loadFile("../extend/html5shiv.js");  
+    exec(r.data);  
+    var r = panjs.loader.loadFile("../extend/respond.min.js");  
+    exec(r.data); 
+}*/
 
 
 $(document).ready(function() 
