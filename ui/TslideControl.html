@@ -4,12 +4,12 @@
 Utilise extends/jquery.js
 -->
 
-<style type="text/less">
+<style type="text/css">
 .TslideControl
 {
 display: inline;
-
-label{
+}
+.TslideControl label{
 	display:inline; 
 	float:left; 
 	margin-top:5px; 
@@ -18,7 +18,7 @@ label{
 	padding-right:15px;
 }
 
-.slideControlContainer {
+.TslideControl .slideControlContainer {
 
 	height:10px; 
 	background: #efefef; /* Old browsers */
@@ -35,7 +35,7 @@ label{
 	margin:12px 15px 0 0;
 }
 
-.slideControlFill {
+.TslideControl .slideControlFill {
 	background: #ea5507; /* Old browsers */
 	background: -moz-linear-gradient(top, #feccb1 0%, #f17432 50%, #ea5507 51%, #fb955e 100%); /* FF3.6+ */
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#feccb1), color-stop(50%,#f17432), color-stop(51%,#ea5507), color-stop(100%,#fb955e)); /* Chrome,Safari4+ */
@@ -51,7 +51,7 @@ label{
 	overflow:visible !important;
 }
 
-.slideControlHandle {
+.TslideControl .slideControlHandle {
 	display:block; 
 	background: #ea5507; /* Old browsers */
 	background: -moz-linear-gradient(top, #feccb1 0%, #f17432 50%, #ea5507 51%, #fb955e 100%); /* FF3.6+ */
@@ -71,7 +71,7 @@ label{
 	cursor:pointer;
 }
 
-.ieShadow {
+.TslideControl .ieShadow {
 	zoom: 1;
 	filter: progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=0,strength=1), 
   progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=45,strength=1), 
@@ -85,7 +85,7 @@ label{
 	right:-4px;
 }
 
-.slideControlInput {
+.TslideControl .slideControlInput {
 	width:60px;
 	font-size:1.3em;
 
@@ -96,7 +96,7 @@ label{
 	font-weight:bold;
 }
 
-}
+
 </style>
 
 <script type="text/x-class-definition">

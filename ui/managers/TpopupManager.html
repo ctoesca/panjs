@@ -144,7 +144,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 
 	_hideMask: function()
 	{   
-		if ((iever == -1) ||(iever >= 10))
+		if ((panjs.iever == -1) ||(panjs.iever >= 10))
 		{
 			this.mask.fadeTo("fast",0, function(e){
         	this.mask.css("display", "none");
@@ -162,7 +162,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 	_showMask: function()
 	{
 		this._refreshMaskSize();  
-		if ((iever == -1) ||(iever >= 10)){
+		if ((panjs.iever == -1) ||(panjs.iever >= 10)){
         	this.mask.fadeTo("fast",0.8,function(e){}); 
 		}
     	else{

@@ -133,7 +133,7 @@ Talert.show = function(message, buttons, closeHandler, data, iconhtml, title, fa
 Talert.warn = function(message, buttons, closeHandler, data, iconhtml, title, fade)
 {
 	if (!defined(iconhtml))
-		var iconhtml = '<i class="fa fa-2x fa-warning" style="color:#f0ad4e"/>';
+		var iconhtml = '<i class="glyphicon glyphicon-exclamation-sign" style="font-size:200%; color:#f0ad4e"/>';
 
 	var _title = "Avertissement";
 	if ((typeof title != "undefined") && (title != null))
@@ -144,7 +144,7 @@ Talert.warn = function(message, buttons, closeHandler, data, iconhtml, title, fa
 Talert.info = function(message, buttons, closeHandler, data, iconhtml, title, fade)
 {
 	if (!defined(iconhtml))
-		var iconhtml = '<i class="glyphicon glyphicon-info-sign fa-2x" style="color:#428bca"/>';
+		var iconhtml = '<i class="glyphicon glyphicon-info-sign" style="font-size:200%; color:#428bca"/>';
 	
 	var _title = "Info";
 	if ((typeof title != "undefined") && (title != null))
@@ -155,7 +155,7 @@ Talert.info = function(message, buttons, closeHandler, data, iconhtml, title, fa
 Talert.error = function(message, buttons, closeHandler, data, iconhtml, title, fade)
 {
 	if (!defined(iconhtml))
-		var iconhtml = '<i class="glyphicon glyphicon-remove fa-2x" style="color:#d9534f"/>';
+		var iconhtml = '<i class="glyphicon glyphicon-remove" style="font-size:200%;color:#d9534f"/>';
 
 	var _title = "Erreur";
 	if ((typeof title != "undefined") && (title != null))
