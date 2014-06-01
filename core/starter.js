@@ -112,7 +112,7 @@
        
       }
 
-      logger.info("FIN _load"); 
+      logger.info("READY"); 
       if (typeof onReady != "undefined")
         onReady();
   }
@@ -590,7 +590,7 @@ defineClass("Tloader", "core.Tobject", {
       try{
           var result = {'result':false, 'exception': "", status: "erreur inconnue"};
         
-        logger.info("Loadfile SYNC ",url);
+        logger.debug("Loadfile SYNC ",url);
 
         jQuery.support.cors = true;
         var req = jQuery.ajax({ 
@@ -760,7 +760,7 @@ defineClass("Tloader", "core.Tobject", {
                 }
                 html = html.replace(/\\r/gi, "").replace(/\\n/gi, "").trim();
                
-                if (iever == 8)
+                if (panjs.iever == 8)
                 {
                   var div = $(html); //renvoie un html avec des balises vides correct (</div/> => <div></div>).
                   window[className].prototype.html = div[0].innerHTML;
@@ -827,7 +827,7 @@ defineClass("Tloader", "core.Tobject", {
       path = panjs.getAbsoluteUrlFromClassPath(classPath);
       if (this.loadedJs[path.toLowerCase()] == true)
       {
-        logger.info("Déjà chargé: "+path);
+        logger.debug("Déjà chargé: "+path);
         return;
       }
 
@@ -867,12 +867,12 @@ defineClass("Tloader", "core.Tobject", {
     var url = panjs.transformUrl(node.getAttribute("href"),dirPath);
     if (this.loadedCss[url.toLowerCase()] == true)
     {
-      logger.info("Déjà chargé: "+url);
+      logger.debug("Déjà chargé: "+url);
       return;
     }
     url = this.getUrlWithVersion(url);
 
-    if ((document.createStyleSheet)&&(iever == 8))
+    if ((document.createStyleSheet)&&(panjs.iever == 8))
     {   
       document.createStyleSheet(url);
 
@@ -894,9 +894,9 @@ defineClass("Tloader", "core.Tobject", {
 
       if (rel == "stylesheet/less")
       {
-        if ((iever >0)&&(iever<=8))
+        if ((panjs.iever >0)&&(panjs.iever<=8))
         {
-          logger.warn("less.js n'es pas compatible avec IE"+iever+": transformer le code less en css");
+          logger.warn("less.js n'es pas compatible avec IE"+panjs.iever+": transformer le code less en css");
         }else
         {
           if (this.lessIsLoaded())
@@ -916,7 +916,7 @@ defineClass("Tloader", "core.Tobject", {
         document.getElementsByTagName('head')[0].appendChild(link);                                 
       }
     }   
-    logger.info("Load link ASYNC: "+url);
+    logger.debug("Load link ASYNC: "+url);
     this.loadedCss[url.toLowerCase()] = true;
   },  
   addStyle: function(css, type){
@@ -928,9 +928,9 @@ defineClass("Tloader", "core.Tobject", {
     
       if (type == "text/less")
       {   
-        if ((iever >0)&&(iever<=8))
+        if ((panjs.iever >0)&&(panjs.iever<=8))
         {
-          logger.warn("less.js n'es pas compatible avec IE"+iever+": transformer le code less en css");
+          logger.warn("less.js n'es pas compatible avec IE"+panjs.iever+": transformer le code less en css");
         }else
         {
             if (this.lessIsLoaded())
@@ -1001,7 +1001,7 @@ defineClass("Tloader", "core.Tobject", {
       
       if (this.loadedJs[this.getUrlWithVersion(url).toLowerCase()] == true)
       {
-        logger.info("Déjà chargé: "+url);
+        logger.debug("Déjà chargé: "+url);
       }
       else
       {         

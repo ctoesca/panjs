@@ -1,6 +1,6 @@
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\extends\1.0.0\base.js#################
+###########  D:\github\panjs\panjs\extend\base.js#################
 ##############################################*/
 
 
@@ -501,7 +501,7 @@ function base64decode(input)
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\extends\1.0.0\jquery.js#################
+###########  D:\github\panjs\panjs\extend\jquery.js#################
 ##############################################*/
 
 
@@ -555,7 +555,7 @@ function isControlKey(evt)
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\starter.js#################
+###########  D:\github\panjs\panjs\core\starter.js#################
 ##############################################*/
 
 
@@ -672,7 +672,7 @@ function isControlKey(evt)
        
       }
 
-      logger.info("FIN _load"); 
+      logger.info("READY"); 
       if (typeof onReady != "undefined")
         onReady();
   }
@@ -1150,7 +1150,7 @@ defineClass("Tloader", "core.Tobject", {
       try{
           var result = {'result':false, 'exception': "", status: "erreur inconnue"};
         
-        logger.info("Loadfile SYNC ",url);
+        logger.debug("Loadfile SYNC ",url);
 
         jQuery.support.cors = true;
         var req = jQuery.ajax({ 
@@ -1320,7 +1320,7 @@ defineClass("Tloader", "core.Tobject", {
                 }
                 html = html.replace(/\\r/gi, "").replace(/\\n/gi, "").trim();
                
-                if (iever == 8)
+                if (panjs.iever == 8)
                 {
                   var div = $(html); //renvoie un html avec des balises vides correct (</div/> => <div></div>).
                   window[className].prototype.html = div[0].innerHTML;
@@ -1387,7 +1387,7 @@ defineClass("Tloader", "core.Tobject", {
       path = panjs.getAbsoluteUrlFromClassPath(classPath);
       if (this.loadedJs[path.toLowerCase()] == true)
       {
-        logger.info("Déjà chargé: "+path);
+        logger.debug("Déjà chargé: "+path);
         return;
       }
 
@@ -1427,12 +1427,12 @@ defineClass("Tloader", "core.Tobject", {
     var url = panjs.transformUrl(node.getAttribute("href"),dirPath);
     if (this.loadedCss[url.toLowerCase()] == true)
     {
-      logger.info("Déjà chargé: "+url);
+      logger.debug("Déjà chargé: "+url);
       return;
     }
     url = this.getUrlWithVersion(url);
 
-    if ((document.createStyleSheet)&&(iever == 8))
+    if ((document.createStyleSheet)&&(panjs.iever == 8))
     {   
       document.createStyleSheet(url);
 
@@ -1454,9 +1454,9 @@ defineClass("Tloader", "core.Tobject", {
 
       if (rel == "stylesheet/less")
       {
-        if ((iever >0)&&(iever<=8))
+        if ((panjs.iever >0)&&(panjs.iever<=8))
         {
-          logger.warn("less.js n'es pas compatible avec IE"+iever+": transformer le code less en css");
+          logger.warn("less.js n'es pas compatible avec IE"+panjs.iever+": transformer le code less en css");
         }else
         {
           if (this.lessIsLoaded())
@@ -1476,7 +1476,7 @@ defineClass("Tloader", "core.Tobject", {
         document.getElementsByTagName('head')[0].appendChild(link);                                 
       }
     }   
-    logger.info("Load link ASYNC: "+url);
+    logger.debug("Load link ASYNC: "+url);
     this.loadedCss[url.toLowerCase()] = true;
   },  
   addStyle: function(css, type){
@@ -1488,9 +1488,9 @@ defineClass("Tloader", "core.Tobject", {
     
       if (type == "text/less")
       {   
-        if ((iever >0)&&(iever<=8))
+        if ((panjs.iever >0)&&(panjs.iever<=8))
         {
-          logger.warn("less.js n'es pas compatible avec IE"+iever+": transformer le code less en css");
+          logger.warn("less.js n'es pas compatible avec IE"+panjs.iever+": transformer le code less en css");
         }else
         {
             if (this.lessIsLoaded())
@@ -1561,7 +1561,7 @@ defineClass("Tloader", "core.Tobject", {
       
       if (this.loadedJs[this.getUrlWithVersion(url).toLowerCase()] == true)
       {
-        logger.info("Déjà chargé: "+url);
+        logger.debug("Déjà chargé: "+url);
       }
       else
       {         
@@ -1592,7 +1592,7 @@ $(document).ready(function()
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\events\Tevent.js#################
+###########  D:\github\panjs\panjs\core\events\Tevent.js#################
 ##############################################*/
 
 /*
@@ -1615,9 +1615,9 @@ defineClass("Tevent", "core.Tobject",
 
 	constructor: function(type, eventData, bubbles, cancelable){
 		this.injectParam("type", type,true);
-	    this.injectParam("data", eventData);
-	    this.injectParam("bubbles", bubbles);
-	    this.injectParam("cancelable", cancelable);     
+		this.injectParam("data", eventData);
+		this.injectParam("bubbles", bubbles);
+		this.injectParam("cancelable", cancelable);     
 	},
 	preventDefault: function()
 	{
@@ -1656,7 +1656,7 @@ Tevent.WAITING = "WAITING";
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\events\TeventDispatcher.js#################
+###########  D:\github\panjs\panjs\core\events\TeventDispatcher.js#################
 ##############################################*/
 
 /*
@@ -1777,7 +1777,7 @@ defineClass("TeventDispatcher", "core.Tobject", {
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\managers\Trouter.js#################
+###########  D:\github\panjs\panjs\core\managers\Trouter.js#################
 ##############################################*/
 
 
@@ -1950,7 +1950,7 @@ panjs.router = new Trouter();
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\display\TproxyDisplayObject.js#################
+###########  D:\github\panjs\panjs\core\display\TproxyDisplayObject.js#################
 ##############################################*/
 
 
@@ -2025,7 +2025,7 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\collections\TarrayCollection.js#################
+###########  D:\github\panjs\panjs\core\collections\TarrayCollection.js#################
 ##############################################*/
 
 
@@ -2223,7 +2223,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\display\TdisplayObject.js#################
+###########  D:\github\panjs\panjs\core\display\TdisplayObject.js#################
 ##############################################*/
 
 
@@ -2375,7 +2375,7 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\display\TdisplayObjectContainer.js#################
+###########  D:\github\panjs\panjs\core\display\TdisplayObjectContainer.js#################
 ##############################################*/
 
 /*
@@ -2703,10 +2703,10 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 				{
 					
 					var text = "";
-					if (iever == -1 )
+					if (panjs.iever == -1 )
 						text = el.textContent;
 					else
-						if (iever <=8)
+						if (panjs.iever <=8)
 							text = el.text.droite("<!--").gauche("-->").trim();
 
 					text = text.toUpperCase();
@@ -2736,7 +2736,7 @@ TdisplayObjectContainer._listeIdElements = [];
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\display\Telement.js#################
+###########  D:\github\panjs\panjs\core\display\Telement.js#################
 ##############################################*/
 
 /*
@@ -2883,7 +2883,7 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 
 
 /*##############################################
-###########  C:\nexilearn\production\apache\portails\cdn\libs\panjs\0.5\core\http\TrestClient.js#################
+###########  D:\github\panjs\panjs\core\http\TrestClient.js#################
 ##############################################*/
 
 /*** 

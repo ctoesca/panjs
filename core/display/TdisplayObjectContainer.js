@@ -323,10 +323,10 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 				{
 					
 					var text = "";
-					if (iever == -1 )
+					if (panjs.iever == -1 )
 						text = el.textContent;
 					else
-						if (iever <=8)
+						if (panjs.iever <=8)
 							text = el.text.droite("<!--").gauche("-->").trim();
 
 					text = text.toUpperCase();

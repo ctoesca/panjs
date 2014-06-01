@@ -1,0 +1,58 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+ <head>  
+ <title>panjs - Examples</title>
+ 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link rel="shortcut icon" href="favicon.png"/>
+    <META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="en-EN,en"/>
+  
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    
+    <script>
+//<![CDATA[  
+
+      var panjs = {
+        logLevel: "INFO",
+        env: "prod", // dev or prod
+        appVersion: "0.1", //utilisé dans l'url des commposants htm, js et css (pas de cache si nouvelle version)
+        version: "0.5", //version de panjs
+        
+        namespaces:[
+        {name: "core", path: "../core"},
+        {name: "ui", path: "../ui"},
+        {name: "app", path: "components"}      
+        ]
+      };
+     
+      $(document).ready(function() 
+      {
+        logger.debug("READY");
+        panjs.load($(document.body));           
+      });
+
+//]]>
+</script>
+
+  <script src="../core/panjs_core.min.js"></script>
+
+</head>
+<body>
+
+<div id="mainView" data-compo="app.Tmain.html">  </div> 
+
+</body>
+
+
+</html>
+
+
+
+
+
+   

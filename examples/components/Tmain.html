@@ -1,0 +1,79 @@
+﻿<html>        
+  <head>
+    <style type="text/css">
+        
+        .Tmain a:visited, a:focus, a:active, a:hover, button{
+          outline:0 none !important;
+          cursor:pointer;
+        }
+        .Tmain input{
+          outline:0 none !important;
+        }
+     
+    </style>
+
+    <script type="text/x-class-definition">
+
+//<![CDATA[      
+
+defineClass("Tmain", "core.display.Telement", { 
+
+	baseElement: "div",	
+
+  	constructor: function(args){
+    	this._super.constructor.call(this,args);  
+ 	},
+
+ 
+});
+//]]>
+</script>
+
+</head>
+<body>	
+ <div class="container" role="main">
+  <div class="row">    
+    <div class="col-sm-10" >
+      
+      <h3>Simple button component</h3>  
+      <pre>&lt;div id="btn1" data-compo="app.TtestButton.html"/&gt; </pre>
+      <div id="btn1" data-compo="app.TtestButton.html">  </div> 
+
+      <hr/>
+
+      <h3>Panel component</h3>
+      <pre>&lt;div id="panel1" data-compo="app.Tpanel.html"/&gt;</pre>
+      <div id="panel1" data-compo="app.Tpanel.html"/>  
+      <hr/>
+
+
+      <h3>Panel containing the simple button</h3>  
+      <pre>&lt;div id="panel2" data-compo="app.Tpanel.html"&gt;
+  &lt;div id="btn2" data-compo="app.TtestButton.html"/&gt;
+&lt;/div&gt;</pre>
+      
+      <div id="panel2" data-compo="app.Tpanel.html">  
+        <div id="btn2" data-compo="app.TtestButton.html">  </div> 
+      </div> 
+
+      <hr/>
+      <h3>Extending Panel component</h3>
+      <pre>&lt;div id="panel3" data-compo="app.TpanelExt.html"/&gt;</pre>
+      <div id="panel3" data-compo="app.TpanelExt.html"/>  
+     
+
+      <hr/>
+      <h3>Extended Panel containing the simple button</h3>
+      <pre>&lt;div id="panel4" data-compo="app.TpanelExt.html"&gt;  
+  &lt;div id="btn3" data-compo="app.TtestButton.html"/&gt;
+&lt;/div&gt;</pre>
+
+       <div id="panel4" data-compo="app.TpanelExt.html">  
+       <div id="btn3" data-compo="app.TtestButton.html"/>  </div> 
+
+
+    </div>
+  </div>
+</div>
+</body>
+</html>	
