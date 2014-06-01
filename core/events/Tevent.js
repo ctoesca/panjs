@@ -18,9 +18,9 @@ defineClass("Tevent", "core.Tobject",
 
 	constructor: function(type, eventData, bubbles, cancelable){
 		this.injectParam("type", type,true);
-	    this.injectParam("data", eventData);
-	    this.injectParam("bubbles", bubbles);
-	    this.injectParam("cancelable", cancelable);     
+		this.injectParam("data", eventData);
+		this.injectParam("bubbles", bubbles);
+		this.injectParam("cancelable", cancelable);     
 	},
 	preventDefault: function()
 	{
