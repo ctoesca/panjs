@@ -1,7 +1,7 @@
 <h2>panJS v0.6.0 <small>- a 35ko component framework</small></h2>
 
-<p>panJs is a javascript framework that uses Jquery and allows you to create application easily, by making components.
-<br/>You can integrate panJS in a existing application (only parts of the application can be managed by panJs
+<p>panJs is a javascript framework that uses Jquery and allows you to create application easily, by making resusable components.
+<br/>You can integrate panJS in a existing application (only parts of the application can be managed by panJs).
 </p>
 
 <h3>Some features:</h3>
