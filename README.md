@@ -33,7 +33,43 @@
 
 <pre>&lt;div data-compo="app.myComponent.html"/&gt;</pre>
 
+<p>myComponent.html:</p>
+<pre>
+&lt;html&gt; 
 
+  &lt;head&gt;
+    &lt;style type="text/css"&gt;
+    .TmyComponent .result
+    {
+      font-weight: bold;           
+      color: #428bca
+    }   
+    &lt;/style&gt;
+
+    &lt;script type="text/x-class-definition"&gt;
+    //&lt;![CDATA[      
+    defineClass("TmyComponent", "core.display.Telement", { 
+       baseElement: "div",	
+       clickCount:0,
+       constructor: function(args){
+    	    this._super.constructor.call(this,args);  
+    	    this.btnSubmit.on("click", this.onSubmit.bind(this));
+       },
+       onSubmit: function(){
+          this.clickCount ++;
+          this.result.html("You have clicked "+this.clickCount+" times");
+       }
+    });
+    //]]&gt;
+    &lt;/script&gt;
+  &lt;/head&gt;
+  
+  &lt;body&gt;
+     &lt;button type="submit" id="btnSubmit" class="btn btn-danger"&gt;Click here&lt;/button&gt;
+     &lt;span id="result" class="result"&gt;&lt;/span&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
 
 <h3>Getting started</h3>
 
