@@ -697,6 +697,7 @@ defineClass("Tloader", "core.Tobject", {
               if ( nodeName == "script")
               { 
                 try{  
+                  
                   this.addScriptNode(node, dirPath, className); 
                 }catch(err)
                 {
