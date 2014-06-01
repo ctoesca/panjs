@@ -23,7 +23,7 @@
 
     return mess;
   };
-  
+   
 
   /*
     Remplacement variables panjs dans namespaces
@@ -56,14 +56,15 @@
     CreateCompoennt 
   */
   panjs.createComponent = function(classPath, args)
-  {  
+  { 
     var className = panjs.getClassNameFromClassPath(classPath);
-    
+   
     if (typeof window[className] == "undefined")
     {
       var r = panjs.loader.usesComponent(classPath);
       if (!r.result) 
       {        
+
           uses("core.display.TerrorElement.html");
           var object = new TerrorElement(r);
           return object;
@@ -72,7 +73,8 @@
     }
     try{
       var object = new window[className](args);
-    }catch(err){
+    }catch(err){ 
+       logger.error("Error while instantiating "+className+": "+err);
        uses("core.display.TerrorElement.html");
        var object = new TerrorElement({message: err, path:r.path,url:r.url, className:className});
     }
@@ -661,15 +663,15 @@ defineClass("Tloader", "core.Tobject", {
       }
       
       this._count ++;
-
+ 
       path = panjs.getAbsoluteUrlFromClassPath(classPath);    
       url = this.getUrlWithVersion(path)
-        
+       
       var r = this.loadFile(url);
    
 
       if (r.result)
-      {
+      { 
           try{
             var dom = getXmlDocument(r.data);
           }catch(err){
@@ -817,7 +819,7 @@ defineClass("Tloader", "core.Tobject", {
         logger.info(h," USES ",classPath, h);
 
       path = panjs.getAbsoluteUrlFromClassPath(classPath);
-      if (this.loadedJs[path.toLowerCase()] == true)
+      if (this.loadedJs[path.toLowerCase()])
         return true;
 
       this._count ++;
@@ -855,7 +857,7 @@ defineClass("Tloader", "core.Tobject", {
   addLinkNode: function(node,dirPath)
   {     
     var url = panjs.transformUrl(node.getAttribute("href"),dirPath);
-    if (this.loadedCss[url.toLowerCase()] == true)
+    if (this.loadedCss[url.toLowerCase()])
     {
       return true;
     }
@@ -979,8 +981,10 @@ defineClass("Tloader", "core.Tobject", {
     else
     {      
       var url = panjs.transformUrl(node.getAttribute("src"),dirPath);
+
       url = this.getUrlWithVersion(url);
-      if (this.loadedJs[url.toLowerCase()] == false)
+
+      if (!this.loadedJs[url.toLowerCase()])
       {         
         var r = this.loadFile(url);
         if ((className != null) && (node.getAttribute("type") == "text/x-class-definition"))
