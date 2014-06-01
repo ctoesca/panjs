@@ -124,10 +124,10 @@ defineClass("TslideControl", "core.display.Telement", {
 	
 		this._refreshSizeData();
 			
-		if (getInternetExplorerVersion() < 9 && getInternetExplorerVersion() > -1) 
+		if (panjs.iever < 9 && panjs.iever > -1) 
 			this.slideControlHandle.addClass('ieShadow');
 			
-		if (getInternetExplorerVersion() != -1)
+		if (panjs.iever != -1)
 			this.input.css("padding-top", "3px");
 
 		this.setValue(this._value, false, true);

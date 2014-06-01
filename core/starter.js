@@ -5,8 +5,26 @@
   panjs.root = {id:"root"};
   panjs.loader = null;
   panjs.iever = getIEVersion();
+ 
+  panjs.messages = {
+    CLASSNAME_MATCHS_FILENAME: "The name of the class (%1) must match the file name %2 (case sensitive)",
+    LESS_IE8: "less.js is not fully compatible with IE%1 : transform less code in css",
+    LESS_NOT_LOADED: "LESS not loaded. Use panjs_core_with_less.min.js or load LESS (before panJs)"
+  };
 
-     
+  panjs.getMessage  = function(mess) {
+
+    for (var i=1; i<arguments.length; i++){
+
+      var a = arguments[i]; 
+      if (a == null) a = 'null';
+      mess = mess.replace("%"+i, a);
+    }
+
+    return mess;
+  };
+  
+
   /*
     Remplacement variables panjs dans namespaces
   */
@@ -33,8 +51,6 @@
     if (typeof( panjs.namespaces[i]) != "undefined")
       panjs.namespaces[i].path = panjs.namespaces[i].path.replace("{version}", panjs.version);       
   }
-
- 
  
   /* 
     CreateCompoennt 
@@ -75,7 +91,7 @@
   panjs.load = function(element)
   {     
       if (arguments.length == 0)
-        element = $(document.body);
+        var element = $(document.body);
       
       var compolist = element.getElements("[data-compo]");
 
@@ -253,25 +269,16 @@ var Tobject = {
             */
             //}
            
-
             var proto = Object.create(superProto, def);
-
-
-
-
             var constr = proto.constructor;
 
-            if (!(constr instanceof Function)) {
+            if (!(constr instanceof Function)) 
               throw new Error("You must define a method 'constructor'");
-            }
-            // Set up the constructor
-            constr.prototype = proto;
-        
-            constr.prototype.parentClassName = parentClassName;
            
+            constr.prototype = proto;
+            constr.prototype.parentClassName = parentClassName;       
             constr._super = superProto;
             constr.extend = this.extend; // inherit class method
- 
         }
         else
         {
@@ -320,7 +327,7 @@ var Tobject = {
         }
     		else{
     			if ((typeof mandatory != "undefined") && (mandatory == true))
-    			 throw "Le paramètre "+name+" n'a pas de valeur pas défaut sur object "+this.className;
+    			 throw "The "+name+" argument has no default value on "+this.className;
     			else
             return false;
         }
@@ -355,7 +362,7 @@ function defineClass(className, inheritsFromClassPath, def)
     if (typeof window[classe] == "undefined")
     {
           if (logger)
-      logger.error("Impossible d'hériter de "+inheritsFromClassPath+": CLASSE NON CHARGEE");
+      logger.error("Unable to inherit from "+inheritsFromClassPath+": class is not loaded");
 
       return null;
     }
@@ -382,41 +389,41 @@ Inclu ici car loader a besoin du logger.
 ***/
 
 defineClass("Tlogger", "core.Tobject", {
-	_severity: null,
+	_level: null,
 	name: "MAIN",
-  	creationDate: null,
-  	active: true,
-  	_currentGroup: 0,
-  	_tabulation: "",
+  creationDate: null,
+  active: true,
+  _currentGroup: 0,
+  _tabulation: "",
 	tab: [],
 
 	constructor: function(args) {
 
-		  this.injectParam("_severity", args.severity,false, Tlogger.INFO);
+		  this.injectParam("_level", args.level,false, Tlogger.INFO);
 		  this.injectParam("name", args.name,false);
     	this.creationDate = new Date().getTime();
 
            
-		  this.setSeverity(this._severity);
+		  this.setLevel(this._level);
     
       this.active = (typeof console != "undefined");
     	this.razTime();
 
-  		this.info("Init logger SEVERITY=",this.getSeverityName());
+  		this.info("Init logger LEVEL=",this.getLevelName());
   	},
     razTime: function()
     {
         this.creationDate = new Date();
     },
-  	getSeverityName:function()
+  	getLevelName:function()
   	{
-  		if (this._severity == Tlogger.DEBUG)
+  		if (this._level == Tlogger.DEBUG)
   			return "DEBUG";
-  		if (this._severity == Tlogger.INFO)
+  		if (this._level == Tlogger.INFO)
   			return "INFO";
-      if (this._severity == Tlogger.WARN)
+      if (this._level == Tlogger.WARN)
         return "WARN";
-  		if (this._severity == Tlogger.ERROR)
+  		if (this._level == Tlogger.ERROR)
   			return "ERROR";
   	},
  	groupStart: function()
@@ -425,7 +432,6 @@ defineClass("Tlogger", "core.Tobject", {
  		{
  			this._currentGroup ++;
  			this._calcTabultation();
- 			//console.group();	
  		}
  	},
  	groupEnd: function()
@@ -434,7 +440,6 @@ defineClass("Tlogger", "core.Tobject", {
  		{
  			this._currentGroup --;
  			this._calcTabultation();
- 			//console.groupEnd();	
  		}
  	},
  	_calcTabultation: function()
@@ -450,7 +455,7 @@ defineClass("Tlogger", "core.Tobject", {
     },
   	_debug: function()
   	{
-      //bizarrement, console.debuf n'existe pas sur IE9  mais si on log en console.info, ça sort en debug dans la console
+      //bizarrement, console.debug n'existe pas sur IE9  mais si on log en console.info, ça sort en debug dans la console
       // console.log sort en INFO dans la console dans tous les cas.
       if (this.active)
   		if (console.debug)
@@ -490,9 +495,9 @@ defineClass("Tlogger", "core.Tobject", {
       return t+" - " +sev+"\t"+this._tabulation+r;
     },
 
-  	setSeverity: function(value)
+  	setLevel: function(value)
   	{
-  		this._severity = value;
+  		this._level = value;
 
   		this.debug = this._debug;
   		this.info = this._info;
@@ -515,15 +520,14 @@ Tlogger.INFO = 20;
 Tlogger.WARN = 25;
 Tlogger.ERROR = 30;
 
-//loader a besoin de logger.
-panjs.logger = new Tlogger({severity: Tlogger[panjs.logLevel], name:"main"});
+//loader needs logger.
+panjs.logger = new Tlogger({level: Tlogger[panjs.logLevel], name:"main"});
 logger = panjs.logger;
 
 
 
 /*** 
-Tloader: classe qui permet de charger d'autres classes ou composants
-en synchrone. 
+Tloader: loads other classes or components (synchronous)
 ***/
 
 defineClass("Tloader", "core.Tobject", {
@@ -549,7 +553,7 @@ defineClass("Tloader", "core.Tobject", {
     
     getClassPathDir: function(classPath){
 
-        /* renvoie:
+        /* returns:
         http://.../.../.../
         app.components.
         */
@@ -571,9 +575,11 @@ defineClass("Tloader", "core.Tobject", {
     {
 
     if (url.contains("?") == false)
-      url = url+"?version="+panjs.appVersion;
+      url += "?";
     else
-      url = url+"&version="+panjs.appVersion;
+      url += "&";
+
+    url += "v="+panjs.appVersion;
 
     if (panjs.env == "dev")
       url=url+"&rid="+Math.random();
@@ -584,7 +590,7 @@ defineClass("Tloader", "core.Tobject", {
     { 
           
       try{
-          var result = {'result':false, 'exception': "", status: "erreur inconnue"};
+        var result = {'result':false, 'exception': "", status: "erreur inconnue"};
         
         logger.debug("Loadfile SYNC ",url);
 
@@ -622,21 +628,20 @@ defineClass("Tloader", "core.Tobject", {
 
     onLoadFileSuccess: function(jqxhr, path)
     {
-      //alert("OK "+path);
     },
   onLoadFileError: function(jqXHR, settings, exception, path)
     {
       logger.error("Echec chargement "+path+": "+exception);
-    //alert(exception+": "+path);
     },
 
     usesComponent: function(classPath)
   {
-    var h = " ************ ";
     /*
-    Chargement du fichier HTML comportant de l'HTML et du javascript
+    Loads HTML file
     */
-//logger.debug("usesComponent "+classPath);
+
+    var h = " ************ ";
+
     var className = panjs.getClassNameFromClassPath(classPath);
   
     var url = null;
@@ -644,7 +649,7 @@ defineClass("Tloader", "core.Tobject", {
 
     if (this._count > this.maxImbrications)
     {
-      return {result:false, message:"Trop de composants imbriqués (max: "+this.maxImbrications+")", className: className, classPath:classPath, url: url, path:path};
+      return {result:false, message:"Too much nested components (max: "+this.maxImbrications+")", className: className, classPath:classPath, url: url, path:path};
     }
 
     if (typeof window[className] == "undefined")
@@ -668,10 +673,8 @@ defineClass("Tloader", "core.Tobject", {
           try{
             var dom = getXmlDocument(r.data);
           }catch(err){
-            var m = "Le fichier est mal formé:\n"+err;
-            logger.error(m);
-           
-            return {result:false, message:m, className: className, classPath:classPath, url: url, path:path};
+            logger.error(err);         
+            return {result:false, message:err, className: className, classPath:classPath, url: url, path:path};
           }
 
           var headNode = dom.getElementsByTagName("head")[0];
@@ -691,36 +694,33 @@ defineClass("Tloader", "core.Tobject", {
             doit "ecraser" les styles des classes parentes.
             */
 
-            try{
-
               if ( nodeName == "script")
-              {   
-                this.addScriptNode(node, dirPath, className); 
-                //if (logger)
-                 // logger.debug("typeof panjs["+className+"] = " + typeof panjs[className]);
+              { 
+                try{  
+                  this.addScriptNode(node, dirPath, className); 
+                }catch(err)
+                {
+                  var mess =  "Error processing <"+nodeName+"> => "+err;
+                  logger.error(path,mess);
+                  return {result:false, message: mess, className: className, classPath:classPath, url: url, path:path, stack:err.stack}; 
+                }
 
               }
               else
               {
                 if (nodeName == "link")   
                   linkNodes.push(node)
-              else
-                if (nodeName == "style")
+                else if (nodeName == "style")
                   styleNodes.push(node);  
               }
-            }catch(err)
-            {
-              var mess =  "Erreur chargement node <"+nodeName+"> => "+err;
-              logger.error(path,mess+"\n"+err.stack);
-              return {result:false, message: mess, className: className, classPath:classPath, url: url, path:path, stack:err.stack}; 
-            }
+
           }
 
           if (typeof window[className] == "undefined")
           {
-            var mess = "La class "+classPath+ " ne s'est pas chargée. ";
+            var mess = classPath+ " class has not been loaded. ";
             if (panjs.lastDefinedClassName != className)
-             mess += "\nLe nom de la classe ("+panjs.lastDefinedClassName+") doit correspondre avec le nom du fichier "+path+" (respectez la casse)";
+             mess += "\n"+panjs.getMessage(panjs.messages.CLASSNAME_MATCHS_FILENAME, panjs.lastDefinedClassName, path);
 
             logger.error(mess);
             return {result:false, message: mess, className: className, classPath:classPath, url: url, path:path, stack:null}; 
@@ -744,33 +744,21 @@ defineClass("Tloader", "core.Tobject", {
                 var parentClassName = window[className].prototype.parentClassName;
                 
                 if (defined(window[parentClassName].prototype.html))
-                {
-
-                 
+                {          
                   html = window[parentClassName].prototype.html.replace( '<!--CONTENT-->', html);
-               
-                
-
-                 // html = html.replace("</content>","");
-                  html = html.replace(/<body>/gi, "");
-                  html = html.replace(/<\/body>/gi, "");
-                  html = "<div>"+html+"</div>";
-
+                  html = "<div>"+html.replace(/<body>/gi, "").replace(/<\/body>/gi, "")+"</div>";
                 }
                 else
                 {
-                  html = html.replace(/<body>/gi, "<div>");
-                  html = html.replace(/<\/body>/gi, "</div>");
+                  html = html.replace(/<body>/gi, "<div>").replace(/<\/body>/gi, "</div>");
                 }
+
                 html = html.replace(/\\r/gi, "").replace(/\\n/gi, "").trim();
-               
+                
+                window[className].prototype.html = html;
+
                 if (panjs.iever == 8)
-                {
-                  var div = $(html); //renvoie un html avec des balises vides correct (</div/> => <div></div>).
-                  window[className].prototype.html = div[0].innerHTML;
-                }else{
-                  window[className].prototype.html = html;
-                }
+                  window[className].prototype.html = $(html)[0].innerHTML; //correct HTML for IE8 (</div/> => <div></div>).
 
                 window[className].prototype.bodyNode = bodyNode;
             }
@@ -779,12 +767,10 @@ defineClass("Tloader", "core.Tobject", {
               return {result:false, message:e.message, className: className, classPath:classPath, url: url, path:path};
             }
           }
-          else
-          {
-            /*
-            html et bodyNode sont hérités
-            */
-          }
+          /*else
+          {         
+            //html et bodyNode are inherited            
+          }*/
           
           window[className].prototype.classPath = classPath;  
           window[className].prototype.classPathDir = this.getClassPathDir(classPath);
@@ -803,7 +789,7 @@ defineClass("Tloader", "core.Tobject", {
       }
       else
       {
-        var mess = "Echec chargement "+classPath+": "+ r.status;
+        var mess = "Error loading "+classPath+": "+ r.status;
         logger.warn(mess);
         this._count --;
         logger.groupEnd();
@@ -811,7 +797,8 @@ defineClass("Tloader", "core.Tobject", {
       }
       
     }
-    return  {result:true, message:"Déjà chargé", className: className, classPath:classPath, url: url, path:path}; 
+
+    return  {result:true, message:"Already loaded", className: className, classPath:classPath, url: url, path:path}; 
     
   },
 
@@ -830,10 +817,7 @@ defineClass("Tloader", "core.Tobject", {
 
       path = panjs.getAbsoluteUrlFromClassPath(classPath);
       if (this.loadedJs[path.toLowerCase()] == true)
-      {
-        logger.debug("Déjà chargé: "+path);
-        return;
-      }
+        return true;
 
       this._count ++;
 
@@ -862,6 +846,7 @@ defineClass("Tloader", "core.Tobject", {
         logger.debug(h," END USES ",classPath,h);     
 
       logger.groupEnd();
+      return true;
     }
     
     },
@@ -871,15 +856,13 @@ defineClass("Tloader", "core.Tobject", {
     var url = panjs.transformUrl(node.getAttribute("href"),dirPath);
     if (this.loadedCss[url.toLowerCase()] == true)
     {
-      logger.debug("Déjà chargé: "+url);
-      return;
+      return true;
     }
     url = this.getUrlWithVersion(url);
 
     if ((document.createStyleSheet)&&(panjs.iever == 8))
     {   
       document.createStyleSheet(url);
-
     }
     else
     {   
@@ -900,7 +883,7 @@ defineClass("Tloader", "core.Tobject", {
       {
         if ((panjs.iever >0)&&(panjs.iever<=8))
         {
-          logger.warn("less.js n'es pas compatible avec IE"+panjs.iever+": transformer le code less en css");
+          logger.warn( panjs.getMessage(panjs.messages.LESS_IE8, panjs.iever));
         }else
         {
           if (this.lessIsLoaded())
@@ -911,7 +894,7 @@ defineClass("Tloader", "core.Tobject", {
           }
           else
           {
-            logger.warn("LESS non chargé. Utilisez panjs_core_with_less.min.js ou bien chargez LESS avant panJs");
+            logger.warn( panjs.getMessage(panjs.messages.LESS_NOT_LOADED));
           }
         }
       }
@@ -920,8 +903,9 @@ defineClass("Tloader", "core.Tobject", {
         document.getElementsByTagName('head')[0].appendChild(link);                                 
       }
     }   
-    logger.debug("Load link ASYNC: "+url);
+    logger.debug("Load <link> ASYNC: "+url);
     this.loadedCss[url.toLowerCase()] = true;
+    return true;
   },  
   addStyle: function(css, type){
 
@@ -934,7 +918,7 @@ defineClass("Tloader", "core.Tobject", {
       {   
         if ((panjs.iever >0)&&(panjs.iever<=8))
         {
-          logger.warn("less.js n'es pas compatible avec IE"+panjs.iever+": transformer le code less en css");
+          logger.warn( panjs.getMessage(panjs.messages.LESS_IE8, panjs.iever));
         }else
         {
             if (this.lessIsLoaded())
@@ -944,7 +928,8 @@ defineClass("Tloader", "core.Tobject", {
             }
             else
             {
-              logger.warn("LESS non chargé. Utilisez panjs_core_with_less.min.js ou bien chargez LESS avant panJs");
+              logger.warn( panjs.getMessage(panjs.messages.LESS_NOT_LOADED));
+           
             }
         }
          
@@ -966,16 +951,8 @@ defineClass("Tloader", "core.Tobject", {
   {
     /*
       Remplace this._super par className._super
-    */
-    
-    var r = code;
-    if (code.indexOf("this._super") == 1 )
-      r = r.replace("this._super", className+"._super")
-    else
-      r = r.replace(/this._super/g, className+"._super");   
-
-
-    return r;
+    */  
+    return code.replace(/this._super/g, className+"._super");   
   },
 
   addScriptNode: function(node, dirPath, className)
@@ -992,7 +969,7 @@ defineClass("Tloader", "core.Tobject", {
       else
       {
         if (className != null)  
-          logger.warn("type=\"text/x-class-definition\" n'a pas été mis sur sur élément <script> de "+className);
+          logger.warn("type=\"text/x-class-definition\" doesn't exist on <script> ("+className+")");
       }
       
       exec(script);
@@ -1001,27 +978,19 @@ defineClass("Tloader", "core.Tobject", {
     else
     {      
       var url = panjs.transformUrl(node.getAttribute("src"),dirPath);
-      
-      if (this.loadedJs[this.getUrlWithVersion(url).toLowerCase()] == true)
-      {
-        logger.debug("Déjà chargé: "+url);
-      }
-      else
+      url = this.getUrlWithVersion(url);
+      if (this.loadedJs[url.toLowerCase()] == false)
       {         
-        var r = this.loadFile(this.getUrlWithVersion(url));
+        var r = this.loadFile(url);
         if ((className != null) && (node.getAttribute("type") == "text/x-class-definition"))
           r.data = this.processCode(r.data, className)
 
         exec(r.data);
       }
-    }  
+    } 
+    return true;
   }   
 
 });
 
 panjs.loader = new Tloader();
-
-$(document).ready(function() 
-{
-
-});

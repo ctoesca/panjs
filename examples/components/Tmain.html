@@ -61,10 +61,10 @@ defineClass("Tmain", "core.display.Telement", {
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-              <pre>&lt;div id="btn1" data-compo="app.TtestButton.html"/&gt; </pre> 
+              <pre>&lt;div data-compo="app.TtestButton.html"/&gt; </pre> 
           </div>
           <div class="col-sm-6" >
-              <div id="btn1" data-compo="app.TtestButton.html">  </div> 
+              <div data-compo="app.TtestButton.html">  </div> 
           </div>
       </div>
   </article>
@@ -79,10 +79,10 @@ defineClass("Tmain", "core.display.Telement", {
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-               <pre>&lt;div id="panel1" data-compo="app.Tpanel.html"/&gt;</pre>
+               <pre>&lt;div data-compo="app.Tpanel.html"/&gt;</pre>
           </div>
           <div class="col-sm-6" >
-              <div id="panel1" data-compo="app.Tpanel.html"/>  
+              <div data-compo="app.Tpanel.html"/>  
           </div>
       </div>
   </article>
@@ -97,13 +97,13 @@ defineClass("Tmain", "core.display.Telement", {
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-               <pre>&lt;div id="panel2" data-compo="app.Tpanel.html"&gt;
-  &lt;div id="btn2" data-compo="app.TtestButton.html"/&gt;
+               <pre>&lt;div data-compo="app.Tpanel.html"&gt;
+  &lt;div data-compo="app.TtestButton.html"/&gt;
 &lt;/div&gt;</pre>
           </div>
           <div class="col-sm-6" >
-              <div id="panel2" data-compo="app.Tpanel.html">  
-                <div id="btn2" data-compo="app.TtestButton.html">  </div> 
+              <div data-compo="app.Tpanel.html">  
+                <div data-compo="app.TtestButton.html">  </div> 
               </div> 
           </div>
       </div>
@@ -120,10 +120,10 @@ defineClass("Tmain", "core.display.Telement", {
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-                <pre>&lt;div id="panel3" data-compo="app.TpanelExt.html"/&gt;</pre>
+                <pre>&lt;div data-compo="app.TpanelExt.html"/&gt;</pre>
           </div>
           <div class="col-sm-6" >
-                <div id="panel3" data-compo="app.TpanelExt.html"/>    
+                <div data-compo="app.TpanelExt.html"/>    
           </div>
       </div>
   </article>
@@ -140,13 +140,13 @@ defineClass("Tmain", "core.display.Telement", {
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-                <pre>&lt;div id="panel4" data-compo="app.TpanelExt.html"&gt;  
-  &lt;div id="btn3" data-compo="app.TtestButton.html"/&gt;
+                <pre>&lt;div data-compo="app.TpanelExt.html"&gt;  
+  &lt;div data-compo="app.TtestButton.html"/&gt;
 &lt;/div&gt;</pre>
           </div>
           <div class="col-sm-6" >
-                <div id="panel4" data-compo="app.TpanelExt.html">  
-                  <div id="btn3" data-compo="app.TtestButton.html"/>  
+                <div data-compo="app.TpanelExt.html">  
+                  <div data-compo="app.TtestButton.html"/>  
                 </div>     
           </div>
       </div>
@@ -170,6 +170,60 @@ defineClass("Tmain", "core.display.Telement", {
       </div>
   </article>
   <hr/>
+
+
+ <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>Component with malformed HTML</h3>
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+                <pre>&lt;div data-compo="app.ThtmlErrorComponent.html"/&gt;</pre>
+          </div>
+          <div class="col-sm-6" >
+                <div data-compo="app.ThtmlErrorComponent.html"/>    
+          </div>
+      </div>
+  </article>
+  <hr/>
+
+
+ <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>Component with javascript syntax error</h3>
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+                <pre>&lt;div data-compo="app.TjsErrorComponent.html"/&gt;</pre>
+          </div>
+          <div class="col-sm-6" >
+                <div data-compo="app.TjsErrorComponent.html"/>    
+          </div>
+      </div>
+  </article>
+  <hr/>
+
+ <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>Component with javascript runtime error</h3>
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+                <pre>&lt;div data-compo="app.TruntimeErrorComponent.html"/&gt;</pre>
+          </div>
+          <div class="col-sm-6" >
+                <div data-compo="app.TruntimeErrorComponent.html"/>    
+          </div>
+      </div>
+  </article>
+  <hr/>
+
 
 
   <article>

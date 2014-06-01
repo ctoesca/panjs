@@ -1,0 +1,33 @@
+﻿<html>        
+  <head>
+    <style type="text/css">
+      .TruntimeErrorComponent .result
+      {  
+          font-weight: bold;
+      }
+    </style>
+
+    <script type="text/x-class-definition">
+
+//<![CDATA[      
+
+defineClass("TruntimeErrorComponent", "core.display.Telement", { 
+
+	baseElement: "div",	
+  	
+
+  	constructor: function(args){
+    	this._super.constructor.call(this,args);  
+      var a = b * 10;
+     
+ 	}
+
+});
+//]]>
+</script>
+
+</head>
+<body>
+    <div>this component contains a runtime error in javascript</div>
+</body>
+</html>	
