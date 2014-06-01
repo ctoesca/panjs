@@ -999,8 +999,7 @@ defineClass("Tloader", "core.Tobject", {
 
     }
     else
-    { 
-      
+    {      
       var url = panjs.transformUrl(node.getAttribute("src"),dirPath);
       
       if (this.loadedJs[this.getUrlWithVersion(url).toLowerCase()] == true)
@@ -1009,33 +1008,18 @@ defineClass("Tloader", "core.Tobject", {
       }
       else
       {         
-        //logger.info("Load script: "+url);     
         var r = this.loadFile(this.getUrlWithVersion(url));
         if ((className != null) && (node.getAttribute("type") == "text/x-class-definition"))
           r.data = this.processCode(r.data, className)
 
         exec(r.data);
-        //var script = $('<script src="'+url+'"></script>');
-        //$(document.getElementsByTagName('head')[0]).append(script); 
-      
       }
-      
     }  
   }   
 
 });
 
-
 panjs.loader = new Tloader();
-
-/*if (panjs.iever == 8)
-{
-    var r = panjs.loader.loadFile("../extend/html5shiv.js");  
-    exec(r.data);  
-    var r = panjs.loader.loadFile("../extend/respond.min.js");  
-    exec(r.data); 
-}*/
-
 
 $(document).ready(function() 
 {
