@@ -21,9 +21,11 @@
 </ul>
 
 <h3>What panJs does not:</h3>
+<ul>
 <li>panJs doesn't choose the architecture of your application (MVC, MVVC etc)</li>
 <li>Data binding (but you can use some data binding frameworks if you want)</li>
 <li>panJs isn't a UI library (but there is already some UI components available)</li>
+</ul>
 
 <h3>What is a panJS component?</h3>
 
