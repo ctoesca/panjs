@@ -76,6 +76,7 @@
     }catch(err){ 
        logger.error("Error while instantiating "+className+": "+err);
        uses("core.display.TerrorElement.html");
+      
        var object = new TerrorElement({message: err, path:r.path,url:r.url, className:className});
     }
 
@@ -320,25 +321,25 @@ var Tobject = {
     },
     injectParam: function(name, value, mandatory, defaut)//void
     {
-    	if ((typeof value == "undefined")||(value == null))
-    	{
-    		if (typeof defaut != "undefined")
+      if ((typeof value == "undefined")||(value == null))
+      {
+        if (typeof defaut != "undefined")
         {
-    			this[name] = defaut;
+          this[name] = defaut;
           return true;
         }
-    		else{
-    			if ((typeof mandatory != "undefined") && (mandatory == true))
-    			 throw "The "+name+" argument has no default value on "+this.className;
-    			else
+        else{
+          if ((typeof mandatory != "undefined") && (mandatory == true))
+           throw "The "+name+" argument has no default value on "+this.className;
+          else
             return false;
         }
-    	}
-    	else
-    	{
-    		this[name] = value;
+      }
+      else
+      {
+        this[name] = value;
         return true;
-    	}
+      }
     },
     callLater: function(f,a)
     {
@@ -377,11 +378,11 @@ function defineClass(className, inheritsFromClassPath, def)
 
 function uses(classPath)
 {
-	var isHtm = classPath.endsWith(".html");
-	if (isHtm)
-		panjs.loader.usesComponent(classPath);
-	else
-		panjs.loader.uses(classPath);
+  var isHtm = classPath.endsWith(".html");
+  if (isHtm)
+    panjs.loader.usesComponent(classPath);
+  else
+    panjs.loader.uses(classPath);
 }
 
 
@@ -391,97 +392,97 @@ Inclu ici car loader a besoin du logger.
 ***/
 
 defineClass("Tlogger", "core.Tobject", {
-	_level: null,
-	name: "MAIN",
+  _level: null,
+  name: "MAIN",
   creationDate: null,
   active: true,
   _currentGroup: 0,
   _tabulation: "",
-	tab: [],
+  tab: [],
 
-	constructor: function(args) {
+  constructor: function(args) {
 
-		  this.injectParam("_level", args.level,false, Tlogger.INFO);
-		  this.injectParam("name", args.name,false);
-    	this.creationDate = new Date().getTime();
+      this.injectParam("_level", args.level,false, Tlogger.INFO);
+      this.injectParam("name", args.name,false);
+      this.creationDate = new Date().getTime();
 
            
-		  this.setLevel(this._level);
+      this.setLevel(this._level);
     
       this.active = (typeof console != "undefined");
-    	this.razTime();
+      this.razTime();
 
-  		this.info("Init logger LEVEL=",this.getLevelName());
-  	},
+      this.info("Init logger LEVEL=",this.getLevelName());
+    },
     razTime: function()
     {
         this.creationDate = new Date();
     },
-  	getLevelName:function()
-  	{
-  		if (this._level == Tlogger.DEBUG)
-  			return "DEBUG";
-  		if (this._level == Tlogger.INFO)
-  			return "INFO";
+    getLevelName:function()
+    {
+      if (this._level == Tlogger.DEBUG)
+        return "DEBUG";
+      if (this._level == Tlogger.INFO)
+        return "INFO";
       if (this._level == Tlogger.WARN)
         return "WARN";
-  		if (this._level == Tlogger.ERROR)
-  			return "ERROR";
-  	},
- 	groupStart: function()
- 	{  
- 		if (this.active)
- 		{
- 			this._currentGroup ++;
- 			this._calcTabultation();
- 		}
- 	},
- 	groupEnd: function()
- 	{
-		if (this.active)
- 		{
- 			this._currentGroup --;
- 			this._calcTabultation();
- 		}
- 	},
- 	_calcTabultation: function()
- 	{
- 			this._tabulation = "";
- 			 for (var i =0; i< this._currentGroup; i++)
- 			 	this._tabulation += "\t";
- 			 
- 	},
+      if (this._level == Tlogger.ERROR)
+        return "ERROR";
+    },
+  groupStart: function()
+  {  
+    if (this.active)
+    {
+      this._currentGroup ++;
+      this._calcTabultation();
+    }
+  },
+  groupEnd: function()
+  {
+    if (this.active)
+    {
+      this._currentGroup --;
+      this._calcTabultation();
+    }
+  },
+  _calcTabultation: function()
+  {
+      this._tabulation = "";
+       for (var i =0; i< this._currentGroup; i++)
+        this._tabulation += "\t";
+       
+  },
     _getTime:function()
     {
         return new Date().getTime() - this.creationDate;
     },
-  	_debug: function()
-  	{
+    _debug: function()
+    {
       //bizarrement, console.debug n'existe pas sur IE9  mais si on log en console.info, ça sort en debug dans la console
       // console.log sort en INFO dans la console dans tous les cas.
       if (this.active)
-  		if (console.debug)
+      if (console.debug)
         console.debug(this._getMessage("DEBUG", arguments));
       else
         console.info(this._getMessage("DEBUG", arguments));
-  	},
-  	_info: function()
-  	{
+    },
+    _info: function()
+    {
       if (this.active){
-		  console.log(this._getMessage("INFO", arguments));
-		}
-  	},
+      console.log(this._getMessage("INFO", arguments));
+    }
+    },
     _warn: function()
     {
       if (this.active)
       console.warn(this._getMessage("WARN", arguments));
     },
-  	_error: function()
-  	{
+    _error: function()
+    {
       if (this.active)
-  		console.error(this._getMessage("ERROR", arguments));	
-  	},
-  	_getMessage: function(sev, args)
+      console.error(this._getMessage("ERROR", arguments));  
+    },
+    _getMessage: function(sev, args)
     {
       var r = "";
       for (var i =0; i< args.length; i++)
@@ -497,24 +498,24 @@ defineClass("Tlogger", "core.Tobject", {
       return t+" - " +sev+"\t"+this._tabulation+r;
     },
 
-  	setLevel: function(value)
-  	{
-  		this._level = value;
+    setLevel: function(value)
+    {
+      this._level = value;
 
-  		this.debug = this._debug;
-  		this.info = this._info;
-      	this.warn = this._warn;
-  		this.error = this._error;
- 		
-  		if (value >= Tlogger.INFO)
-  			this.debug = function(){};
+      this.debug = this._debug;
+      this.info = this._info;
+        this.warn = this._warn;
+      this.error = this._error;
+    
+      if (value >= Tlogger.INFO)
+        this.debug = function(){};
   
-      	if (value >= Tlogger.WARN)
-       		this.info = function(){};
+        if (value >= Tlogger.WARN)
+          this.info = function(){};
 
-  		if (value >= Tlogger.ERROR)
-  			this.warn = function(){};
-  	}
+      if (value >= Tlogger.ERROR)
+        this.warn = function(){};
+    }
 });
 
 Tlogger.DEBUG = 10;
@@ -651,7 +652,7 @@ defineClass("Tloader", "core.Tobject", {
 
     if (this._count > this.maxImbrications)
     {
-      return {result:false, message:"Too much nested components (max: "+this.maxImbrications+")", className: className, classPath:classPath, url: url, path:path};
+      return {result:false, message:"Too much nested components (max: "+this.maxImbrications+")", className: className, classPath:classPath, url: url, path:"?"};
     }
 
     if (typeof window[className] == "undefined")
@@ -747,7 +748,7 @@ defineClass("Tloader", "core.Tobject", {
                 var parentClassName = window[className].prototype.parentClassName;
                 
                 if (defined(window[parentClassName].prototype.html))
-                {          
+                {         
                   html = window[parentClassName].prototype.html.replace( '<!--CONTENT-->', html);
                   html = "<div>"+html.replace(/<body>/gi, "").replace(/<\/body>/gi, "")+"</div>";
                 }
@@ -764,9 +765,10 @@ defineClass("Tloader", "core.Tobject", {
                   window[className].prototype.html = $(html)[0].innerHTML; //correct HTML for IE8 (</div/> => <div></div>).
 
                 window[className].prototype.bodyNode = bodyNode;
+
             }
             catch(e)
-            {
+            { 
               return {result:false, message:e.message, className: className, classPath:classPath, url: url, path:path};
             }
           }
