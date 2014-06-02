@@ -5,7 +5,7 @@
 <br/>You can integrate panJS in a existing application (only parts of the application can be managed by panJs).
 </p>
 
-<h3>Some features:</h3>
+## Feature Highlights
 
 * A component is a HTML file that contains CSS, JS, HTML, css &lt;link&gt; like any Html file
 * Components can be integrated in a page or in other components with html markup
@@ -21,14 +21,14 @@
 * ...
 
 
-##What panJs does not:
+###What panJs does not:
 <ul>
 <li>panJs doesn't choose the architecture of your application (MVC, MVVC etc)</li>
 <li>Data binding (but you can use some data binding frameworks if you want)</li>
 <li>panJs isn't a UI library (but there is already some UI components available)</li>
 </ul>
 
-##What is a panJS component?
+## What is a panJS component?
 
 <p>You put a component in HTML page (or in another HTML component) like this:</p>
 
