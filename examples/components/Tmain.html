@@ -23,8 +23,17 @@ defineClass("Tmain", "core.display.Telement", {
   	constructor: function(args){
     	this._super.constructor.call(this,args);  
       this.btn4.on("click", this.onBtn4click.bind(this));
+      this.btn5.on("click", this.onBtn5click.bind(this));
  	},
   onBtn4click: function(e){
+    uses("ui.managers.TpopupManager.html");
+    compo = panjs.PopupManager.createPopup("app.Tpanel.html",{}, {closeOnMaskClick:true});
+    compo.container.css("margin", "40px auto auto auto");
+
+  },
+
+
+  onBtn5click: function(e){
     uses("ui.Talert.html");
     var mess = "<article>\
     <p>If ever there was evidence of God, the humble pea is it.</p>\
@@ -224,6 +233,29 @@ defineClass("Tmain", "core.display.Telement", {
   </article>
   <hr/>
 
+ <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>ui.managers.TpopupManager</h3>
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+                <pre>&lt;button class="btn btn-success" id="btn4">Click here to show alert&lt;/button&gt;</pre>
+                <p>Javascript (on button click):</p>
+                <pre>uses("ui.managers.TpopupManager.html");
+panjs.PopupManager.createPopup("app.Tpanel.html",{}, {closeOnMaskClick:true});
+</pre>
+<p>Open the console (F12): ui.manager.TpopupManager and app.Tpanel.html are lazy loaded.</p>
+          </div>
+          <div class="col-sm-6" >
+                <button class="btn btn-success" id="btn4">Click here to show popup</button>  
+          </div>
+      </div>
+  </article>
+  <hr/>
+
+
 
 
   <article>
@@ -234,14 +266,14 @@ defineClass("Tmain", "core.display.Telement", {
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-                <pre>&lt;button class="btn btn-success" id="btn4">Click here to show alert&lt;/button&gt;</pre>
+                <pre>&lt;button class="btn btn-success" id="btn5">Click here to show alert&lt;/button&gt;</pre>
                 <p>Javascript (on button click):</p>
                 <pre>uses("ui.Talert.html");
 Talert.warn("the html to show....", [Talert.OK], null, null, null, "title", true);
 </pre>
           </div>
           <div class="col-sm-6" >
-                <button class="btn btn-success" id="btn4">Click here to show alert</button>  
+                <button class="btn btn-success" id="btn5">Click here to show alert</button>  
           </div>
       </div>
   </article>
