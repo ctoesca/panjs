@@ -15,14 +15,10 @@
 }
 
 .TpopupManager.window {
-	  /*position:fixed;	*/
-	  position:absolute;
-	  /*display:table;
-	 width:100%;
-	 */
-	  margin: auto;
-	  z-index:9999;
 	 
+	  position:absolute;
+	  margin: auto;
+	  z-index:9999; 
 	  width:100%;
 	  display:none;
 	 	
@@ -101,7 +97,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		this._showMask();
 		return instance;
 	},
-	createPopup: function(className, options, args )
+	createPopup: function(className, args , options )
 	{		
 		if (defined(args)){
 			if (typeof className == "string")
