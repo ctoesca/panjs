@@ -210,7 +210,7 @@
 
 var Tobject = {
     classHierarchy: "Tobject",
-
+   
     extend: function (properties, className, parentClassName) {
         var superProto = this.prototype || Tobject;
                 
@@ -685,7 +685,7 @@ defineClass("Tloader", "core.Tobject", {
           var linkNodes = [];
           var styleNodes = [];
           var dirPath = path.substring(0, path.lastIndexOf("/")); 
-          
+         
           for (var i=0; i< headNode.childNodes.length; i++)
           {
 
@@ -779,8 +779,10 @@ defineClass("Tloader", "core.Tobject", {
           
           window[className].prototype.classPath = classPath;  
           window[className].prototype.classPathDir = this.getClassPathDir(classPath);
-          window[className].prototype.className = className;    
+          window[className].prototype.className = className;  
+          window[className].prototype.dirPath = dirPath;  
           window[className].lastId = 0;
+
           
           this._count --;
           if (this._count == 0)
@@ -859,26 +861,37 @@ defineClass("Tloader", "core.Tobject", {
   addLinkNode: function(node,dirPath)
   {     
     var url = panjs.transformUrl(node.getAttribute("href"),dirPath);
+
+    var type =  node.getAttribute("type") || 'text/css';
+    var rel = node.getAttribute("rel") || 'stylesheet';
+      
+    this.loadCssFile(url, type, rel);
+
+  },  
+  loadCssFile: function(url, type , rel){
+    var r = false;
+
     if (this.loadedCss[url.toLowerCase()])
-    {
-      return true;
-    }
+      return r;
+    
+    var l = arguments.length;
+    if (l == 0)
+      throw "loadCssFile(url, type , rel): Missing url";
+
+    
+    else if (l == 2)
+      var rel = "stylesheet/less";
+
     url = this.getUrlWithVersion(url);
 
     if ((document.createStyleSheet)&&(panjs.iever == 8))
     {   
       document.createStyleSheet(url);
+      r = true;
     }
     else
     {   
-      var rel =  node.getAttribute("rel");
-      if (rel == null)
-        rel = 'stylesheet';
-
-      var type =  node.getAttribute("type");
-      if (type == null)
-        type = 'text/css';
-
+     
       var link  = document.createElement('link');
       link.rel  = rel;
       link.type = type;
@@ -889,6 +902,7 @@ defineClass("Tloader", "core.Tobject", {
         if ((panjs.iever >0)&&(panjs.iever<=8))
         {
           logger.warn( panjs.getMessage(panjs.messages.LESS_IE8, panjs.iever));
+
         }else
         {
           if (this.lessIsLoaded())
@@ -896,22 +910,27 @@ defineClass("Tloader", "core.Tobject", {
             less.sheets.push(link);
             less.refresh(true);
             logger.debug("INJECTION LESS OK");
+            r = true;
           }
           else
-          {
+          {         
             logger.warn( panjs.getMessage(panjs.messages.LESS_NOT_LOADED));
           }
         }
       }
       else
       {
-        document.getElementsByTagName('head')[0].appendChild(link);                                 
+        document.getElementsByTagName('head')[0].appendChild(link); 
+        r = true;                                
       }
     }   
+    if (r == true)
     logger.debug("Load <link> ASYNC: "+url);
+
     this.loadedCss[url.toLowerCase()] = true;
-    return true;
-  },  
+
+    return r;
+  },
   addStyle: function(css, type){
 
     if (typeof type =="undefined")

@@ -1,29 +1,6 @@
 <html>        
 <head>
-
-<style>
-.TpopupManager.mask {
-	  position:fixed;
-	  top:0;
-	  left:0;
-	  z-index:9000;
-	  background-color:#000;
-	  display:none;
-	  opacity:0;
-	  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; 
-	  filter: alpha(opacity=0);	
-}
-
-.TpopupManager.window {
-	 
-	  position:absolute;
-	  margin: auto;
-	  z-index:9999; 
-	  width:100%;
-	  display:none;
-	 	
-	}
-</style>
+<link href="TpopupManager.css" type="text/css"></link>
 
 <script type="text/x-class-definition">
 //<![CDATA[
@@ -39,9 +16,6 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		this._super.constructor.call(this,args);		
 
 		this.popups = [];
-		this.mask =  $('<div class="mask TpopupManager"></div>');
-		$(document.body).append( this.mask);
-		this.mask.on("click", this._onMaskClick.bind(this)); 
 
 		$(window).resize(function () {
 	        if (this.popups.length ==0)	return;
@@ -56,6 +30,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 	        	this._positionnerModal( this.popups[i].window );
 	        
 		}.bind(this));
+
 	},
 
 	addPopup: function(instance, options)
@@ -157,6 +132,12 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 	},
 	_showMask: function()
 	{
+		if (this.mask == null){
+			this.mask =  $('<div class="mask TpopupManager" style="display:none"></div>');
+			$(document.body).append( this.mask);
+			this.mask.on("click", this._onMaskClick.bind(this)); 
+		}
+
 		this._refreshMaskSize();  
 		if ((panjs.iever == -1) ||(panjs.iever >= 10)){
         	this.mask.fadeTo("fast",0.8,function(e){}); 
@@ -215,6 +196,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 });
 
 panjs.PopupManager = new TpopupManager();
+
 //]]>
 </script>
 </head>
