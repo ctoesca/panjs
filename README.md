@@ -24,7 +24,7 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 ###What panJs does not:
 
 * panJs doesn't choose the architecture of your application (MVC, MVVC etc)</li>
-* Data binding (but you can use some data binding frameworks if you want)</li>
+* Data binding (but you can use some data binding frameworks if you want like KnockoutJS, Mustach ...)</li>
 * panJs isn't a UI library (but there is already some UI components available)</li>
 
 
