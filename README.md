@@ -22,17 +22,17 @@
 
 
 ###What panJs does not:
-<ul>
-<li>panJs doesn't choose the architecture of your application (MVC, MVVC etc)</li>
-<li>Data binding (but you can use some data binding frameworks if you want)</li>
-<li>panJs isn't a UI library (but there is already some UI components available)</li>
-</ul>
+
+* panJs doesn't choose the architecture of your application (MVC, MVVC etc)</li>
+* Data binding (but you can use some data binding frameworks if you want)</li>
+* panJs isn't a UI library (but there is already some UI components available)</li>
+
 
 ## What is a panJS component?
 
-<p>You put a component in HTML page (or in another HTML component) like this:</p>
+You put a component in HTML page (or in another HTML component) like this:
 
-<pre>&lt;div data-compo="app.myComponent.html"/&gt;</pre>
+```<div data-compo="app.myComponent.html"/>```
 
 <p>myComponent.html:</p>
 <pre>
