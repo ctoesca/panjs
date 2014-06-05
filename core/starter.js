@@ -4,8 +4,7 @@
   panjs.logger = null;
   panjs.root = {id:"root"};
   panjs.loader = null;
-  panjs.iever = getIEVersion();
- 
+   
   panjs.messages = {
     CLASSNAME_MATCHS_FILENAME: "The name of the class (%1) must match the file name %2 (case sensitive)",
     LESS_IE8: "less.js is not fully compatible with IE%1 : transform less code in css",
@@ -24,7 +23,6 @@
     return mess;
   };
    
-
   /*
     Remplacement variables panjs dans namespaces
   */
@@ -87,16 +85,46 @@
 
     return object;
   }
+ 
 
   /*
     _load
   */
   panjs.load = function(element)
   {     
+    /* var helperPath = panjs.getNamespace("core").path+"/helpers";
+
+      if (!$.fn.getElement)
+      {
+      $LAB.setOptions({ Debug:true})
+       .script(helperPath+"/jquery.js")
+       .script(helperPath+"/base.js")
+       .wait(function(){
+           panjs._load(element); 
+       });
+      }     
+      else{*/
+
+       panjs._load(element); 
+     // }
+  
+  }
+
+  panjs._load = function(element)
+  { 
+      panjs.iever = getIEVersion();
+      panjs.chromever = getChromeVersion();
+      panjs.ffver = getFirefoxVersion();
+
       if (arguments.length == 0)
         var element = $(document.body);
       
-      var compolist = element.getElements("[data-compo]");
+      var compolist = [];
+
+      if (element.attr("data-compo") != null)
+        compolist.push(element);
+      else
+        compolist = element.getElements("[data-compo]");
 
       for (var i=0; i< compolist.length; i++)
       {
@@ -107,11 +135,9 @@
 
         if (autoload == true)
         {
-
           var compo = panjs.createComponent(dataCompo,{elem:el[0]});     
           el.replaceWith(compo.container);
-          compo.container[0].owner = compo;
-         
+          compo.container[0].owner = compo;   
         }
         else
         {
@@ -149,6 +175,16 @@
     return r;
   }
 
+  panjs.getNamespace = function(name)
+  {
+     for (var i=0; i< panjs.namespaces.length; i++)
+     {
+        var ns = panjs.namespaces[i];
+        if (ns.name == name)
+          return ns;
+     }
+     return null;
+  }
   panjs.getAbsoluteUrlFromClassPath = function(classPath)
   {
     var isHtm = (classPath.endsWith(".html"));
@@ -167,7 +203,7 @@
       {
         var n = panjs.namespaces[i];
         
-        if (classPath.startsWith(n.name))
+        if (classPath.startsWith(n.name+"."))
         {
           var r = classPath.removeEnd(".html").replace(/\./g, "/");
           r = r.replace(n.name, n.path);
@@ -351,7 +387,7 @@ var Tobject = {
 
 function defineClass(className, inheritsFromClassPath, def)
 {
-  var isHtm = inheritsFromClassPath.endsWith(".html");
+  var isHtm =  inheritsFromClassPath.endsWith(".html");
   var classe = panjs.getClassNameFromClassPath(inheritsFromClassPath);
 
   if (typeof window[classe] == "undefined")
@@ -1018,5 +1054,7 @@ defineClass("Tloader", "core.Tobject", {
   }   
 
 });
+
+
 
 panjs.loader = new Tloader();

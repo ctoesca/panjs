@@ -1,4 +1,5 @@
-﻿window["MsxmlObject"] = null;
+﻿
+window["MsxmlObject"] = null;
 
 function exec(s)
 {           
@@ -169,33 +170,6 @@ function getXmlDocument (text) {
       return xmlDoc;
 }
 
-
-
-/*function getXmlDocument(txt)
-{
-  var xmlDoc = null;
-  if (window.DOMParser)
-    { 
-    var parser=new DOMParser();
-    
-      xmlDoc=parser.parseFromString(txt,"text/xml");
-      if (xmlDoc.documentElement.nodeName == "parsererror") 
-      {
-        var errStr = xmlDoc.documentElement.childNodes[0].nodeValue;
-        throw errStr;
-      }
-   
-    }
-  else 
-    {
-    xmlDoc=new ActiveXObject("Microsoft.XMLDOM");
-    xmlDoc.async=false;
-    xmlDoc.loadXML(txt);
-    } 
-    return xmlDoc;
-}*/
-
-
 /* 
   defined(object, "prop1", "prop2", "prop3" , ...) 
 */
@@ -247,12 +221,11 @@ function getChromeVersion()
   }
 
 
-if (!Number.toFixed) {
-  Number.prototype.toFixed=function(n){
-    var n = Math.pow(10, n);
-    return Math.round(this*n) / n;
-  }
-}
+if (!Number.prototype.toFixed)
+    Number.prototype.toFixed = function(precision) {
+        var power = Math.pow(10, precision || 0);
+        return String(Math.round(this * power)/power);
+    }
 
 String.prototype.contains = function(it) { 
   return this.indexOf(it) > -1; 
