@@ -593,7 +593,10 @@ function isControlKey(evt)
   panjs.logger = null;
   panjs.root = {id:"root"};
   panjs.loader = null;
-   
+  panjs.iever = getIEVersion();
+  panjs.chromever = getChromeVersion();
+  panjs.ffver = getFirefoxVersion();
+
   panjs.messages = {
     CLASSNAME_MATCHS_FILENAME: "The name of the class (%1) must match the file name %2 (case sensitive)",
     LESS_IE8: "less.js is not fully compatible with IE%1 : transform less code in css",
@@ -701,10 +704,6 @@ function isControlKey(evt)
 
   panjs._load = function(element)
   { 
-      panjs.iever = getIEVersion();
-      panjs.chromever = getChromeVersion();
-      panjs.ffver = getFirefoxVersion();
-
       if (arguments.length == 0)
         var element = $(document.body);
       
