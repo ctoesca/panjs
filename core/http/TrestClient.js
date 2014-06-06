@@ -148,6 +148,7 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 									//nécessité d'utiliser XdomainRequest (CORS pour IE8)
 				success: function(data, textStatus, req) {
 					logger.debug("Requête AJAX terminée avec succès: ",url);
+					logger.debug("X-Time="+req.getResponseHeader("X-Time"));
 					
 					if (this.exitCodeFieldName != null)
 					{

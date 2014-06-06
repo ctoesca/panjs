@@ -1,6 +1,6 @@
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\helpers\base.js#################
+###########  ..\..\core\helpers\base.js#################
 ##############################################*/
 
 
@@ -530,7 +530,7 @@ function base64decode(input)
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\helpers\jquery.js#################
+###########  ..\..\core\helpers\jquery.js#################
 ##############################################*/
 
 
@@ -584,7 +584,7 @@ function isControlKey(evt)
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\starter.js#################
+###########  ..\..\core\starter.js#################
 ##############################################*/
 
 
@@ -1649,7 +1649,7 @@ panjs.loader = new Tloader();
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\events\Tevent.js#################
+###########  ..\..\core\events\Tevent.js#################
 ##############################################*/
 
 /*
@@ -1713,7 +1713,7 @@ Tevent.WAITING = "WAITING";
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\events\TeventDispatcher.js#################
+###########  ..\..\core\events\TeventDispatcher.js#################
 ##############################################*/
 
 /*
@@ -1834,7 +1834,7 @@ defineClass("TeventDispatcher", "core.Tobject", {
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\managers\Trouter.js#################
+###########  ..\..\core\managers\Trouter.js#################
 ##############################################*/
 
 
@@ -2007,7 +2007,7 @@ panjs.router = new Trouter();
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\display\TproxyDisplayObject.js#################
+###########  ..\..\core\display\TproxyDisplayObject.js#################
 ##############################################*/
 
 
@@ -2082,7 +2082,7 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\collections\TarrayCollection.js#################
+###########  ..\..\core\collections\TarrayCollection.js#################
 ##############################################*/
 
 
@@ -2280,7 +2280,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\display\TdisplayObject.js#################
+###########  ..\..\core\display\TdisplayObject.js#################
 ##############################################*/
 
 
@@ -2432,7 +2432,7 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\display\TdisplayObjectContainer.js#################
+###########  ..\..\core\display\TdisplayObjectContainer.js#################
 ##############################################*/
 
 /*
@@ -2792,7 +2792,7 @@ TdisplayObjectContainer._listeIdElements = [];
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\display\Telement.js#################
+###########  ..\..\core\display\Telement.js#################
 ##############################################*/
 
 /*
@@ -2939,7 +2939,7 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 
 
 /*##############################################
-###########  D:\github\panjs\panjs\core\http\TrestClient.js#################
+###########  ..\..\core\http\TrestClient.js#################
 ##############################################*/
 
 /*** 
@@ -3092,6 +3092,7 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 									//nécessité d'utiliser XdomainRequest (CORS pour IE8)
 				success: function(data, textStatus, req) {
 					logger.debug("Requête AJAX terminée avec succès: ",url);
+					logger.debug("X-Time="+req.getResponseHeader("X-Time"));
 					
 					if (this.exitCodeFieldName != null)
 					{
