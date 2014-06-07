@@ -1038,15 +1038,15 @@ defineClass("Tloader", "core.Tobject", {
     {      
       var url = panjs.transformUrl(node.getAttribute("src"),dirPath);
 
-      url = this.getUrlWithVersion(url);
-
       if (!this.loadedJs[url.toLowerCase()])
       {         
-        var r = this.loadFile(url);
-        if ((className != null) && (node.getAttribute("type") == "text/x-class-definition"))
+        var r = this.loadFile(this.getUrlWithVersion(url));
+        if ((className != null) && (node.getAttribute("type") == "text/x-class-definition")){
           r.data = this.processCode(r.data, className)
+        }
 
         exec(r.data);
+        this.loadedJs[url.toLowerCase()] = 1;
       }
     } 
     return true;
