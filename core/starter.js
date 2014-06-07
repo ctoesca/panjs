@@ -878,7 +878,7 @@ defineClass("Tloader", "core.Tobject", {
           window[className].prototype.classPathDir = this.getClassPathDir(classPath);
           window[className].lastId = 0; 
       }
-      logger.debug(className+" = "+typeof window[className]+" path = "+path+", result="+r.result);
+      //logger.debug(className+" = "+typeof window[className]+" path = "+path+", result="+r.result);
       this._count --;
       
       logger.groupEnd();
