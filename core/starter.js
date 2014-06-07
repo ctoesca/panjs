@@ -1047,6 +1047,8 @@ defineClass("Tloader", "core.Tobject", {
 
         exec(r.data);
         this.loadedJs[url.toLowerCase()] = 1;
+      }else{
+        logger.debug("Le script "+url+" est déjà chargé");
       }
     } 
     return true;
