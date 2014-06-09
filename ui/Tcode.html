@@ -5,14 +5,41 @@
 <script src="/libs/js-beautify/1.4.2/js/lib/beautify-css.js"></script>
 <script src="/libs/js-beautify/1.4.2/js/lib/beautify-html.js"></script>
 <script src="/libs/js-beautify/1.4.2/js/lib/beautify.js"></script>
+<!--
 <link rel="stylesheet" href="/libs/CodeMirror/4.2/lib/codemirror.css"/>
 
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/addon/fold/foldgutter.css">
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/addon/dialog/dialog.css">
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/theme/monokai.css">
 
-<link rel="stylesheet" href="/libs/CodeMirror/4.2/theme/ambiance.css"/>
 
 <script src="/libs/CodeMirror/4.2/lib/codemirror.js"></script>
 <script src="/libs/CodeMirror/4.2/mode/javascript/javascript.js"></script>
 <script src="/libs/CodeMirror/4.2/mode/xml/xml.js"></script>
+
+<script src="/libs/CodeMirror/4.2/addon/search/searchcursor.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/search/search.js"></script>
+
+<script src="/libs/CodeMirror/4.2/keymap/sublime.js"></script>-->
+
+
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/lib/codemirror.css"/>
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/addon/fold/foldgutter.css"/>
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/addon/dialog/dialog.css"/>
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/theme/monokai.css"/>
+<script src="/libs/CodeMirror/4.2/lib/codemirror.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/search/searchcursor.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/search/search.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/dialog/dialog.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/edit/matchbrackets.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/edit/closebrackets.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/comment/comment.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/wrap/hardwrap.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/fold/foldcode.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/fold/brace-fold.js"></script>
+<script src="/libs/CodeMirror/4.2/mode/javascript/javascript.js"></script>
+<script src="/libs/CodeMirror/4.2/mode/xml/xml.js"></script>
+<script src="/libs/CodeMirror/4.2/keymap/sublime.js"></script>
 
 
 <style type="text/less">
@@ -23,6 +50,8 @@
 	
 	.CodeMirror {
 	  border: 1px solid #eee;
+	  font-size:1.2em;
+	  max-width: 1200px;
 	 /* height: auto;*/
 	  /*max-height:500px;*/
 	}
@@ -41,10 +70,12 @@ defineClass("Tcode", "core.display.Telement", {
 	baseElement: "div",	
 	render: false,
 	titleResult: "Result:",
-	codeMirror: null,
+	editor: null,
 	readOnly: false,
 	mode: "javascript",
 	height: null,
+	_minHeight: 200,
+	_source: "",
 
 
 	constructor: function(args){
@@ -62,63 +93,76 @@ defineClass("Tcode", "core.display.Telement", {
 		if (defined(args, "style"))
 			this.container.attr("style", args.style);
 
-		var source = this.content[0].innerHTML.trim();	
-		source = source.droite("<!--");
-		source = source.removeEnd("-->");
 
-		source = source.replace(/&lt;!--/g, "<!--");
-		source = source.replace(/--&gt;/g, "-->");
-		
-		source = source.replace(/\[COMMENT\]/gi, "<!--");
-		source = source.replace(/\[\/COMMENT\]/gi, "-->");
-
-		source = source.replace(/<commentaire>/gi, "<!--");
-		source = source.replace(/<\/commentaire>/gi, "-->");
-		source = html_beautify(source);
- 
-
-		this.codeMirror = CodeMirror.fromTextArea(this.editor1[0], {
+		this.editor = CodeMirror.fromTextArea(this.editor1[0], {
 				mode:  this.mode,
-				theme: "ambiance",
 				lineNumbers: true,
 				indent: true,
-				readOnly: this.readOnly
+				readOnly: this.readOnly,
+				keymap: "sublime",
+				theme: "monokai"
 			}
   		);
 
+		var s = this.content[0].innerHTML.trim();	
+		
+		if (s != "")
+		{
+			s = s.droite("<!--");
+			s = s.removeEnd("-->");
+
+			s = s.replace(/&lt;!--/g, "<!--");
+			s = s.replace(/--&gt;/g, "-->");
+			
+			s = s.replace(/\[COMMENT\]/gi, "<!--");
+			s = s.replace(/\[\/COMMENT\]/gi, "-->");
+
+			s = s.replace(/<commentaire>/gi, "<!--");
+			s = s.replace(/<\/commentaire>/gi, "-->");
+			s = html_beautify(s);
+			this._source = s;
+			
+			this.setSource(this._source);
+	
+			if (this.render){
+				this.labelRendu.html(this.titleresult);
+				this.rendu.html(this._source);
+				this.rendu.show();
+				this.labelRendu.show();
+				panjs.load(this.rendu);
+			}
+
+		}
+	},
+	getSource: function(s){
+		return this.editor.getDoc().getValue();
+	},
+
+	setSource: function(s){
+		
+		this._source= s;
+		
 		setTimeout(	function(){
-			this.codeMirror.setValue( source);
+			this.editor.getDoc().setValue(s);
 			if (this.height == null)
 			{
-				var n = source.nbsouschaine("\n", source);
+
+				var n = this._source.nbsouschaine("\n", this._source);
 				//logger.info("this.codeMirror.defaultTextHeight = "+this.codeMirror.defaultTextHeight());
-				var h = n* this.codeMirror.defaultTextHeight() + 43;
-				//if (h>500) h=500;
-				this.codeMirror.setSize("100%", h+"px");
+				var h = n* this.editor.defaultTextHeight() + 43;
+				
+				if (h<this._minHeight) h=this._minHeight;
+				this.editor.setSize("100%", h+"px");
 			}
 			else
 			{
-				this.codeMirror.setSize("100%", this.height);	
+				var h = this.height;
+				if (h<this._minHeight) h=this._minHeight;
+				this.editor.setSize("100%", h);	
 			}
 		}.bind(this),200);
 
 		
-
-		
-
-		var code = source.htmlEntities();
-		code = code.replace(/\t/g, '<span class="tabulation">	</span>');
-	
-		this.content.html(code);
-		
-	
-		if (this.render){
-			this.labelRendu.html(this.titleresult);
-			this.rendu.html(source);
-			this.rendu.show();
-			this.labelRendu.show();
-			panjs.load(this.rendu);
-		}
 	}
 
 	

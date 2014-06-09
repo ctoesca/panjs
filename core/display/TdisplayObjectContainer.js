@@ -262,7 +262,11 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 									//On crée l'instance du composant
 									
 									var compo = panjs.createComponent(dataType,{elem:el, parent:this});	
-									
+									/*if (compo.className == "TerrorElement"){
+							
+										panjs.stack.push("Unable to create "+dataType+" : "+compo.message);
+									}*/
+
 									compo.parent = this;
 
 									if ((setObject)&&(id != null))

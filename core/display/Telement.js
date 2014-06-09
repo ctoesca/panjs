@@ -35,74 +35,82 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 
 		this.container.addClass(styleClass);
 
-
-		if (defined(args, "elem"))
+		if (typeof args != "undefined")
 		{
-			/* On injecte les attributs de l'élément dans args */
-			var el = args.elem;
-			
-			for ( var i =0; i< el.attributes.length; i++)
-        	{
-            	var attr =  el.attributes.item(i);
-            	var name = attr.nodeName.toLowerCase();
-
-            	if ((name != "id")&&(name != "data-compo"))
-            	{
-            		if (name.startsWith("data-"))
-            			name = name.droite("-");
-            		var value = attr.value;
-
-            		if (value == "true")
-            			value = true;
-            		if (value == "false")
-            			value = false;
-
-            		args[name] = value;
-            			
-            		//ATTENTION: attr.nodeName est toujours en lowerCase
-            		//logger.info("Attribut "+this.id+" , "+name+"="+attr.value);
-            	}
-            	if (name == "includeinstate"){
-            		this.includeInState = value; 
-            		//Ajout de l'attribut includeinstate pour qu'il soit parsé dans processStates
-            		this.container.attr("includeInState", this.includeInState);
-            	}
-        	}
-	
-			/* On injecte le contenu de l'élément source dans l'élément <CONTENT> */	
-			this.sourceElement = args.elem;	
-
-			if (this.content != null)
+			if (defined(args, "elem"))
 			{
-				if (this.sourceElement.innerHTML.trim() != ""){
+				/* On injecte les attributs de l'élément dans args */
+				var el = args.elem;
 				
-					this.content[0].innerHTML = this.sourceElement.innerHTML;
-					if (typeof args.parent != "undefined"){
+				for ( var i =0; i< el.attributes.length; i++)
+	        	{
+	            	var attr =  el.attributes.item(i);
 
-						args.parent._populateElements(this.content[0], true,[]);
+
+	            	var name = attr.nodeName.toLowerCase();
+
+	            	if ((name != "id")&&(name != "data-compo"))
+	            	{
+	            		if (name.startsWith("data-"))
+	            			name = name.droite("-");
+	            		var value = attr.value;
+
+	            		if (value == "true")
+	            			value = true;
+	            		if (value == "false")
+	            			value = false;
+
+	            		args[name] = value;
+	            			
+	            		//ATTENTION: attr.nodeName est toujours en lowerCase
+	            		//logger.info("Attribut "+this.id+" , "+name+"="+attr.value);
+	            	}
+	            	if (name == "includeinstate"){
+	            		this.includeInState = value; 
+	            		//Ajout de l'attribut includeinstate pour qu'il soit parsé dans processStates
+	            		this.container.attr("includeInState", this.includeInState);
+	            	}
+
+	        	}
+		
+				/* On injecte le contenu de l'élément source dans l'élément <CONTENT> */	
+				this.sourceElement = args.elem;	
+
+				if (this.content != null)
+				{
+					if (this.sourceElement.innerHTML.trim() != ""){
+					
+						this.content[0].innerHTML = this.sourceElement.innerHTML;
+						if (typeof args.parent != "undefined"){
+
+							args.parent._populateElements(this.content[0], true,[]);
+						}
 					}
 				}
+
+				/* On vide l'élément source */
+				//this.sourceElement.innerHTML = "";
+				
+
 			}
-
-			/* On vide l'élément source */
-			//this.sourceElement.innerHTML = "";
-			
-
-		}
-  		
-		if (args)
-		{
-			if (args.style)
-				this.sourceElementStyle = args.style;
-			if (args.elem){
-				var tmpStyle = args.elem.getAttribute("data-inline-style");
-				if (tmpStyle != null)
-					this.sourceElementStyle =  tmpStyle;	
+	  			
+			if (args.elem)
+			{
+					var tmpStyle = args.elem.getAttribute("data-inline-style");
+					if (tmpStyle != null){
+						this.sourceElementStyle =  tmpStyle;	
+						this.setStyle(tmpStyle);
+					}
 			}
-			
-
 		}
+		
 
+		
+  	},
+  	
+	setStyle: function(css)
+   	{
+		this.container.attr("style", css);  
   	},
 
   	_onHashChange: function(hash)

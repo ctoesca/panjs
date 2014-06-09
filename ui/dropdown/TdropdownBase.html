@@ -52,19 +52,13 @@ defineClass("TdropdownBase", "core.display.Telement", {
 			this.injectParam("defaultTexte", args.defaulttexte,false, this.defaultTexte);
 			this.injectParam("insertNullItem", args.insertnullitem,false, this.insertNullItem);
 			this.injectParam("nullLabelItem", args.nulllabelitem,false, this.nullLabelItem);
-			if (typeof args.style != "undefined")
-				this.setStyle(args.style);
+			
 		}
 
-		
 		this._setEvents();	
 		this._setLabel(this.defaultTexte);
 	},
-	setStyle: function(css)
-	{
-		this.container.attr("style", css);
-	},
-	
+		
 	_onInitialized: function()
 	{
 	},
@@ -252,25 +246,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 	{
 		//ABSTRACT
 	}
-	/*,
-	_setStyle: function()
-	{
-		var s = this.sourceElementStyle;
-		if (s == null)
-			return;
-
-		s = s.split(";");
 	
-		for (var i=0; i< s.length; i++)
-		{
-			var v= s[i].split(":");
-				
-
-			if ((v[0] != "")&&(v[1] != ""))
-			this.container.css(v[0],v[1]);		
-		}
-
-	}*/
 
 });
 

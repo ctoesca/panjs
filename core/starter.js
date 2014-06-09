@@ -7,6 +7,8 @@
   panjs.iever = getIEVersion();
   panjs.chromever = getChromeVersion();
   panjs.ffver = getFirefoxVersion();
+  panjs.stack = [];
+  panjs.stackLevel = 0;
 
   panjs.messages = {
     CLASSNAME_MATCHS_FILENAME: "The name of the class (%1) must match the file name %2 (case sensitive)",
@@ -56,35 +58,59 @@
   /* 
     CreateCompoennt 
   */
+  
   panjs.createComponent = function(classPath, args)
   { 
+    panjs.stackLevel ++;
     var className = panjs.getClassNameFromClassPath(classPath);
-   
+    var object = null;
+
     if (typeof window[className] == "undefined")
     {
-      var r = panjs.loader.usesComponent(classPath);
-      if (!r.result) 
-      {        
+        var r = panjs.loader.usesComponent(classPath);
 
-          uses("core.display.TerrorElement.html");
-          var object = new TerrorElement(r);
-          return object;
-      }
+        if (!r.result) 
+        {        
+            uses("core.display.TerrorElement.html");
+            object = new TerrorElement(r);
 
+            panjs.stack.push(r.message);
+            panjs.stackLevel --;
+           
+            if (panjs.stackLevel <= 0){
+              panjs.stack = [];
+              panjs.stackLevel = 0;
+            }
+            
+            return object;
+        }
     }
+    
     try{
-      var object = new window[className](args);
+      object = new window[className](args);
     }catch(err){ 
-       logger.error("Error while instantiating "+className+": "+err);
-       uses("core.display.TerrorElement.html");
-      
-       var object = new TerrorElement({message: err, path:r.path,url:r.url, className:className});
+           var m = "Error instantiating "+className+": "+err;
+           logger.error(m);
+           uses("core.display.TerrorElement.html");  
+           var path = panjs.getAbsoluteUrlFromClassPath(classPath);    
+           var url = panjs.loader.getUrlWithVersion(path)
+
+           var object = new TerrorElement({message: err, path: path,url:url, className:className});
+           panjs.stack.push(m);
+    }
+    
+    panjs.stackLevel --;
+    if (panjs.stackLevel <= 0){
+      panjs.stack = [];
+      panjs.stackLevel = 0;
     }
 
     //_onInitialized signifie que l'objet est compètement construit (mais il n'est pas forcément visible).
     //!!cette fonction ne s'applique qu'aux composants (mais devrait aussi s'appliquer aux objets)
     if (object._onInitialized)
     object._onInitialized();
+
+       
 
     return object;
   }
@@ -246,6 +272,7 @@
 var Tobject = {
     classHierarchy: "Tobject",
    
+
     extend: function (properties, className, parentClassName) {
         var superProto = this.prototype || Tobject;
                 
@@ -739,7 +766,7 @@ defineClass("Tloader", "core.Tobject", {
                   this.addScriptNode(node, dirPath, className); 
                 }catch(err)
                 {
-                  var mess =  "Error processing <"+nodeName+"> => "+err;
+                  var mess =  "Error processing <"+nodeName+"> in "+className+" => "+err;
                   logger.error(path,mess);
                   return {result:false, message: mess, className: className, classPath:classPath, url: url, path:path, stack:err.stack}; 
                 }
@@ -1047,6 +1074,7 @@ defineClass("Tloader", "core.Tobject", {
 
         exec(r.data);
         this.loadedJs[url.toLowerCase()] = 1;
+      
       }else{
         logger.debug("Le script "+url+" est déjà chargé");
       }

@@ -596,6 +596,8 @@ function isControlKey(evt)
   panjs.iever = getIEVersion();
   panjs.chromever = getChromeVersion();
   panjs.ffver = getFirefoxVersion();
+  panjs.stack = [];
+  panjs.stackLevel = 0;
 
   panjs.messages = {
     CLASSNAME_MATCHS_FILENAME: "The name of the class (%1) must match the file name %2 (case sensitive)",
@@ -645,35 +647,59 @@ function isControlKey(evt)
   /* 
     CreateCompoennt 
   */
+  
   panjs.createComponent = function(classPath, args)
   { 
+    panjs.stackLevel ++;
     var className = panjs.getClassNameFromClassPath(classPath);
-   
+    var object = null;
+
     if (typeof window[className] == "undefined")
     {
-      var r = panjs.loader.usesComponent(classPath);
-      if (!r.result) 
-      {        
+        var r = panjs.loader.usesComponent(classPath);
 
-          uses("core.display.TerrorElement.html");
-          var object = new TerrorElement(r);
-          return object;
-      }
+        if (!r.result) 
+        {        
+            uses("core.display.TerrorElement.html");
+            object = new TerrorElement(r);
 
+            panjs.stack.push(r.message);
+            panjs.stackLevel --;
+           
+            if (panjs.stackLevel <= 0){
+              panjs.stack = [];
+              panjs.stackLevel = 0;
+            }
+            
+            return object;
+        }
     }
+    
     try{
-      var object = new window[className](args);
+      object = new window[className](args);
     }catch(err){ 
-       logger.error("Error while instantiating "+className+": "+err);
-       uses("core.display.TerrorElement.html");
-      
-       var object = new TerrorElement({message: err, path:r.path,url:r.url, className:className});
+           var m = "Error instantiating "+className+": "+err;
+           logger.error(m);
+           uses("core.display.TerrorElement.html");  
+           var path = panjs.getAbsoluteUrlFromClassPath(classPath);    
+           var url = panjs.loader.getUrlWithVersion(path)
+
+           var object = new TerrorElement({message: err, path: path,url:url, className:className});
+           panjs.stack.push(m);
+    }
+    
+    panjs.stackLevel --;
+    if (panjs.stackLevel <= 0){
+      panjs.stack = [];
+      panjs.stackLevel = 0;
     }
 
     //_onInitialized signifie que l'objet est compètement construit (mais il n'est pas forcément visible).
     //!!cette fonction ne s'applique qu'aux composants (mais devrait aussi s'appliquer aux objets)
     if (object._onInitialized)
     object._onInitialized();
+
+       
 
     return object;
   }
@@ -835,6 +861,7 @@ function isControlKey(evt)
 var Tobject = {
     classHierarchy: "Tobject",
    
+
     extend: function (properties, className, parentClassName) {
         var superProto = this.prototype || Tobject;
                 
@@ -1328,7 +1355,7 @@ defineClass("Tloader", "core.Tobject", {
                   this.addScriptNode(node, dirPath, className); 
                 }catch(err)
                 {
-                  var mess =  "Error processing <"+nodeName+"> => "+err;
+                  var mess =  "Error processing <"+nodeName+"> in "+className+" => "+err;
                   logger.error(path,mess);
                   return {result:false, message: mess, className: className, classPath:classPath, url: url, path:path, stack:err.stack}; 
                 }
@@ -1636,6 +1663,7 @@ defineClass("Tloader", "core.Tobject", {
 
         exec(r.data);
         this.loadedJs[url.toLowerCase()] = 1;
+      
       }else{
         logger.debug("Le script "+url+" est déjà chargé");
       }
@@ -2701,7 +2729,11 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 									//On crée l'instance du composant
 									
 									var compo = panjs.createComponent(dataType,{elem:el, parent:this});	
-									
+									/*if (compo.className == "TerrorElement"){
+							
+										panjs.stack.push("Unable to create "+dataType+" : "+compo.message);
+									}*/
+
 									compo.parent = this;
 
 									if ((setObject)&&(id != null))
@@ -2834,74 +2866,82 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 
 		this.container.addClass(styleClass);
 
-
-		if (defined(args, "elem"))
+		if (typeof args != "undefined")
 		{
-			/* On injecte les attributs de l'élément dans args */
-			var el = args.elem;
-			
-			for ( var i =0; i< el.attributes.length; i++)
-        	{
-            	var attr =  el.attributes.item(i);
-            	var name = attr.nodeName.toLowerCase();
-
-            	if ((name != "id")&&(name != "data-compo"))
-            	{
-            		if (name.startsWith("data-"))
-            			name = name.droite("-");
-            		var value = attr.value;
-
-            		if (value == "true")
-            			value = true;
-            		if (value == "false")
-            			value = false;
-
-            		args[name] = value;
-            			
-            		//ATTENTION: attr.nodeName est toujours en lowerCase
-            		//logger.info("Attribut "+this.id+" , "+name+"="+attr.value);
-            	}
-            	if (name == "includeinstate"){
-            		this.includeInState = value; 
-            		//Ajout de l'attribut includeinstate pour qu'il soit parsé dans processStates
-            		this.container.attr("includeInState", this.includeInState);
-            	}
-        	}
-	
-			/* On injecte le contenu de l'élément source dans l'élément <CONTENT> */	
-			this.sourceElement = args.elem;	
-
-			if (this.content != null)
+			if (defined(args, "elem"))
 			{
-				if (this.sourceElement.innerHTML.trim() != ""){
+				/* On injecte les attributs de l'élément dans args */
+				var el = args.elem;
 				
-					this.content[0].innerHTML = this.sourceElement.innerHTML;
-					if (typeof args.parent != "undefined"){
+				for ( var i =0; i< el.attributes.length; i++)
+	        	{
+	            	var attr =  el.attributes.item(i);
 
-						args.parent._populateElements(this.content[0], true,[]);
+
+	            	var name = attr.nodeName.toLowerCase();
+
+	            	if ((name != "id")&&(name != "data-compo"))
+	            	{
+	            		if (name.startsWith("data-"))
+	            			name = name.droite("-");
+	            		var value = attr.value;
+
+	            		if (value == "true")
+	            			value = true;
+	            		if (value == "false")
+	            			value = false;
+
+	            		args[name] = value;
+	            			
+	            		//ATTENTION: attr.nodeName est toujours en lowerCase
+	            		//logger.info("Attribut "+this.id+" , "+name+"="+attr.value);
+	            	}
+	            	if (name == "includeinstate"){
+	            		this.includeInState = value; 
+	            		//Ajout de l'attribut includeinstate pour qu'il soit parsé dans processStates
+	            		this.container.attr("includeInState", this.includeInState);
+	            	}
+
+	        	}
+		
+				/* On injecte le contenu de l'élément source dans l'élément <CONTENT> */	
+				this.sourceElement = args.elem;	
+
+				if (this.content != null)
+				{
+					if (this.sourceElement.innerHTML.trim() != ""){
+					
+						this.content[0].innerHTML = this.sourceElement.innerHTML;
+						if (typeof args.parent != "undefined"){
+
+							args.parent._populateElements(this.content[0], true,[]);
+						}
 					}
 				}
+
+				/* On vide l'élément source */
+				//this.sourceElement.innerHTML = "";
+				
+
 			}
-
-			/* On vide l'élément source */
-			//this.sourceElement.innerHTML = "";
-			
-
-		}
-  		
-		if (args)
-		{
-			if (args.style)
-				this.sourceElementStyle = args.style;
-			if (args.elem){
-				var tmpStyle = args.elem.getAttribute("data-inline-style");
-				if (tmpStyle != null)
-					this.sourceElementStyle =  tmpStyle;	
+	  			
+			if (args.elem)
+			{
+					var tmpStyle = args.elem.getAttribute("data-inline-style");
+					if (tmpStyle != null){
+						this.sourceElementStyle =  tmpStyle;	
+						this.setStyle(tmpStyle);
+					}
 			}
-			
-
 		}
+		
 
+		
+  	},
+  	
+	setStyle: function(css)
+   	{
+		this.container.attr("style", css);  
   	},
 
   	_onHashChange: function(hash)

@@ -47,6 +47,15 @@ defineClass("TcrudService", "core.events.TeventDispatcher", {
 
 		}
 	},
+	getObjectClass: function(name){
+
+		for (var i=0; i< this.objectClasses.length; i++){
+ 			if (this.objectClasses[i].nom == name)
+ 				return this.objectClasses[i];
+ 		}
+ 		return null;
+	},
+	
 	bindForeignKeys: function( sourceClass, sourceFieldName, destClass, destFieldName, foreighKeyField)
 	{
 		/* Exemples:
@@ -55,7 +64,7 @@ defineClass("TcrudService", "core.events.TeventDispatcher", {
 		this.foreignBindings.push( { sourceClass: sourceClass, sourceFieldName: sourceFieldName, destClass:destClass, destFieldName:destFieldName, foreighKeyField:foreighKeyField} );
 	},
 
-
+	
 	getAllCallers: function(){
 		var r = [];
 		for (var i =0; i< this.objectClasses.length; i++)		

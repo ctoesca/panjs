@@ -1,10 +1,10 @@
 <html>        
 <head>
 
-<style type="text/css">	
+<style type="text/css"> 
 .TerrorElement .message
 {
-	font-family:Consolas;
+    font-family:Consolas;
 }
 </style>
 
@@ -15,32 +15,34 @@ defineClass("TerrorElement", "core.display.Telement",
 { 
     baseElement: "div",
     compoClassName: '?',
-    
+    message: "?",
+
     constructor: function(args) { 
         
         TerrorElement._super.constructor.call(this,args);
-        if (typeof args.message != "undefined"){
+        if (typeof args != "undefined"){
         
-            var mess = "?";
+         
             var path = "?";
             var url = "?";
             
-           
+        
             if (typeof args.message == "string")
             {
-                mess = args.message;   
+                this.message = args.message;   
             }
             else{
                 if (defined( args, "message" ,"message"))
-                    mess =  args.message.message;
+                    this.message =  args.message.message;
                 else
-                    mess = args.message;
+                    this.message = args.message;
             }
 
-            if (typeof mess == "string")
+            var messHtml = this.message;
+            if (typeof this.message == "string")
             {
-                mess =  mess.htmlEntities();
-                mess = mess.replace(/\n/g, '<br/>');
+                messHtml =  this.message.htmlEntities();
+                messHtml = messHtml.replace(/\n/g, '<br/>');
             }
 
 
@@ -53,11 +55,16 @@ defineClass("TerrorElement", "core.display.Telement",
              if (typeof args.className == "string")
                 this.compoClassName = args.className;
 
-            mess += "<br/>Fichier: "+path;
-            mess += "<br/>URL: "+url;
+            messHtml += "<br/>Fichier: "+path;
+            messHtml += "<br/>URL: "+url;
+
+            messHtml += "<br/>Previous errors:";
+                for (var i = 0; i< panjs.stack.length; i++)
+                    messHtml += "<br/>"+panjs.stack[i].htmlEntities().replace(/\n/g, '<br/>');
 
             this.titre.html (this.titre.html().replace("{compoClassName}", this.compoClassName));
-            this.message.html(mess);
+            this.messageContent.html(messHtml);
+
         }
                 
 
@@ -73,15 +80,15 @@ defineClass("TerrorElement", "core.display.Telement",
 
 </head>
 
-<body>	 
-	
-	<div class="alert alert-danger fade in">
+<body>   
+    
+    <div class="alert alert-danger fade in">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4 id="titre">Unable to load the component <em>{compoClassName}</em> !</h4>
-        <pre id="message" class="message">
+        <pre id="messageContent" class="message">
         </pre>
     </div>
 
- 	
+    
 </body>
 </html>

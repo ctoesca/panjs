@@ -11,6 +11,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 	maskIsVisible: false,
 	winH: null,
 	winW: null,
+	allowScroll: true,
 
 	constructor: function(args){
 		this._super.constructor.call(this,args);		
@@ -53,7 +54,8 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 
 		if (defined(options, "closeOnMaskClick"))
 			obj.closeOnMaskClick = options.closeOnMaskClick;
-
+		if (defined(options, "allowScroll"))
+				this.allowScroll = options.allowScroll;
 
 		instance.on(Tevent.CLOSE, this._onCompoClose, null ,this);
 	
@@ -64,6 +66,9 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		$(document.body).append(ctn);
 		this._positionnerModal(ctn);
 		ctn.show();
+
+		if (this.allowScroll == false)
+		$(document.body).css("overflow-y", "hidden");
         //ctn.fadeIn(500); 
 
 		this.dispatchEvent(new Tevent(Tevent.SHOW, instance));	
@@ -79,6 +84,8 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 				var compo = panjs.createComponent(className,args); 
 			else
 				var compo = new className(args); 
+
+		
 		}
 		else{
 			if (typeof className == "string")
@@ -96,6 +103,9 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		{
 			if (this.popups[i].compo == compo)
 			{
+				if (this.allowScroll == false)
+				$(document.body).css("overflow-y", "auto");
+
 				this.popups[i].window.detach();
 				compo.off(Tevent.CLOSE, this._onCompoClose);
 			

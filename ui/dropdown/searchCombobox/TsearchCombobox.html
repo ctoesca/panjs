@@ -79,10 +79,7 @@ defineClass("TsearchCombobox", "core.display.Telement", {
         
         this.dispatchEvent( new Tevent(Tevent.CHANGE, v));
     },
-    setStyle: function(css)
-    {
-        this.container.attr("style", css);
-    },
+   
     _addItem: function(item)
     {
         if (item == null)
