@@ -115,6 +115,14 @@
     return object;
   }
  
+  panjs.loadScript = function(src, success)
+  { 
+      $LAB.script(src).wait(function(){
+
+        if (typeof success != "undefined")
+          success(src);
+      });
+  }
 
   /*
     _load
