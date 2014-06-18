@@ -1416,7 +1416,7 @@ defineClass("Tloader", "core.Tobject", {
                 if (defined(window[parentClassName].prototype.html))
                 {         
                   html = window[parentClassName].prototype.html.replace( '<!--CONTENT-->', html);
-                  html = "<div>"+html.replace(/<body>/gi, "").replace(/<\/body>/gi, "")+"</div>";
+                  html = html.replace(/<body>/gi, "").replace(/<\/body>/gi, "");
                 }
                 else
                 {
@@ -1427,8 +1427,10 @@ defineClass("Tloader", "core.Tobject", {
                 
                 window[className].prototype.html = html;
 
-                if (panjs.iever == 8)
-                  window[className].prototype.html = $(html)[0].innerHTML; //correct HTML for IE8 (</div/> => <div></div>).
+                if (panjs.iever == 8){
+                	var div = $('<div>'+html+'</div>');
+                    window[className].prototype.html = div[0].innerHTML; //correct HTML for IE8 (</div/> => <div></div>).
+                }
 
                 window[className].prototype.bodyNode = bodyNode;
 
