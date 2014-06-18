@@ -15,7 +15,7 @@
 	swapChildrenAt(index1:int, index2:int):void
 */
 
-uses("core.display.TproxyDisplayObject");
+
 
 defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 { 	
@@ -307,6 +307,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 								{
 									//Le composant n'est pas instancié: on met un proxy à la place, qui a la fonction LOAD()
 									el.setAttribute("id", this.id+"_"+id);
+									uses("core.display.TproxyDisplayObject");
 									var proxyCompo = new TproxyDisplayObject({sourceElement:el});
 									
 

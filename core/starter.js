@@ -598,6 +598,13 @@ panjs.logger = new Tlogger({level: Tlogger[panjs.logLevel], name:"main"});
 logger = panjs.logger;
 
 
+//Compat Ttracer (temporaire)
+Ttracer = function(){};
+Ttracer.getLogger = function(name){
+  return logger;
+}
+
+
 
 /*** 
 Tloader: loads other classes or components (synchronous)
@@ -824,7 +831,7 @@ defineClass("Tloader", "core.Tobject", {
                 }
                 else
                 {
-                  html = html.replace(/<body>/gi, "<div>").replace(/<\/body>/gi, "</div>");
+                  html = html.replace(/<body>/gi, "").replace(/<\/body>/gi, "");
                 }
 
                 html = html.replace(/\\r/gi, "").replace(/\\n/gi, "").trim();

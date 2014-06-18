@@ -1187,6 +1187,13 @@ panjs.logger = new Tlogger({level: Tlogger[panjs.logLevel], name:"main"});
 logger = panjs.logger;
 
 
+//Compat Ttracer (temporaire)
+Ttracer = function(){};
+Ttracer.getLogger = function(name){
+  return logger;
+}
+
+
 
 /*** 
 Tloader: loads other classes or components (synchronous)
@@ -1413,7 +1420,7 @@ defineClass("Tloader", "core.Tobject", {
                 }
                 else
                 {
-                  html = html.replace(/<body>/gi, "<div>").replace(/<\/body>/gi, "</div>");
+                  html = html.replace(/<body>/gi, "").replace(/<\/body>/gi, "");
                 }
 
                 html = html.replace(/\\r/gi, "").replace(/\\n/gi, "").trim();
@@ -2490,7 +2497,7 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 	swapChildrenAt(index1:int, index2:int):void
 */
 
-uses("core.display.TproxyDisplayObject");
+
 
 defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 { 	
@@ -2782,6 +2789,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 								{
 									//Le composant n'est pas instancié: on met un proxy à la place, qui a la fonction LOAD()
 									el.setAttribute("id", this.id+"_"+id);
+									uses("core.display.TproxyDisplayObject");
 									var proxyCompo = new TproxyDisplayObject({sourceElement:el});
 									
 
