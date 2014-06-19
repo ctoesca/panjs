@@ -159,9 +159,9 @@ function getXmlDocument (text) {
       else 
       {
         if (xmlDoc.documentElement) {
-          if (xmlDoc.documentElement.nodeName == "parsererror") {
-            errorMsg = xmlDoc.documentElement.childNodes[0].nodeValue;
-          }
+          var errors = xmlDoc.getElementsByTagName( 'parsererror' );
+          if( errors.length > 0 )
+            errorMsg = errors[0].textContent;
         }
         else {
           errorMsg = "XML Parsing Error!";
