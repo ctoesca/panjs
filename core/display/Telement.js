@@ -70,7 +70,8 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 	            		//Ajout de l'attribut includeinstate pour qu'il soit parsé dans processStates
 	            		this.container.attr("includeInState", this.includeInState);
 	            	}
-
+	            	//if (name == "visible")
+	            	//	this.visible = (value == "true");
 	        	}
 		
 				/* On injecte le contenu de l'élément source dans l'élément <CONTENT> */	
@@ -104,7 +105,9 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 			}
 		}
 		
-
+		/*if (this.visible == false){
+			this.hide();
+		}*/
 		
   	},
   	

@@ -261,12 +261,18 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 	},
 	getTr: function(item)
 	{
+		//!! PB ID
 		var r = null;
-		if (typeof item.id != "undefined")
-		r = this.container.getElement('tr[itemId="'+item.id+'"]');
+		var id = item.id || item.ID;
+		if (typeof id == "undefined")
+			logger.error(this.className+" : no item.ID or item.id property on object");
+
+		r = this.container.getElement('tr[itemId="'+id+'"]');
 	    if (r!= null)
 	    	r = r[0];
 		return r;
+
+
 	},
 	_onItemReplaced: function(e)
 	{
@@ -522,7 +528,7 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 				if (col.cellClass != null)
 					td.setAttribute("class", col.cellClass);
 
-				tr.setAttribute("itemId", obj.id);
+				tr.setAttribute("itemId", obj.id|| obj.ID);
 				$(td).on("click", this.onTdClick.bind(this));
 				tr.appendChild(td);
 			}

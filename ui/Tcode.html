@@ -42,25 +42,24 @@
 <script src="/libs/CodeMirror/4.2/keymap/sublime.js"></script>
 
 
-<style type="text/less">
-.Tcode{
-	/*.CodeMirror-linenumber{
-		color:white;
-	}*/
+<style type="text/css">
+
 	
-	.CodeMirror {
+.Tcode .CodeMirror {
 	  border: 1px solid #eee;
 	  max-width: 1200px;
 	 /* height: auto;*/
 	  /*max-height:500px;*/
-	  font-size: 1.15em;
-	}
-	.CodeMirror-scroll {
+	  font-size: 16px;
+	  height: 500px;
+}
+
+.Tcode .CodeMirror-scroll {
 	  overflow-y: auto;
 	  overflow-x: auto;
-	}
-	
 }
+	
+
 </style>
 
 <script type="text/x-class-definition">
@@ -101,9 +100,10 @@ defineClass("Tcode", "core.display.Telement", {
 				indent: true,
 				readOnly: this.readOnly,
 				keymap: "sublime",
-				theme: "monokai"
+				theme: "monokai",
 			}
   		);
+
 
 		var s = this.content[0].innerHTML.trim();	
 		
@@ -142,10 +142,11 @@ defineClass("Tcode", "core.display.Telement", {
 	setSource: function(s){
 		
 		this._source= s;
+		this.editor.getDoc().setValue(s);
 		
 		setTimeout(	function(){
-			this.editor.getDoc().setValue(s);
-			if (this.height == null)
+			
+			/*if (this.height == null)
 			{
 
 				var n = this._source.nbsouschaine("\n", this._source);
@@ -160,7 +161,7 @@ defineClass("Tcode", "core.display.Telement", {
 				var h = this.height;
 				if (h<this._minHeight) h=this._minHeight;
 				this.editor.setSize("100%", h);	
-			}
+			}*/
 		}.bind(this),200);
 
 		

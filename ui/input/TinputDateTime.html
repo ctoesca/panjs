@@ -26,6 +26,8 @@ defineClass("TinputDateTime", "core.display.Telement", {
 	format: "DD/MM/YYYY",
 	pickTime: false,
 	useCurrent: false,    
+	minuteStepping: 15,
+
 	/* METHODES */
 	
 	constructor: function(args){
@@ -38,6 +40,9 @@ defineClass("TinputDateTime", "core.display.Telement", {
 			
 			if (typeof args.picktime != "undefined")
 				this.pickTime = args.picktime;
+
+			if (typeof args.minutestepping != "undefined")
+				this.minuteStepping = parseInt(args.minutestepping);
 		}
 		
 
@@ -46,7 +51,8 @@ defineClass("TinputDateTime", "core.display.Telement", {
 		this.datepicker = this.datePicker.datetimepicker({
 			language: 'fr',
 			pickTime: this.pickTime,
-			useCurrent: this.useCurrent
+			useCurrent: this.useCurrent,
+			minuteStepping: this.minuteStepping
 		});
 		this.widget = this.datepicker.data("DateTimePicker").widget;
 		this.widget.attr("style", "z-index: 1000000");
@@ -110,7 +116,7 @@ defineClass("TinputDateTime", "core.display.Telement", {
         var r = this.val();
         
         if (r !=null)
-        r = moment(r).format("YYYY-MM-DD HH:mm:ss");
+        r = moment(r).format("YYYY-MM-DD HH:mm:00");
         return r;
     }
 });

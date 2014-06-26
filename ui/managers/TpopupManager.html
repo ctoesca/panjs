@@ -49,14 +49,18 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		var obj = {
 			window: ctn, 
 			compo: instance, 
-			closeOnMaskClick: false
+			closeOnMaskClick: false,
+			freeOnClose: true
 		};
 
 		if (defined(options, "closeOnMaskClick"))
 			obj.closeOnMaskClick = options.closeOnMaskClick;
+		if (defined(options, "freeOnClose"))
+			obj.freeOnClose = options.freeOnClose;
 		if (defined(options, "allowScroll"))
 				this.allowScroll = options.allowScroll;
 
+	
 		instance.on(Tevent.CLOSE, this._onCompoClose, null ,this);
 	
 		this.popups.push( obj );
@@ -67,8 +71,10 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		this._positionnerModal(ctn);
 		ctn.show();
 
-		if (this.allowScroll == false)
-		$(document.body).css("overflow-y", "hidden");
+		if (this.allowScroll == false){
+			$(document.body).css("overflow-y", "hidden");
+			$(document.body).css("overflow-x", "hidden");
+		}
         //ctn.fadeIn(500); 
 
 		this.dispatchEvent(new Tevent(Tevent.SHOW, instance));	
@@ -103,10 +109,15 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		{
 			if (this.popups[i].compo == compo)
 			{
-				if (this.allowScroll == false)
-				$(document.body).css("overflow-y", "auto");
+				if (this.allowScroll == false){
+					$(document.body).css("overflow-y", "auto");
+					$(document.body).css("overflow-x", "auto");
+				}
+
+				var freeOnClose = this.popups[i].freeOnClose;
 
 				this.popups[i].window.detach();
+
 				compo.off(Tevent.CLOSE, this._onCompoClose);
 			
 				this.popups.splice(i,1);	
@@ -115,7 +126,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 					this._hideMask();
 								
 				this.dispatchEvent(new Tevent(Tevent.CLOSE, compo));
-				if (typeof compo.free == "function")
+				if ((typeof compo.free == "function")&&( freeOnClose == true))
 					compo.free();
 					
 				break;

@@ -34,6 +34,7 @@ defineClass("TcrudService", "core.events.TeventDispatcher", {
 				caller.url = classe.url;
 				caller.className = classe.nom;
 				caller.cached =  classe.cached || false;
+				caller.IDField =  classe.IDField || "id";
 				
 				this["caller"+classe.nom] = caller;
 				this["get"+classe.nom+"ById"] = caller.getById.bind(caller);

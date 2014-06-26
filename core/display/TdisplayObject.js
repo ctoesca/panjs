@@ -70,14 +70,16 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 		else
 			this._setId(args.id);
 
-		if (args)
-		this.injectParam("visible", args.visible,false, this.visible);
-
 		this.container[0].owner = this;
 		
   		//logger.debug("init TdisplayObject: ",this.className,", id=",this.id);
   	},
-
+  	addClass: function(v){
+  		this.container.addClass(v);
+  	},
+  	removeClass: function(v){
+  		this.container.removeClass(v);
+  	},
   	appendTo: function(elem){
   		
 		if (this._parent != null)

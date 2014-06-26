@@ -12,6 +12,8 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	extraUrlParams: null,
 	data: null,
 	url: null, // ex: /machines
+	IDField: "id",
+
 
 	constructor: function(args){
 		this._super.constructor.call(this,args);	
@@ -58,11 +60,12 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		for (var nomModel in this.data){
 			var model = this.data[nomModel];
 
-			var item = model.getByProp("id", id);
+			var item = model.getByProp(this.IDField, id);
 
 			if (item != null)
 				r.push({item: item, model: model});
 		}
+		
 		return r;
 	},
 	
@@ -81,7 +84,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 
 	replaceItemInModels: function(item){
 		
-		var items = this.getItemsById(item.id);
+		var items = this.getItemsById(item[this.IDField]);
 		for (var i=0; i<items.length; i++)
 			items[i].model.replaceItem(items[i].item, item);		
 	},
@@ -195,8 +198,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		}
 		else
 		{
-			var itemModels= this.getItemsById(item.id);
-
+			var itemModels= this.getItemsById(item[this.IDField]);
 
 			if (itemModels.length > 0)
 			{

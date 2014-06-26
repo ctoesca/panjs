@@ -824,7 +824,7 @@ function isControlKey(evt)
       for (var i=0; i< panjs.namespaces.length; i++)
       {
         var n = panjs.namespaces[i];
-        
+      
         if (classPath.startsWith(n.name+"."))
         {
           var r = classPath.removeEnd(".html").replace(/\./g, "/");
@@ -838,6 +838,10 @@ function isControlKey(evt)
         }
       }
     }
+
+    if (r == "")
+        throw "Can't resolve "+classPath+": verify namespaces";
+
     return  r;
   }
 
@@ -1030,7 +1034,12 @@ function defineClass(className, inheritsFromClassPath, def)
     }
   }
 
+try{
   window[className] = window[classe].extend(def,className,classe);
+}catch(err)
+{
+  alert(classe+" "+err);
+}
 
   panjs.lastDefinedClassName = className;
 }
@@ -1491,6 +1500,7 @@ defineClass("Tloader", "core.Tobject", {
         logger.info(h," USES ",classPath, h);
 
       path = panjs.getAbsoluteUrlFromClassPath(classPath);
+
       if (this.loadedJs[path.toLowerCase()])
         return true;
 
@@ -1626,6 +1636,10 @@ defineClass("Tloader", "core.Tobject", {
         }
          
     }
+  
+    if ((panjs.iever == 8)&&(typeof respond != "undefined"))
+      respond.update();
+
   },
   addStyleNode: function(node)
   {                   
@@ -2402,14 +2416,16 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 		else
 			this._setId(args.id);
 
-		if (args)
-		this.injectParam("visible", args.visible,false, this.visible);
-
 		this.container[0].owner = this;
 		
   		//logger.debug("init TdisplayObject: ",this.className,", id=",this.id);
   	},
-
+  	addClass: function(v){
+  		this.container.addClass(v);
+  	},
+  	removeClass: function(v){
+  		this.container.removeClass(v);
+  	},
   	appendTo: function(elem){
   		
 		if (this._parent != null)
@@ -2919,7 +2935,8 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 	            		//Ajout de l'attribut includeinstate pour qu'il soit parsé dans processStates
 	            		this.container.attr("includeInState", this.includeInState);
 	            	}
-
+	            	//if (name == "visible")
+	            	//	this.visible = (value == "true");
 	        	}
 		
 				/* On injecte le contenu de l'élément source dans l'élément <CONTENT> */	
@@ -2953,7 +2970,9 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 			}
 		}
 		
-
+		/*if (this.visible == false){
+			this.hide();
+		}*/
 		
   	},
   	

@@ -235,7 +235,7 @@
       for (var i=0; i< panjs.namespaces.length; i++)
       {
         var n = panjs.namespaces[i];
-        
+      
         if (classPath.startsWith(n.name+"."))
         {
           var r = classPath.removeEnd(".html").replace(/\./g, "/");
@@ -249,6 +249,10 @@
         }
       }
     }
+
+    if (r == "")
+        throw "Can't resolve "+classPath+": verify namespaces";
+
     return  r;
   }
 
@@ -441,7 +445,12 @@ function defineClass(className, inheritsFromClassPath, def)
     }
   }
 
+try{
   window[className] = window[classe].extend(def,className,classe);
+}catch(err)
+{
+  alert(classe+" "+err);
+}
 
   panjs.lastDefinedClassName = className;
 }
@@ -902,6 +911,7 @@ defineClass("Tloader", "core.Tobject", {
         logger.info(h," USES ",classPath, h);
 
       path = panjs.getAbsoluteUrlFromClassPath(classPath);
+
       if (this.loadedJs[path.toLowerCase()])
         return true;
 
@@ -1037,6 +1047,10 @@ defineClass("Tloader", "core.Tobject", {
         }
          
     }
+  
+    if ((panjs.iever == 8)&&(typeof respond != "undefined"))
+      respond.update();
+
   },
   addStyleNode: function(node)
   {                   
