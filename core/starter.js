@@ -12,7 +12,7 @@
 
   panjs.messages = {
     CLASSNAME_MATCHS_FILENAME: "The name of the class (%1) must match the file name %2 (case sensitive)",
-    LESS_IE8: "less.js is not fully compatible with IE%1 : transform less code in css",
+    LESS_IE8: "less is not fully compatible with IE%1 : transform less code in css",
     LESS_NOT_LOADED: "LESS not loaded. Use panjs_core_with_less.min.js or load LESS (before panJs)"
   };
 
@@ -25,9 +25,9 @@
       mess = mess.replace("%"+i, a);
     }
 
-    return mess;
+    return mess; 
   };
-   
+    
   /*
     Remplacement variables panjs dans namespaces
   */
@@ -692,7 +692,13 @@ defineClass("Tloader", "core.Tobject", {
           dataType: "html",
           processData: false,
           context: this,
-
+          //Sur accès GSM, les proxies des providers "optimisent" et modifient les pages html, les rendant non valides, et injectent du script etc.
+          //no-transform évite ça, mais ce n'est psa imparable.
+          
+          beforeSend: function (request)
+          {
+              request.setRequestHeader("Cache-Control", "no-transform");
+          },
           success: function(data, textStatus, jqXHR) { 
             this.onLoadFileSuccess(jqXHR, url);   
             result = {'result':true, 'data': data};   
@@ -760,6 +766,17 @@ defineClass("Tloader", "core.Tobject", {
       if (r.result)
       { 
           try{
+           
+            //if (r.data.indexOf("bmi_orig_img") >= 0){
+              //certains providers injectent du code à la fin des fichiers HTML (3G)
+              //et remplacent les liens des fichiers js et css par leurs contenus js/css
+              //REMPLACE PAR ajout header cache-control = no-transform loadFile
+              
+           //  var indx = r.data.lastIndexOf("</html>");
+           //   r.data = r.data.substring(0, indx+7);
+           //   r.data = r.data.replace(/\&/g, "&amp;");
+           // }
+                
             var dom = getXmlDocument(r.data);
           }catch(err){
             logger.error(err);         

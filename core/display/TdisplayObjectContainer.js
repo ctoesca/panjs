@@ -157,7 +157,8 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 		{	
 			var el = this._statesElements[j];
 
-			var included = false;
+			var included = null;
+			var excluded = null;
 
 			for (var i=0; i<arguments.length; i++)
 			{
@@ -165,34 +166,32 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 
 				if (this.stateExists(stateName))
 				{		
-					//logger.debug(el.id+", i="+i+", setState stateName = "+stateName);
-					if (included == false)
-			 		if (el.includeIn != null)
-						included = (el.includeIn.indexOf(stateName) >= 0);
-					else
-						included = true;
+					if (flag == false)
+			 			this.currentState.push(stateName);
 
-					if (included == true)
-			 		if (el.excludeFrom != null)
-			 		{
-			 			if (el.excludeFrom.indexOf(stateName) >= 0)
-			 			{
-							included = false;
+					if ((el.includeIn != null)&&(included != true))
+					{
+						included = (el.includeIn.indexOf(stateName) >= 0);						
+					}
+
+					if ((el.excludeFrom != null)&&(excluded != true))
+					{
+						excluded = (el.excludeFrom.indexOf(stateName) >= 0);	
+						if (excluded)				
 							break;
-						}
-			 		}	
-			 		if (flag == false)
-			 			 this.currentState.push(stateName);
-				}
-				else
-				{
-					logger.warn(el.id+", state "+stateName+" n'existe pas!");
+					}
 				}
 			}
-			flag = true;
-			var show = (included);
-			//logger.debug("setState: elem.id="+el.id+", show = "+show);
-			this._setStateElementVisible( show, el);
+			
+			flag = true;						
+
+			if ((included != null)||(excluded != null)){
+				logger.debug("setState "+this.currentState+": affichage "+el.id+", included="+included+", excluded="+excluded);
+				//On  intervient que si included est défini (non null)
+				var show = (((included == true)||(included == null)) && ((excluded == false)||(excluded == null)));
+				this._setStateElementVisible( show, el);
+			}
+			
 		}	
 	
 		for (var i=0; i< this.currentState.length; i++){

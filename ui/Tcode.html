@@ -51,7 +51,7 @@
 	 /* height: auto;*/
 	  /*max-height:500px;*/
 	  font-size: 16px;
-	  height: 500px;
+	  height: 400px;
 }
 
 .Tcode .CodeMirror-scroll {
@@ -138,7 +138,12 @@ defineClass("Tcode", "core.display.Telement", {
 	getSource: function(s){
 		return this.editor.getDoc().getValue();
 	},
-
+	getDoc: function(){
+		var r = null;
+		if (this.editor != null)
+		r = this.editor.getDoc();
+		return r;
+	},
 	setSource: function(s){
 		
 		this._source= s;

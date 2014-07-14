@@ -41,7 +41,13 @@ defineClass("TcrudService", "core.events.TeventDispatcher", {
 				this["update"+classe.nom] = caller.update.bind(caller);
 				this["delete"+classe.nom] = caller.remove.bind(caller);
 				this["search"+classe.nom] = caller.search.bind(caller);
+				
+				if (classe.hasFiles == true){
 
+					this["listFiles"+classe.nom] = caller.listFiles.bind(caller);
+					this["deleteFile"+classe.nom] = caller.deleteFile.bind(caller);
+					this["uploadFiles"+classe.nom] = caller.uploadFiles.bind(caller);
+				}
 				caller.onUpdate = this.onCallerUpdate.bind(this);
 				caller.onRemove = this.onCallerRemove.bind(this);
 			}
@@ -169,4 +175,6 @@ defineClass("TcrudService", "core.events.TeventDispatcher", {
 			success(value);
 		return true;
 	}
+
+	
 });

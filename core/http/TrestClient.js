@@ -33,7 +33,12 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 	},
 	_getSuccessEvent: function(data, req, token)
 	{
-		var r = new Tevent(Tevent.SUCCESS, data);
+		
+		logger.debug("X-Time="+req.getResponseHeader("X-Time"));
+
+		var r = new Tevent(Tevent.SUCCESS, data);	
+		r.xTime = req.getResponseHeader("X-Time");
+
 		return r;
 	},
 	_getErrorEvent: function(req, method, exception,url, token)
@@ -94,6 +99,10 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 	{
 		this._call("GET", url, params, data, success||null, failure||null,token);
 	},
+	getText: function(url, params, data, success, failure, token)
+	{
+		this._call("GET", url, params, data, success||null, failure||null,token, "text");
+	},
 	put: function(url, params, data, success, failure, token)
 	{
 		this._call("PUT", url, params, data, success||null, failure||null,token);
@@ -102,7 +111,7 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 	{
 		this._call("DELETE", url, params, data, success||null, failure||null,token);
 	},
-	_call: function(method, url, params, data, success, failure, token)
+	_call: function(method, url, params, data, success, failure, token, dataType)
 	{
 		/*
 			Construction des paramètres de l'url
@@ -131,7 +140,13 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 
 		var path = this.baseUrl+url+urlParams;
 
-		logger.debug("Appel ",method,": ",path,", dataType="+this.dataType);
+		
+		if (arguments.length < 8)
+			var dataType = this.dataType;
+		
+		token.dataType = dataType;
+
+		logger.debug("Appel ",method,": ",path,", dataType="+dataType);
 
 
 		var req = $.ajax({ 
@@ -144,12 +159,13 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
    				   withCredentials: true
    				},
 
-				dataType: this.dataType,	//json: fonctionne pas en crossdomain sur IE8
+				dataType: dataType,	//json: fonctionne pas en crossdomain sur IE8
 									//nécessité d'utiliser XdomainRequest (CORS pour IE8)
 				success: function(data, textStatus, req) {
-					logger.debug("Requête AJAX terminée avec succès: ",url);
-					logger.debug("X-Time="+req.getResponseHeader("X-Time"));
 					
+					logger.debug("Requête AJAX terminée avec succès: ",url);
+
+
 					if (this.exitCodeFieldName != null)
 					{
 						var status = data[this.exitCodeFieldName];
@@ -158,9 +174,6 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 						{
 							if ( status != 200)
 							{
-
-
-
 								//C'est une erreur:
 								var e = this._getErrorEvent(req, method,  data[this.errorTextFieldName],path, token);
 								this.dispatchEvent(e);
@@ -172,7 +185,6 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 						}
 
 					}
-
 
 					var e = this._getSuccessEvent(data,req, token);
 					this.dispatchEvent(e);

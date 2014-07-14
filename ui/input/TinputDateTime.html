@@ -100,8 +100,11 @@ defineClass("TinputDateTime", "core.display.Telement", {
             return r;
 
         }else
-        {
-            this.datePicker.data("DateTimePicker").setDate(moment(value).format(this.format));
+        {	
+        	if (value == null)
+        		this.datePicker.data("DateTimePicker").setDate(null);
+        	else
+            	this.datePicker.data("DateTimePicker").setDate(moment(value).format(this.format));
         }
     },
 

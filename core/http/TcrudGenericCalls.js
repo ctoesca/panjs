@@ -134,6 +134,98 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	{
 
 	},
+
+	/************************************************************/
+	/*********************   GESTION FICHIERS DES RESSOURCES  ****/
+	/************************************************************/
+	
+	listFiles: function(id, success, failure)
+	{
+		var token = {extSuccess:success, extFailure:failure};		
+		var data = null;
+		this.restClient.get(this.url+"/"+id+"/listFiles", "" , data, this.onListFilesSuccess.bind(this), failure||this.defaultErrorHandler, token);
+	},
+	onListFilesSuccess: function(evt, token)
+	{
+		if (defined(token.extSuccess))
+           token.extSuccess(evt.data, token);  
+	},
+
+	
+	deleteFile: function(id,filename, success, failure)
+	{
+		var token = {extSuccess:success, extFailure:failure};
+		var data = null;
+		this.restClient.del(this.url+"/"+id+"/files/"+filename, "" , data, this.onDeleteFileSuccess.bind(this), failure||this.defaultErrorHandler, token);
+	},
+	onDeleteFileSuccess: function(evt, token){
+		if (defined(token.extSuccess))
+           token.extSuccess(evt.data, token);
+	},
+
+	uploadFiles: function(id, formData,progressHandler, success, failure)
+	{
+	
+		var url = this.apiUrl+this.url+'/'+id+'/files/upload?'+this.extraUrlParams;
+
+ 		$.ajax({
+		        url: url,  //Server script to process data
+		        type: 'POST',
+		        xhr: function() {  // Custom XMLHttpRequest
+		            var myXhr = $.ajaxSettings.xhr();
+		            if(myXhr.upload){ // Check if upload property exists
+		                myXhr.upload.addEventListener('progress',progressHandler, false); // For handling the progress of the upload
+		            }
+		            return myXhr;
+		        }.bind(this),
+
+		        //beforeSend: this.beforeSendHandler.bind(this),
+		        //success: this.completeHandler.bind(this),
+		        //error: this.errorHandler.bind(this),	   
+		        data: formData,
+		        cache: false,
+		        contentType: false,
+		        processData: false,
+
+		        success: function(data, textStatus, req) {
+					logger.info("Upload terminé avec succès: "+data);
+					if (typeof data != "object")
+					{
+						logger.error(err+" =>"+data);
+						return;
+					}
+
+					if (defined(success)){
+						success(data);
+					}
+
+				}.bind(this),
+				error: function(req, settings, exception) { 
+					
+					logger.error(req.responseText);
+
+					var data={
+						uploaded: [],
+						errors:1,
+						message: ""
+					};
+
+					try{
+					data = JSON.parse(req.responseText);
+					}catch(err)
+					{
+						data.message = req.responseText;																	
+					}
+
+					if (defined(failure)){
+						failure(data);
+					}
+					
+				}.bind(this)
+		});  
+	},
+
+
 	//*********************************************************************************************************
 	//********************************************  CRUD  *****************************************************
 	//*********************************************************************************************************

@@ -1,3 +1,2 @@
-﻿Panjs version 0.6.1
+﻿Pre release 0.6.1
 IE8 compatible
-Release 0.6.1 dans SVN

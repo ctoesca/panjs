@@ -187,6 +187,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 	},
 	_refreshMaskSize: function()
 	{
+		if (this.mask == null) return;
 		var maskHeight = $(document).height();
         var maskWidth = $(window).width();     	
         this.mask.css({'width':maskWidth,'height':maskHeight});  
