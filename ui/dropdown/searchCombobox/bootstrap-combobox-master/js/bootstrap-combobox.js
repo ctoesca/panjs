@@ -27,6 +27,7 @@
     this.options = $.extend({}, $.fn.combobox.defaults, options);
     this.$source = $(element);
     this.$container = this.setup();
+
     this.$element = this.$container.find('input[type=text]');
     this.$target = this.$container.find('input[type=hidden]');
     this.$button = this.$container.find('.dropdown-toggle');
@@ -39,6 +40,7 @@
     this.refresh();
     this.transferAttributes();
     this.listen();
+
   };
 
   Combobox.prototype = {
@@ -50,6 +52,7 @@
       var combobox = $(this.options.template);
       this.$source.before(combobox);
       this.$source.hide();
+
       return combobox;
     }
 
@@ -113,7 +116,12 @@
       this.$element.val(this.updater(val)).trigger('change');
       this.$source.val(this.map[val]).trigger('change');
       this.$target.val(this.map[val]).trigger('change');
+
+      if (val != null)
       this.$container.addClass('combobox-selected');
+      else
+      this.$container.removeClass('combobox-selected');
+
       this.selected = true;
 
 
@@ -255,7 +263,7 @@
   }
 
   , clearElement: function () {
-
+    this.$container.removeClass('combobox-selected');
     this.$element.val('').focus();
   }
 

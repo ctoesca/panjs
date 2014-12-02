@@ -4,11 +4,9 @@ uses("core.collections.TarrayCollection");
 defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", { 
 
 	apiUrl: null, // Url de base de l'api. ex: http://cid/apis/cmdb/1.0/index.php
-	listeSearchOptions: null,
-	lastIdSearch: null,
+	
 	className: null,
 	cached: false,
-	listeIsSet: false,
 	extraUrlParams: null,
 	data: null,
 	url: null, // ex: /machines
@@ -37,18 +35,20 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		}
 		return r;
 	},
-	getModel: function(nom){
+	getModel: function(nom, create){
 
-		var r = this.data.Default;
+		var r = null;
 		
 		if ((arguments.length > 0) && (nom != null) ){
 			if (typeof this.data[nom] != "undefined"){
 				return this.data[nom];
 			}else
 			{
-				logger.debug("Affectation model "+nom);
-				this.data[nom] = new TarrayCollection();
-				r = this.data[nom];
+				if ((arguments.length == 2) && (create == true)){
+					logger.debug("Affectation model "+nom);
+					this.data[nom] = new TarrayCollection();
+					r = this.data[nom];	
+				}
 			}
 		}
 		return r;
@@ -68,7 +68,23 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		
 		return r;
 	},
-	
+
+	getItemsByProp: function(propName, value){
+		//Recherche par propriété, dans tous les models 
+		var r = [];
+		for (var nomModel in this.data){
+			var model = this.data[nomModel];
+
+			var items = model.getByProp(propName, value, true);
+			for (var i=0; i< items.length; i++){
+				if (items[i] != null)
+				r.push({item: items[i], model: model});
+			}
+		}
+		
+		return r;
+	},	
+
 	addItemInModels: function(item){
 		for (var nomModel in this.data){
 			var model = this.data[nomModel];
@@ -163,9 +179,8 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
            token.extSuccess(evt.data, token);
 	},
 
-	uploadFiles: function(id, formData,progressHandler, success, failure)
+	uploadFiles: function(id, formData, progressHandler, success, failure)
 	{
-	
 		var url = this.apiUrl+this.url+'/'+id+'/files/upload?'+this.extraUrlParams;
 
  		$.ajax({
@@ -191,10 +206,15 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 					logger.info("Upload terminé avec succès: "+data);
 					if (typeof data != "object")
 					{
-						logger.error(err+" =>"+data);
+						logger.error("ECHEC UPLOAD =>"+data);
+						if (defined(failure)){
+							failure(data);
+						}
 						return;
 					}
-
+					
+					this.updateModel(data.item);
+					
 					if (defined(success)){
 						success(data);
 					}
@@ -236,16 +256,16 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		var data = null;
 		if (arguments.length >= 4) {
 			if (typeof opt.updateModel != "")
-			updateModel = opt.updateModel;
+				updateModel = opt.updateModel;
 			data = opt;
 		}
 			
 		var token = {extSuccess:success, extFailure:failure, updateModel: updateModel, searchId: id};
 		
-		if ((this.cached == false) || (this.listeIsSet == false)|| (this.lastIdSearch!= id))
-		{
+		//if ((this.cached == false) || (this.listeIsSet == false)|| (this.lastIdSearch!= id))
+		//{
 			this.restClient.get(this.url+"/"+id, "" , data, this._ongetById.bind(this), failure||this.defaultErrorHandler, token);	
-		}
+		/*}
 		else
 		{
 			this.lastIdSearch = id;
@@ -256,28 +276,48 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 				item = itemsModel[0].item;
 
 			token.extSuccess(item);	
-		}
+		}*/
 	},
 
 	_ongetById: function(evt, token)
 	{
-		this.lastIdSearch = token.searchId;
 		this._ongetByIdDefault(evt, token);	
 	},
 
 	update: function(obj, success, failure)
 	{
 		var token = { extSuccess:success, extFailure:failure};
-		var data = {data: JSON.stringify(obj)};
+		var idType = typeof obj[this.IDField];
+		var hasId = false;
 
-		this.restClient.post(this.url, "" , data, this._onupdate.bind(this), failure||this.defaultErrorHandler, token);
+		if (idType == "string")
+		{
+			if (obj[this.IDField].trim() != "")
+				hasId = true;
+		}
+		else{
+			if ((idType == "number")&&(obj[this.IDField] != 0))
+				hasId = true;
+		}
+		
+		//POST=> Creation, le serveur définit le ID, PUT=> Update ou Creation avec un Id définit par le client
+		if (hasId == false)
+			this.restClient.post(this.url, "" , obj, this._onupdate.bind(this), failure||this.defaultErrorHandler, token);
+		else
+			this.restClient.put(this.url+"/"+obj[this.IDField], "" , obj, this._onupdate.bind(this), failure||this.defaultErrorHandler, token);
 	},
 
 	_onupdate: function(evt, token)
 	{
-		this.updateModel(evt.data)
+		if (typeof evt.data.push == "function"){
+			
+			for (var i = 0; i < evt.data.length; i++) {
+				this.updateModel(evt.data[i]);
+			};
+		}else{
+			this.updateModel(evt.data);
+		}
        	//Pour recharger les grilles attachées au modèle
-        //this.search(this.listeSearchOptions); 
         this._onupdateDefault(evt, token);
 	},
 
@@ -348,18 +388,17 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	
 	search: function(searchOptions, success, failure, opt)
 	{
-		this.startSearch = new Date();
-		var _updateModel = true;
-		var nomModel = 'Default';
-		var fields = null;
+		var updateModel = true;
+		var nomModel = null;
+		var useCache = this.cached;
 
 		if (arguments.length > 3){
 			if (typeof opt.updateModel != "undefined")
-				_updateModel = opt.updateModel;
+				updateModel = opt.updateModel;
 			if (typeof opt.nomModel != "undefined")
 				nomModel = opt.nomModel;
-			if (typeof opt.fields != "undefined")
-				fields = opt.fields;
+			if (typeof opt.useCache != "undefined")
+				useCache = opt.useCache;
 		}
 		
 		if (searchOptions == null)
@@ -368,55 +407,67 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		if (searchOptions.startsWith("&"))
 			searchOptions = searchOptions.substring(1);
 	
-		if (fields != null)
-			searchOptions +="&fields="+fields;
+		if (nomModel == null){
+			nomModel = searchOptions;
+		}
 
-		var token = {url: this.url, extSuccess:success, extFailure:failure, searchOptions: searchOptions, updateModel:_updateModel, nomModel:nomModel};
+		var model = this.getModel(nomModel, false);
+
+		var token = {startSearch: new Date(), url: this.url, extSuccess:success, extFailure:failure, searchOptions: searchOptions, updateModel:updateModel, nomModel:nomModel};
 		var data = null;
-		
-		if ((this.cached == false) || (this.listeIsSet == false) || (this.listeSearchOptions != searchOptions))
+
+		if ((useCache == false) || (model == null) )
 		{
 			this.restClient.get(this.url, searchOptions , data, this._onsearch.bind(this), failure||this.defaultErrorHandler, token);		
 		}
 		else
 		{
 			logger.debug("UTILISATION DU CACHE SUR "+this.className);
-			var model = this.getModel(nomModel);
-			var data = {total: model.length, data: model, processTime:0};
+			var data = {total: model.total, data: model};
 			model.refresh();
-			token.extSuccess(data);
-		}
-		
+			var randomWait = randomBetween(10, 100);
+			delay(token.extSuccess, randomWait, data);  
+			//token.extSuccess(data);
+		}	
 	},
 
 	_onsearch: function(evt, token)
 	{
 		var debut = new Date();
-		var tempsAppel = (debut - this.startSearch);
-		var tempsCpuServeur =  Math.round(evt.data.processTime*1000);
+		var tempsAppel = (debut - token.startSearch);
+		var tempsCpuServeur =  Math.round(evt.xTime);
 	
-		logger.debug("Temps traitement ("+tempsAppel +"ms) = Temps serveur ("+tempsCpuServeur+"ms) + encodage/decodage Json ("+ (tempsAppel - tempsCpuServeur)+" ms) token.updateModel="+token.updateModel) ;
+		logger.debug("Temps total ("+tempsAppel +"ms) = Traitement serveur ("+tempsCpuServeur+"ms) + encodage/decodage Json etc ("+ (tempsAppel - tempsCpuServeur)+" ms) token.updateModel="+token.updateModel) ;
 		
+		if (evt.data == null){	
+			evt.data = {status: 200, responseText: "Résultat non conforme: La requête a réussi (status="+evt.req.status+") mais a renvoyé null."};
+			if (defined(token.extFailure)){
+				token.extFailure(evt, token);
+			}
+			return;
+		}
+		
+
 		if (token.updateModel)
 		{
-			model = this.getModel(token.nomModel);
-		
-			model.setSource(evt.data.data);
+			//On met à jour le model
+			model = this.getModel(token.nomModel, true);			
 			model.total = evt.data.total;
+			model.setSource(evt.data.data);
 			evt.data.data = model;
-			this._onsearchDefault(evt, token);	
-			this.listeIsSet = true;
-			this.listeSearchOptions = token.searchOptions;
 		}
 		else
-		{
+		{	
+			//On renvoie une nouvelle collection
 			var l = new TarrayCollection();
 			l.setSource(evt.data.data);
 			l.total = evt.data.total;
-			evt.data.data = l;	
-			this._onsearchDefault(evt, token);	
+			evt.data.data = l;
+			
 		}
 		
+		this._onsearchDefault(evt, token);
+
 		var fin = new Date();
  		logger.debug("Temps maj model = "+ (fin - debut)+" ms") ;
  			

@@ -93,12 +93,15 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
     },
     replaceItem:function(item, newItem)
     {
+      if (item == newItem)
+        return;
         var indx = this.getItemIndex(item);
         if (indx > -1)
         {
           this._source[indx] = newItem;
           this.length = this._source.length; 
           this.dispatchEvent( new Tevent(Tevent.REPLACE, {item:item, newItem: newItem}));
+          this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REPLACE",item:item, newItem: newItem}));
         }
     },
 
@@ -134,6 +137,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
   			this._source.push(item);
         this.length = this._source.length;    
         this.dispatchEvent( new Tevent(Tevent.ADDED, {item:item, index:this.length-1}));
+        this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:item, index:this.length-1}));
   		}
   	},
     addItems: function(items)
@@ -151,6 +155,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
         this._source.splice(indx, 0, item);
         this.length = this._source.length;    
         this.dispatchEvent( new Tevent(Tevent.ADDED, {item:item, index:indx}));
+        this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:item, index:indx}));
     },
 
   	
@@ -159,6 +164,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
   		var indx = this.getItemIndex(item);
   		if (indx >= 0)
   			this._removeItemAt(indx, item);
+      return indx;
   	},
   	
   	removeItemAt: function(indx)
@@ -177,6 +183,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
     {
         this.length = this._source.length;
         this.dispatchEvent( new Tevent(Tevent.REFRESH, this));
+        this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REFRESH"}));
     },
     
   	/*
@@ -187,6 +194,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
   		this._source.splice(indx, 1);
       this.length = this._source.length;
   		this.dispatchEvent( new Tevent(Tevent.DELETE, item));
+      this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"DELETE", item:item}));
   	}
 });
 

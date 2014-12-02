@@ -2,13 +2,14 @@
  (function () {
 
   panjs.logger = null;
-  panjs.root = {id:"root"};
+  panjs.root = {id:"root", components: {}};
   panjs.loader = null;
   panjs.iever = getIEVersion();
   panjs.chromever = getChromeVersion();
   panjs.ffver = getFirefoxVersion();
   panjs.stack = [];
   panjs.stackLevel = 0;
+  panjs.setSourceInComponents = false;
 
   panjs.messages = {
     CLASSNAME_MATCHS_FILENAME: "The name of the class (%1) must match the file name %2 (case sensitive)",
@@ -27,7 +28,14 @@
 
     return mess; 
   };
+  panjs.getClass  = function(classPath) {
+
+    if (typeof window[classPath] == "undefined")    
+      uses(classPath);
     
+    return window[classPath];
+
+  };   
   /*
     Remplacement variables panjs dans namespaces
   */
@@ -81,13 +89,59 @@
               panjs.stack = [];
               panjs.stackLevel = 0;
             }
-            
             return object;
         }
     }
     
     try{
+
+      if (typeof args == "undefined")
+        var args = {};
+
+      if (typeof args.elem != "undefined")
+      {
+          var el = args.elem;
+
+          for ( var i =0; i< el.attributes.length; i++)
+          {
+                  var attr =  el.attributes.item(i);
+
+                  var name = attr.nodeName.toLowerCase();
+                  var value = attr.value;
+
+                  if ((name != "id")&&(name != "data-compo"))
+                  {
+                    if (name.startsWith("data-")){
+                      //name = name.droite("-");
+                      name = panjs.getFormatedArgName(name);
+
+                    }
+                    
+                    if (value == "true")
+                      value = true;
+                    if (value == "false")
+                      value = false;
+
+                    args[name] = value;
+                    //ATTENTION: attr.nodeName est toujours en lowerCase!
+                    //logger.info("Attribut "+this.id+" , "+name+"="+attr.value);
+                  }       
+        }
+      }
+        
+      if (typeof panjs.root.components[classPath] != "undefined"){
+          if (args.reuse != "undefined") 
+          {
+            if (args.reuse === true){
+              var c = panjs.root.components[classPath];
+              c.reuse(args);
+              return c;
+            }
+          }
+      };
+
       object = new window[className](args);
+
     }catch(err){ 
            var m = "Error instantiating "+className+": "+err;
            logger.error(m);
@@ -110,11 +164,44 @@
     if (object._onInitialized)
     object._onInitialized();
 
-       
+    panjs.root.components[classPath] = object;
 
     return object;
   }
- 
+  panjs.getFormatedIdName = function(idName)
+  {
+    //transforme un id="menu-toggle" en "menuToggle"
+    //logger.debug("idName="+idName);
+
+    if (idName.indexOf("-") == -1)
+      return idName;
+
+    var r = "";
+    var parts = idName.split("-");
+
+    for (var i=0; i< parts.length; i++){
+        if (i == 0)
+          r = parts[i];
+        else
+          r += parts[i].capitalizeFirstLetter();
+    }
+    //logger.debug("idName="+idName+", parts.length = "+parts.length+",r="+r);
+    return r;
+  }
+  panjs.getFormatedArgName = function(argName)
+  {
+    //exemple: data-nom-model  => revoie nomModel    
+    var r = "";
+    var parts = argName.split("-");
+    for (var i=1; i< parts.length; i++){
+        if (i == 1)
+          r = parts[i];
+        else
+          r += parts[i].capitalizeFirstLetter();
+    }
+    return r;
+  }
+
   panjs.loadScript = function(src, success)
   { 
       $LAB.script(src).wait(function(){
@@ -175,11 +262,13 @@
         else
         {
           uses("core.display.TproxyDisplayObject");
-          var compo = new TproxyDisplayObject({sourceElement: el[0] });
-          el.hide();
-          el[0].setAttribute("id", panjs.root.id+"_"+id);
-          el[0].originalId = id; 
-          el[0].owner = panjs.root;
+          var compo = new TproxyDisplayObject({sourceElement:el[0]});
+          compo.parent = this;
+          el[0].loaded = false;
+          el.hide();     
+          el[0].setAttribute("id", panjs.root.id+"_"+id);          
+          el[0].originalId = id;       
+          el[0].owner = panjs.root;          
         }
 
         panjs.root[id] = compo;
@@ -414,12 +503,9 @@ var Tobject = {
         this[name] = value;
         return true;
       }
-    },
-    callLater: function(f,a)
-    {
-   
-      setTimeout(f.bind(this, a), 50);
     }
+
+    
 };
 
 
@@ -459,9 +545,10 @@ function uses(classPath)
 {
   var isHtm = classPath.endsWith(".html");
   if (isHtm)
-    panjs.loader.usesComponent(classPath);
+    var r = panjs.loader.usesComponent(classPath);
   else
-    panjs.loader.uses(classPath);
+    var r = panjs.loader.uses(classPath);
+  return r;
 }
 
 
@@ -626,11 +713,13 @@ defineClass("Tloader", "core.Tobject", {
   loadedJs: null,
   loadedCss: null,
   _lessIsLoaded: null,
+  randomId: "",
 
   constructor: function(args) {
     
     this.loadedJs = {};
     this.loadedCss = {};
+    this.randomId = Math.random();
 
     },
     lessIsLoaded: function()
@@ -646,17 +735,16 @@ defineClass("Tloader", "core.Tobject", {
         http://.../.../.../
         app.components.
         */
-        var classPathDir = null;
-        var className = panjs.getClassNameFromClassPath(classPath);
-
+        var classPathDir = classPath;
+      
         if (classPath.endsWith(".js"))
-          classPathDir =  classPath.removeEnd(className+".js"); 
+          classPathDir =  classPath.removeEnd(".js"); 
         else 
           if (classPath.endsWith(".html"))
-          classPathDir =  classPath.removeEnd(className+".html"); 
-        else
-          return;
-
+          classPathDir =  classPath.removeEnd(".html"); 
+       
+        classPathDir = classPathDir.substr(0, classPathDir.lastIndexOf("."));
+    
         return classPathDir;
     },
 
@@ -671,7 +759,7 @@ defineClass("Tloader", "core.Tobject", {
     url += "v="+panjs.appVersion;
 
     if (panjs.env == "dev")
-      url=url+"&rid="+Math.random();
+      url=url+"&rid="+this.randomId;
 
     return url;
     },
@@ -738,13 +826,13 @@ defineClass("Tloader", "core.Tobject", {
     var h = " ************ ";
 
     var className = panjs.getClassNameFromClassPath(classPath);
-  
+ 
     var url = null;
     var path = null;
 
     if (this._count > this.maxImbrications)
     {
-      return {result:false, message:"Too much nested components (max: "+this.maxImbrications+")", className: className, classPath:classPath, url: url, path:"?"};
+      return {result:false, message:"Too much nested components (max: "+this.maxImbrications+")", className: className, classPath:classPath, url: url, path:"?", Class: null};
     }
 
     if (typeof window[className] == "undefined")
@@ -850,19 +938,18 @@ defineClass("Tloader", "core.Tobject", {
                 var html = getXml(bodyNode);
                 var parentClassName = window[className].prototype.parentClassName;
                 
-                if (defined(window[parentClassName].prototype.html))
-                {         
-                  html = window[parentClassName].prototype.html.replace( '<!--CONTENT-->', html);
-                  html = html.replace(/<body>/gi, "").replace(/<\/body>/gi, "");
-                }
-                else
-                {
-                  html = html.replace(/<body>/gi, "").replace(/<\/body>/gi, "");
-                }
+                if (defined(window[parentClassName].prototype.html)){
+                    if (window[parentClassName].prototype.html.contains('<!--CONTENT-->'))
+                      html = window[parentClassName].prototype.html.replace( '<!--CONTENT-->', html); 
 
+                }
+                
+                html = html.replace(/<body>/gi, "").replace(/<\/body>/gi, "");
                 html = html.replace(/\\r/gi, "").replace(/\\n/gi, "").trim();
                 
                 window[className].prototype.html = html;
+
+               
 
                 if (panjs.iever == 8){
                 	var div = $('<div>'+html+'</div>');
@@ -874,14 +961,15 @@ defineClass("Tloader", "core.Tobject", {
             }
             catch(e)
             { 
-              return {result:false, message:e.message, className: className, classPath:classPath, url: url, path:path};
+              return {result:false, message:e.message, className: className, classPath:classPath, url: url, path:path, Class: null};
             }
-          }
+        }
           /*else
           {         
             //html et bodyNode are inherited            
           }*/
-          
+          if (panjs.setSourceInComponents)
+          window[className].prototype.source = r.data;
           window[className].prototype.classPath = classPath;  
           window[className].prototype.classPathDir = this.getClassPathDir(classPath);
           window[className].prototype.className = className;  
@@ -897,37 +985,39 @@ defineClass("Tloader", "core.Tobject", {
           }
       
           logger.groupEnd();
-          return {result:true, message:"ok", className: className, classPath:classPath, url: url, path:path}; 
+          return {result:true, message:"ok", className: className, classPath:classPath, url: url, path:path, Class: window[className]}; 
       }
       else
-      {
+      { 
         var mess = "Error loading "+classPath+": "+ r.status;
         logger.warn(mess);
         this._count --;
         logger.groupEnd();
-        return {result:false, message:mess, className: className, classPath:classPath, url: url, path:path};
+
+        return {result:false, message:mess, className: className, classPath:classPath, url: url, path:path, Class: null};
       }
       
     }
 
-    return  {result:true, message:"Already loaded", className: className, classPath:classPath, url: url, path:path}; 
+    return  {result:true, message:"Already loaded", className: className, classPath:classPath, url: url, path:path, Class: window[className]}; 
     
   },
 
     uses: function(classPath)
     {
-    
+     
     var h = " ------------ ";
     var className = panjs.getClassNameFromClassPath(classPath);
     var url = null;
     var path = null;
 
-    if (typeof window[className] == "undefined")
+    if (typeof window[classPath] == "undefined")
     { logger.groupStart();
       if (this._count == 0)
         logger.info(h," USES ",classPath, h);
 
       path = panjs.getAbsoluteUrlFromClassPath(classPath);
+      var dirPath = path.substring(0, path.lastIndexOf("/")); 
 
       if (this.loadedJs[path.toLowerCase()])
         return true;
@@ -936,6 +1026,7 @@ defineClass("Tloader", "core.Tobject", {
 
       logger.groupStart();
       url = this.getUrlWithVersion(path);
+      
 
       var r = this.loadFile(url);     
       
@@ -947,7 +1038,11 @@ defineClass("Tloader", "core.Tobject", {
           window[className].prototype.classPath = classPath;    
           window[className].prototype.className = className;  
           window[className].prototype.classPathDir = this.getClassPathDir(classPath);
-          window[className].lastId = 0; 
+          window[className].prototype.dirPath = dirPath;
+
+          window[className].lastId = 0;
+
+          window[classPath] = window[className];
       }
       //logger.debug(className+" = "+typeof window[className]+" path = "+path+", result="+r.result);
       this._count --;
@@ -976,6 +1071,8 @@ defineClass("Tloader", "core.Tobject", {
   },  
   loadCssFile: function(url, type , rel){
     var r = false;
+    
+    url = this.getUrlWithVersion(url);
 
     if (this.loadedCss[url.toLowerCase()])
       return r;
@@ -983,12 +1080,14 @@ defineClass("Tloader", "core.Tobject", {
     var l = arguments.length;
     if (l == 0)
       throw "loadCssFile(url, type , rel): Missing url";
+    
+    if (typeof type == "undefined")
+      var type = "text/css";
+    
+    if (typeof rel == "undefined")
+       var rel = "stylesheet";
 
     
-    else if (l == 2)
-      var rel = "stylesheet/less";
-
-    url = this.getUrlWithVersion(url);
 
     if ((document.createStyleSheet)&&(panjs.iever == 8))
     {   
@@ -1054,6 +1153,7 @@ defineClass("Tloader", "core.Tobject", {
             if (this.lessIsLoaded())
             {
               less.refresh();
+
               logger.debug("INJECTION LESS OK");    
             }
             else
@@ -1100,14 +1200,7 @@ defineClass("Tloader", "core.Tobject", {
       { 
         script = this.processCode(script, className); 
       }
-      else
-      {
-        if (className != null)  
-          logger.warn("type=\"text/x-class-definition\" doesn't exist on <script> ("+className+")");
-      }
-      
       exec(script);
-
     }
     else
     {      

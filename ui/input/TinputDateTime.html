@@ -62,11 +62,12 @@ defineClass("TinputDateTime", "core.display.Telement", {
 	
 	_setEvents: function()
 	{
-		this.datePicker.on("dp.change", this._onChangeDate.bind(this));
+		//this.datePicker.on("dp.change", this._onChangeDate.bind(this));
 		this.datePicker.on("dp.hide", this._onHideDate.bind(this));
 		this.datePicker.on("dp.show", this._onShowDate.bind(this));
 		this.datePicker.on("dp.error", this._onErrorDate.bind(this));
-		
+		this.input.on("change", this._onChangeDate.bind(this));
+
 	},
 	free: function(){
 		this._super.free.call(this);
@@ -81,6 +82,27 @@ defineClass("TinputDateTime", "core.display.Telement", {
 	},
 	_onChangeDate: function(e)
 	{
+		this.checkDate();
+	},
+	checkDate : function()
+	{
+		this.input.css("color", "");
+		try{
+			if (this.input.val().trim() == "")
+				return true;
+			var isValide = moment(this.getInputText(), this.format).isValid();
+
+			if (!isValide){
+				this.input.css("color", "red");
+				return false;
+			}
+			else{
+				return true;
+			}
+		}catch(err){
+			this.input.css("color", "red");
+			return false;
+		}
 	},
 	_onShowDate: function(e)
 	{
@@ -93,21 +115,34 @@ defineClass("TinputDateTime", "core.display.Telement", {
 
         if (arguments.length == 0)
         {
+  		
             var r = this.datePicker.data("DateTimePicker").getDate();
-            
             if (this.input.val().trim() == "")
             r = null;
+
+        	if (this.checkDate() == false)
+				throw "Date incorrecte";
+
             return r;
 
         }else
         {	
-        	if (value == null)
+        	
+
+        	if (value == null){
         		this.datePicker.data("DateTimePicker").setDate(null);
-        	else
+        	}
+        	else{
+
             	this.datePicker.data("DateTimePicker").setDate(moment(value).format(this.format));
+				if (this.checkDate() == false)
+				throw "Date incorrecte";
+        	}
         }
     },
-
+    getInputText: function(){
+    	return this.input.val().trim();
+    },
 	setTimeStamp: function(v)
 	{
 		if (v == null)
@@ -116,10 +151,12 @@ defineClass("TinputDateTime", "core.display.Telement", {
 	},
 	getTimeStamp: function()
     {
+    	
         var r = this.val();
         
         if (r !=null)
         r = moment(r).format("YYYY-MM-DD HH:mm:00");
+
         return r;
     }
 });

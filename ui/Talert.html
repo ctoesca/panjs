@@ -115,6 +115,7 @@ Talert.CANCEL = "Annuler";
 Talert.show = function(message, buttons, closeHandler, data, iconhtml, title, fade)
 {
 	uses("ui.managers.TpopupManager.html");
+	message = message.replace(/\n/g,'<br/>');
 	
 	var p = panjs.PopupManager.createPopup(Talert, 
 	{

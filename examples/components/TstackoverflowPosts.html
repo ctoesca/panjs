@@ -1,0 +1,139 @@
+<html>        
+  <head>
+    
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+
+    <style type="text/css">
+    .app h1
+    {
+      background-color: #d9edf7;
+      border: 1px solid #bce8f1;
+      border-radius: 4px;
+      padding:5px;
+    }
+    </style>
+
+    <script type="text/x-class-definition">
+    //<![CDATA[      
+    uses("core.helpers.Ttimer");
+    defineClass("app", "core.display.Telement", { 
+      
+      baseElement: "div", 
+      refreshInterval: 20000,
+      lastItem:null,
+      isLoading: false,
+
+      constructor: function(args){
+          this._super.constructor.call(this,args);   
+          this.buttonRefresh.on("click", this.onRefreshClick.bind(this));
+          
+          this.timer = new Ttimer({delay: this.refreshInterval});
+          this.timer.on(Ttimer.ON_TIMER, this.onTimer.bind(this));
+          this.timer.start();
+
+          this.loadData();
+      },
+
+      onTimer: function(e){
+          this.loadData();
+      },
+      onRefreshClick: function(e){
+          this.loadData();
+      },
+
+      setIsLoading: function(value){
+        this.isLoading = value;
+        if (value)
+        {      
+          this.buttonRefresh.addClass("disabled");
+          this.buttonRefresh.getElement("i").addClass("fa-spin");
+        }else{
+          this.buttonRefresh.removeClass("disabled");
+          this.buttonRefresh.getElement("i").removeClass("fa-spin");
+        }
+      },
+
+      loadData: function()
+      { 
+          this.timer.stop();
+          if (this.isLoading)
+            return;
+          this.setIsLoading(true);
+                
+          $.ajax({
+            url: 'https://api.stackexchange.com/2.2/posts?order=desc&sort=creation&site=stackoverflow&filter=!-*f(6qtpmXx8',
+            type: 'GET',
+            success: this.onLoadDataSuccess.bind(this),
+            error: this.onLoadDataFailure.bind(this),
+          });
+      },
+
+      onLoadDataSuccess: function(data){       
+                
+        for (var i=data.items.length-1; i>=0; i--){
+          if ((this.lastItem == null) || (data.items[i].creation_date > this.lastItem.creation_date ))
+          this.addItem(data.items[i]);
+        }
+
+        this.errorElem.hide();
+        this.lastItem = data.items[0];
+        this.setIsLoading(false);
+        this.timer.start();
+      },
+
+      onLoadDataFailure: function(e){
+        this.setIsLoading(false);
+        this.errorElem.html(e.responseText);
+        this.errorElem.show();
+        this.timer.start();
+      },
+
+      addItem: function(item){
+          var html = '<div class="panel panel-default">';
+          html +=         '<div class="panel-heading" role="tab" id="post_'+item.post_id+'">';
+          html +=           '<h4 class="panel-title">';
+          html +=             '<a data-toggle="collapse" data-parent="#accordion" href="#collapse'+item.post_id+'" aria-expanded="true" aria-controls="collapse'+item.post_id+'">';
+          html +=               this.getDateFromTimestamp(item.creation_date)+ ' - ' + item.title;
+          html +=             '</a>';
+          html +=           '</h4>';
+          html +=         '</div>';
+          html +=         '<div id="collapse'+item.post_id+'" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="post_'+item.post_id+'">';
+          html +=           '<div class="panel-body">';
+          html +=                item.body;
+          html +=           '</div>';
+          html +=         '</div>';
+          html +=   '</div>';
+          var itemHtml = $(html);
+          this.accordion.prepend( itemHtml );
+      },
+      
+      getDateFromTimestamp: function(unix_timestamp){
+       
+        var a = new Date(unix_timestamp*1000);
+        var year = a.getFullYear();
+        var month = a.getMonth();
+        var date = a.getDate();
+        var hour = a.getHours();
+        var min = a.getMinutes();
+        var sec = a.getSeconds();
+        var time = date + '/' + month + '/' + year + ' ' + hour + ':' + min + ':' + sec ;
+        return time;
+      }
+    });
+    //]]>
+    </script>
+
+  </head>
+  <body>  
+
+      <div class="btn-group" role="group">
+        <button id="buttonRefresh" type="button" class="btn btn-default"><i class="fa fa-refresh"/></button>
+      </div>
+
+      <div id="errorElem" class="alert alert-danger" style="display:none"></div>
+      
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      </div>
+
+  </body>
+</html> 

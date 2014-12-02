@@ -63,10 +63,10 @@ defineClass("TeventDispatcher", "core.Tobject", {
 	/* 	params type:String, listener:Function
 		return void
 	*/
-	on: function(type, listener, data, bind)
+	on: function(type, listener, bind, data)
 	{
-		if (arguments.length <4 ) var bind = null;
-		if (arguments.length <3 ) var data = null;
+		if (arguments.length <4 ) var data = null;
+		if (arguments.length <3 ) var bind = null;
 
 		var l = {"listener":listener, "data": data, "bind":bind};
 

@@ -1,0 +1,73 @@
+ <html>        
+ <head>
+
+  <!--<link rel="stylesheet" href="/libs/highlight.js/8.4/default.min.css"/>-->
+  <link rel="stylesheet" href="/libs/highlight.js/8.4/src/styles/vs.css"/>
+  <script src="/libs/highlight.js/8.4/highlight.min.js"></script>
+
+
+  <style type="text/css">
+    .TcodeHighlight code
+    {
+        overflow: auto; 
+    }
+
+    .TcodeHighlight pre{
+        padding: 2px;
+    }
+  </style>
+
+  <script type="text/x-class-definition">
+    //<![CDATA[      
+
+    defineClass("TcodeHighlight", "core.display.Telement.html", { 
+
+      baseElement: "div", 
+      sourceClasspath:null,
+
+      constructor: function(args){  
+
+        this._super.constructor.call(this,args);
+        if (defined(args, "processCode"))
+          this.processCode = args.processCode;
+
+
+        if (defined(args, "sourceClasspath"))
+        {
+            this.sourceClasspath = args.sourceClasspath;
+
+            var classe = uses(this.sourceClasspath);
+            var source = classe.Class.prototype.source;
+
+            source = source.replace(/&/g, "&amp;");
+            source = source.replace(/</g, "&lt;");
+            source = source.replace(/>/g, "&gt;");
+            source = source.trim();
+        }else{
+            var source = this.sourceElement.innerHTML;
+        }
+        source = this.processCode(source);
+
+        if (defined(args,"maxHeight")){
+          this.code1.css("max-height", args.maxHeight);
+        }
+
+        this.code1[0].innerHTML = source;
+
+        hljs.highlightBlock(this.code1[0]);
+
+      },
+      processCode: function(code){
+        return code;
+      }
+
+    });
+    panjs.setSourceInComponents = true;
+    //]]>
+</script>
+
+</head>
+<body>  
+      <pre><code class="html" id="code1"></code></pre>
+</body>
+</html> 

@@ -13,7 +13,7 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 
 		this.injectParam("sourceElement", args.sourceElement,true);
 		this.sourceElement.style.display = "none";
-
+		this.sourceElement.setAttribute("loaded", "false");
   		//logger.debug("init TproxyDisplayObject: ",this.className,", id=",this.id);
   	},
   	load: function(args)
@@ -21,7 +21,7 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 		var h = this.sourceElement;
 
 		if ((h != null) && (this.loaded == false))
-		{		
+		{
 			var dataType = h.getAttribute("data-compo");	
 		
 			var origId = h.originalId;
@@ -36,19 +36,20 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 				args.parent = this.parent;
 			}
 
-
+			this.dispatchEvent( new Tevent( Tevent.BEFORE_LOAD, {args:args, dataType:dataType}));
 			var compo = panjs.createComponent(dataType,args);	
 		
 			compo.parent = this.parent;
 			h.owner[origId] = compo;
-	
+		
 			$(h).replaceWith(compo.container);
+			compo.container[0].originalId = origId;
+
 			compo.loaded = true;		
 
 			if (compo.visible)
 			compo.show();
-
-			
+	
 			h.setAttribute("id", h.owner.id+"_"+origId);
 
 			this.dispatchEvent( new Tevent( Tevent.LOADED, compo));

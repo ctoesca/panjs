@@ -30,17 +30,10 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 		this._statesElements = [];
 		this.currentState = [];
 
-
 		if (defined(this.html) && (this.html.trim() != ""))
-		{		
-			
-
-			this.container.html(this.html);	
-			
-			this._populateElements(this.container[0],true,[]);
-			
-
-			
+		{			
+			this.container.html(this.html);		
+			this._populateElements(this.container[0],true,[]);		
 		}
 
   		//logger.debug("init TdisplayObjectContainer: "+this.className+". args="+args);
@@ -186,7 +179,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 			flag = true;						
 
 			if ((included != null)||(excluded != null)){
-				logger.debug("setState "+this.currentState+": affichage "+el.id+", included="+included+", excluded="+excluded);
+				//logger.debug("setState "+this.currentState+": affichage "+el.id+", included="+included+", excluded="+excluded);
 				//On  intervient que si included est défini (non null)
 				var show = (((included == true)||(included == null)) && ((excluded == false)||(excluded == null)));
 				this._setStateElementVisible( show, el);
@@ -239,7 +232,9 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 									logger.error('1-Duplication du id "'+id+'" sur objet '+this.className);
 							
 								//logger.debug('Affectation '+id+' sur objet '+this.className);
-								this[id] = $(el);
+								var fId = panjs.getFormatedIdName(id);
+
+								this[fId] = $(el);
 								r.push(id);	
 							}
 
@@ -300,6 +295,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 									
 									el.loaded = true;
 									compo.loaded = true;
+									
 									
 								}
 								else

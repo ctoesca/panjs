@@ -61,7 +61,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 				this.allowScroll = options.allowScroll;
 
 	
-		instance.on(Tevent.CLOSE, this._onCompoClose, null ,this);
+		instance.on(Tevent.CLOSE, this._onCompoClose, this);
 	
 		this.popups.push( obj );
 
@@ -76,11 +76,11 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 			$(document.body).css("overflow-x", "hidden");
 		}
         //ctn.fadeIn(500); 
-
+        this._showMask();
 		this.dispatchEvent(new Tevent(Tevent.SHOW, instance));	
 		//$(document.body).css("overflow-y", "hidden");
 		
-		this._showMask();
+		
 		return instance;
 	},
 	createPopup: function(className, args , options )
@@ -136,7 +136,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 
 	_hideMask: function()
 	{   
-		if ((panjs.iever == -1) ||(panjs.iever >= 10))
+		/*if ((panjs.iever == -1) ||(panjs.iever >= 10))
 		{
 			this.mask.fadeTo("fast",0, function(e){
         	this.mask.css("display", "none");
@@ -144,10 +144,10 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
         		this._showMask();
        		}.bind(this));
 		}else
-		{
+		{*/
 			this.mask.hide();
 			this.mask.css("opacity", "0"); 
-		}
+		//}
         
         this.maskIsVisible = false;
 	},
@@ -160,13 +160,13 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		}
 
 		this._refreshMaskSize();  
-		if ((panjs.iever == -1) ||(panjs.iever >= 10)){
+		/*if ((panjs.iever == -1) ||(panjs.iever >= 10)){
         	this.mask.fadeTo("fast",0.8,function(e){}); 
 		}
-    	else{
+    	else{*/
 			this.mask.css("opacity", "0.8"); 
 			this.mask.show();
-    	}
+    	//}
         this.maskIsVisible = true;
 	},
 	_positionnerModal: function(ctn)

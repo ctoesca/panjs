@@ -32,8 +32,8 @@ defineClass("Tdropdown", "ui.dropdown.TdropdownBase.html", {
 	baseElement: "div",	
 	labelField: null,
 	nullLabelItem: '                           ',
-	defaultTexte: "Sélectionnez une valeur",
-	capitalizeFirstLetter: true,
+	placeholder: "Sélectionnez une valeur",
+
 	_dataProvider: null,
 	_selectedItem: null,
 	_readonly: false,
@@ -71,9 +71,9 @@ defineClass("Tdropdown", "ui.dropdown.TdropdownBase.html", {
 	{
 		this.button.removeClass("error");
 	},
-	_setLabel: function(value)
+	_setLabel: function(item)
 	{
-		this.label.html(this.getFormatedLabel(value));
+		this.label.html(this.labelFunction(item));
 	},
 
 	_close: function()
@@ -107,22 +107,21 @@ defineClass("Tdropdown", "ui.dropdown.TdropdownBase.html", {
 
 			if (t != null)
 			{
-				if (this.capitalizeFirstLetter)
 				t = t.capitalizeFirstLetter();
 				this._itemsCount ++;
-			}
-			else
+			}else
 			{
 				t = this.nullLabelItem;
 			}
-
+			
 			var li = $('<li><a style="height:25px;" href="#">'+t+'</a></li>');
 			var a = li.getElement("a");
-			a[0].data = obj;
+
+			a.prop("data",obj);
 
 			if (obj === this._selectedItem)
 			{	
-				this._setLabel(obj[this.labelField]);	
+				this._setLabel(obj);	
 			}
 
 		}
@@ -137,10 +136,9 @@ defineClass("Tdropdown", "ui.dropdown.TdropdownBase.html", {
 	{
 		if (!this._isReady()) return;
 
-		var cell = $(e.target);
-		
+		var cell = $(e.target).closest( "a" )
 		if (cell[0].nodeName == "A")
-			this.setSelectedItem(cell[0].data);
+			this.setSelectedItem(cell.prop("data"));
 		this._close();
 		return false;
 	},

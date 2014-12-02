@@ -41,7 +41,9 @@ defineClass("TcrudService", "core.events.TeventDispatcher", {
 				this["update"+classe.nom] = caller.update.bind(caller);
 				this["delete"+classe.nom] = caller.remove.bind(caller);
 				this["search"+classe.nom] = caller.search.bind(caller);
-				
+				this["uploadFiles"+classe.nom] = caller.uploadFiles.bind(caller);
+				this["deleteFile"+classe.nom] = caller.deleteFile.bind(caller);
+
 				if (classe.hasFiles == true){
 
 					this["listFiles"+classe.nom] = caller.listFiles.bind(caller);
@@ -138,8 +140,14 @@ defineClass("TcrudService", "core.events.TeventDispatcher", {
 	getValue: function (name, success, failure) {
 
 		var key = this.localStorageId+"."+name;
-		var item = localStorage.getItem(key);
 		var result = null;
+
+		try{
+			var item = localStorage.getItem(key);
+		}catch(err){
+			item = null;
+			logger.error("Erreur localstorage.getItem("+key+") => "+err);
+		}
 
 		if (item != null){
 			try{
@@ -166,10 +174,10 @@ defineClass("TcrudService", "core.events.TeventDispatcher", {
 		}catch(e)
 		{
 			logger.error("Erreur TcrudService.setValue: "+e);
-			if (defined(failure))
+			/*if (defined(failure))
 			failure(e);
 
-			return false;
+			return false;*/
 		}
 		if (defined(success))
 			success(value);

@@ -1,0 +1,37 @@
+<html>        
+  <head>
+    
+    <style type="text/css">
+    .app4
+    {
+      border: 1px solid #bce8f1;
+      border-radius: 4px;
+      padding:5px;
+    }
+    </style>
+
+    <script type="text/x-class-definition">
+    //<![CDATA[      
+
+    defineClass("app4", "core.display.Telement", { 
+      
+      baseElement: "div", 
+
+      constructor: function(args){
+          this._super.constructor.call(this,args);   
+      }
+    });
+    //]]>
+    </script>
+
+  </head>
+  <body>  
+      <p><code>app.html</code> component</p>
+      
+      <div id="compo3" data-compo="components.Tpanel.html">
+          <h4>Normal DOM element</h4>
+          <div id="compo1" data-compo="components.TtestButton.html"></div>
+          <div id="compo2" data-compo="components.TtestButtonExt.html"></div> 
+      </div>   
+  </body>
+</html> 

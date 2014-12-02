@@ -24,14 +24,15 @@
     //<![CDATA[  
       var panjs = {
         logLevel: "DEBUG",
-        env: "prod", // dev or prod
-        appVersion: "0.1", //utilisé dans l'url des commposants htm, js et css (pas de cache si nouvelle version)
-        version: "0.61", //version de panjs
+        env: "dev", // dev or prod
+        appVersion: "1.0.0", //utilisé dans l'url des commposants htm, js et css (pas de cache si nouvelle version)
+        version: "0.6.1", //version de panjs
               
         namespaces:[
           {name: "core", path: "../core"},
           {name: "ui", path: "../ui"},
-          {name: "app", path: "components"}     
+          {name: "app", path: "components"},
+          {name: "components", path: "components"}
           ]
         };  
     //]]>
@@ -57,6 +58,8 @@
 
 <body>
   <div id="mainView" data-compo="app.Tmain.html">  </div> 
+
+
 </body>
 
 </html>

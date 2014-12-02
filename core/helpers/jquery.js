@@ -3,6 +3,10 @@
 * Extension de jquery
 */
 
+clone = function(obj) {
+	return jQuery.extend(true, {}, obj);
+}
+
 $.fn.getElement = function (selector) {  
     //renvoie un seul element Jquery ou null si aucun élément trouvé 
 		var r = $(selector, this);		     

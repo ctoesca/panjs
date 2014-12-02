@@ -11,6 +11,139 @@
           outline:0 none !important;
         }
      
+
+
+     /*!
+ * Start Bootstrap - Simple Sidebar HTML Template (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+/* Toggle Styles */
+
+#wrapper {
+    padding-left: 0;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+    padding-left: 250px;
+}
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: 250px;
+    width: 0;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    background: #000;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    width: 250px;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    padding: 15px;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    position: absolute;
+    margin-right: -250px;
+}
+
+/* Sidebar Styles */
+
+.sidebar-nav {
+    position: absolute;
+    top: 0;
+    width: 250px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    text-indent: 20px;
+    line-height: 40px;
+}
+
+.sidebar-nav li a {
+    display: block;
+    text-decoration: none;
+    color: #999999;
+}
+
+.sidebar-nav li a:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+    text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+    height: 65px;
+    font-size: 18px;
+    line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+    color: #999999;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+    color: #fff;
+    background: none;
+}
+
+@media(min-width:768px) {
+    #wrapper {
+        padding-left: 250px;
+    }
+
+    #wrapper.toggled {
+        padding-left: 0;
+    }
+
+    #sidebar-wrapper {
+        width: 250px;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        width: 0;
+    }
+
+    #page-content-wrapper {
+        padding: 20px;
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+        position: relative;
+        margin-right: 0;
+    }
+    #menu-toggle{
+      display: none;
+    }
+}
+@media(max-width:768px) {
+    #menu-toggle{
+      display: block;
+    }
+}
     </style>
 
     <script type="text/x-class-definition">
@@ -18,14 +151,35 @@
 //<![CDATA[      
 
 defineClass("Tmain", "core.display.Telement", { 
+  enableHashManager: true,
+  hashKey: "main",
 
 	baseElement: "div",	
 
   	constructor: function(args){
     	this._super.constructor.call(this,args);  
-      this.btn4.on("click", this.onBtn4click.bind(this));
-      this.btn5.on("click", this.onBtn5click.bind(this));
+     // this.btn4.on("click", this.onBtn4click.bind(this));
+     // this.btn5.on("click", this.onBtn5click.bind(this));
+      this.setHash("");
+       this.menuToggle.click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
  	},
+
+  onHashChange: function(hash){
+    this.container.getElements('.topicCompo').each( function(indx,el){
+      el.hide();
+    });
+    if( typeof this[hash] != "undefined"){
+      this[hash].load();
+      this[hash].container.show(); 
+    }
+
+    $( document).scrollTop( 0 );
+    return false;
+  },
+
   onBtn4click: function(e){
     uses("ui.managers.TpopupManager.html");
     compo = panjs.PopupManager.createPopup("app.Tpanel.html",{}, {closeOnMaskClick:true});
@@ -62,26 +216,56 @@ defineClass("Tmain", "core.display.Telement", {
 
 </head>
 <body>	
- <div class="container" role="main">
 
-  <article>
-      <div class="row">  
-          <div class="col-sm-12" >
-              <h3>Simple button component</h3>  
-          </div>
-      </div>
-      <div class="row">    
-          <div class="col-sm-6" >    
-              <pre>&lt;div data-compo="app.TtestButton.html"/&gt; </pre> 
-          </div>
-          <div class="col-sm-6" >
-              <div data-compo="app.TtestButton.html">  </div> 
-          </div>
-      </div>
-  </article>
+
+<a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                        Start panjs
+                    </a>
+                </li>
+                <li>
+                    <a href="#main=getting_started">Getting started</a>
+                </li>
+                <li>
+                    <a href="#main=create_first_component">Creating a component</a>
+                </li>
+                <li>
+                    <a href="#main=extend_component">Extend a component</a>
+                </li>
+                <li>
+                    <a href="#main=container_component">Container component</a>
+                </li>
+                <li>
+                    <a href="#">Extend a container component</a>
+                </li>
+               
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        
+
+
+                 
+
+ <div data-compo="app.topics.TgettingStarted.html" class="topicCompo" id="getting_started" autoload="false"/>
+  <div data-compo="app.topics.Tcreate_first_component.html" class="topicCompo" id="create_first_component"  autoload="false"/>
+   <div data-compo="app.topics.Textend_component.html" class="topicCompo" id="extend_component"  autoload="false"/>
+      <div data-compo="app.topics.Tcontainer_component.html" class="topicCompo" id="container_component"  autoload="false"/>
   <hr/>
 
-
+<!--
   <article>
       <div class="row">  
           <div class="col-sm-12" >
@@ -119,6 +303,8 @@ defineClass("Tmain", "core.display.Telement", {
           </div>
       </div>
   </article>
+
+
   <hr/>
 
 
@@ -284,6 +470,25 @@ Talert.warn("the html to show....", [Talert.OK], null, null, null, "title", true
 
   <br/><br/>
     
-</div>
+-->
+
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+   
+
+ 
 </body>
 </html>	

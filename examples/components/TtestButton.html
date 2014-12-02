@@ -1,55 +1,64 @@
 ﻿<html>        
   <head>
     <style type="text/css">
-   
-    .TtestButton .result
-    {
+    .TtestButton{
+      background-color: #d9edf7;
+      border: 1px solid #bce8f1;
+      border-radius: 4px;
+      padding:5px;
+    }
+    .TtestButton .result{
       font-weight: bold;  
     }
-    .TtestButton .result.failure
-    {
+    .TtestButton .result.failure{
        color: #d9534f; 
     }
-    .TtestButton .result.success
-    {
+    .TtestButton .result.success{
       color: #5cb85c;
-    }
-      
+    }  
     </style>
 
     <script type="text/x-class-definition">
 
-//<![CDATA[      
+      //<![CDATA[      
 
-defineClass("TtestButton", "core.display.Telement", { 
+      defineClass("TtestButton", "core.display.Telement", { 
 
-	baseElement: "div",	
-  clickCount:0,
+      	baseElement: "div",	
+        clickCount:0,
 
-  constructor: function(args){
-    	this._super.constructor.call(this,args);  
-    	this.btnSubmit.on("click", this.onSubmit.bind(this));
- 	},
+        constructor: function(args){
+          this._super.constructor.call(this,args); 
+          this.compoClass.text(this.className);
+          this.btnSubmit.on("click", this.onSubmit.bind(this));
+       	},
 
-  onSubmit: function()
-  {
-      	this.clickCount ++;
-        if (this.clickCount < 3){
-          this.result.addClass("failure").removeClass("success");
-          this.result.html("You have clicked only "+this.clickCount+" times");
-        }else
+        onSubmit: function()
         {
-          this.result.addClass("success").removeClass("failure");         
-          this.result.html("Great! You have clicked "+this.clickCount+" times");
-        } 
-  	}
-});
-//]]>
-</script>
+          this.clickCount ++;
+          if (this.clickCount < 3)
+            this.onFailure();
+          else
+            this.onSuccess(); 
+        },
 
-</head>
-<body>
-    <button type="submit" id="btnSubmit" class="btn btn-danger">Click here</button>
-    <span id="result" class="result"></span>
-</body>
+        onFailure: function(){
+            this.result.addClass("failure").removeClass("success");
+            this.result.html("You have clicked only "+this.clickCount+" times");
+        },
+            
+        onSuccess: function(){
+            this.result.addClass("success").removeClass("failure");         
+            this.result.html("Great! You have clicked "+this.clickCount+" times");
+        },
+      });
+      //]]>
+    </script>
+
+  </head>
+  <body>
+      <p><code id="compoClass"></code> component</p>
+      <button type="submit" id="btnSubmit" class="btn btn-danger">Click here</button>
+      <span id="result" class="result"></span>
+  </body>
 </html>	

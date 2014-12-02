@@ -19,7 +19,7 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 		
 		Telement._super.constructor.call(this,args);
 
-		
+	
 		if (this.enableHashManager == true){
 			uses("core.managers.Trouter");
 			if (this.hashKey == null)
@@ -34,6 +34,8 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 			styleClass = this.className;
 
 		this.container.addClass(styleClass);
+		this.container.attr("data-compo", this.classPath);
+		this.container.attr("data-class-name", this.className);
 
 		if (typeof args != "undefined")
 		{
@@ -41,39 +43,7 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 			{
 				/* On injecte les attributs de l'élément dans args */
 				var el = args.elem;
-				
-				for ( var i =0; i< el.attributes.length; i++)
-	        	{
-	            	var attr =  el.attributes.item(i);
-
-
-	            	var name = attr.nodeName.toLowerCase();
-
-	            	if ((name != "id")&&(name != "data-compo"))
-	            	{
-	            		if (name.startsWith("data-"))
-	            			name = name.droite("-");
-	            		var value = attr.value;
-
-	            		if (value == "true")
-	            			value = true;
-	            		if (value == "false")
-	            			value = false;
-
-	            		args[name] = value;
-	            			
-	            		//ATTENTION: attr.nodeName est toujours en lowerCase
-	            		//logger.info("Attribut "+this.id+" , "+name+"="+attr.value);
-	            	}
-	            	if (name == "includeinstate"){
-	            		this.includeInState = value; 
-	            		//Ajout de l'attribut includeinstate pour qu'il soit parsé dans processStates
-	            		this.container.attr("includeInState", this.includeInState);
-	            	}
-	            	//if (name == "visible")
-	            	//	this.visible = (value == "true");
-	        	}
-		
+							
 				/* On injecte le contenu de l'élément source dans l'élément <CONTENT> */	
 				this.sourceElement = args.elem;	
 
@@ -83,7 +53,7 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 					
 						this.content[0].innerHTML = this.sourceElement.innerHTML;
 						if (typeof args.parent != "undefined"){
-
+							this.parent = args.parent;
 							args.parent._populateElements(this.content[0], true,[]);
 						}
 					}
@@ -91,18 +61,17 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 
 				/* On vide l'élément source */
 				//this.sourceElement.innerHTML = "";
-				
-
-			}
-	  			
-			if (args.elem)
-			{
-					var tmpStyle = args.elem.getAttribute("data-inline-style");
-					if (tmpStyle != null){
-						this.sourceElementStyle =  tmpStyle;	
-						this.setStyle(tmpStyle);
-					}
-			}
+	
+				var tmpStyle = args.elem.getAttribute("data-inline-style");
+				if (tmpStyle != null){
+					this.sourceElementStyle =  tmpStyle;	
+					this.setStyle(tmpStyle);
+				}
+				var tmpClass = args.elem.getAttribute("class");
+				if (tmpClass != null){
+					this.container.addClass(tmpClass);
+				}
+			}	
 		}
 		
 		/*if (this.visible == false){
@@ -122,7 +91,7 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 		
   		if (this.enableHashManager) 
   		if (typeof this.onHashChange === "function"){
-  			logger.debug("Telement._onHashChange => "+hash);
+  			logger.debug("Telement."+this.id+"._onHashChange => "+hash);
   			r = this.onHashChange(hash);
   		}
   		return r;
@@ -131,8 +100,12 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 	},
 
   	_onShow: function(){
-  	 	this._onHashChange( panjs.router.getHash(this));
+  	 	//this._onHashChange( panjs.router.getHash(this));
   	},
+  	_onHide: function(){
+
+  	},
+
   	setHash:function(hash)
   	{
   		if (this.enableHashManager) 

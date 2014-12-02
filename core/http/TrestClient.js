@@ -38,12 +38,13 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 
 		var r = new Tevent(Tevent.SUCCESS, data);	
 		r.xTime = req.getResponseHeader("X-Time");
-
+		r.req = req;
+		
 		return r;
 	},
 	_getErrorEvent: function(req, method, exception,url, token)
 	{
-		var evtData = {"method":method, responseText:"", statusText:"Erreur inconnue", status:0, url:"url=?"};
+		var evtData = {req:req, "method":method, responseText:"", statusText:"Erreur inconnue", status:0, url:"url=?"};
 
 		
 		/* 
@@ -66,7 +67,7 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 		if (defined(req , "responseText"))
 		evtData.responseText = req.responseText;	
 		if (evtData.responseText == "")
-		evtData.responseText = evtData.statusText;
+		evtData.responseText = "Empty response. status="+evtData.statusText;
 
 
 		/* 
@@ -92,11 +93,12 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 
 	post: function(url, params, data, success, failure, token)
 	{
-		
 		this._call("POST", url, params, data, success||null, failure||null,token);
 	},
 	get: function(url, params, data, success, failure, token)
 	{
+		//data est un objet qui est transformé en URL par jquery
+		//params sont des paramètres de l'url. Exemple: orderBy=nom&search=toto
 		this._call("GET", url, params, data, success||null, failure||null,token);
 	},
 	getText: function(url, params, data, success, failure, token)
@@ -111,43 +113,44 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 	{
 		this._call("DELETE", url, params, data, success||null, failure||null,token);
 	},
-	_call: function(method, url, params, data, success, failure, token, dataType)
+	_call: function(method, url, params, data, success, failure, token)
 	{
+		var dataType = this.dataType;
+		if ((arguments.length >= 8)&&(typeof token.dataType != "undefined"))
+			dataType = token.dataType;
+		
+		if ((dataType == "json")&&((method=="POST")||(method=="PUT")))
+			data = JSON.stringify(data);
+
 		/*
 			Construction des paramètres de l'url
 		*/
 		token.id = this.getNewTokenId();
+		if (url.lastIndexOf("?") == -1)
+			url += "?";
 		
-		var urlParams = "";
+		url += "&";
+			
+
+
+		var urlParams = this.extraUrlParams;
 		if (defined(params))
 		{
 			if (typeof params == "object")
 			{
-				urlParams = "?";
-				for (p in params)
-					urlParams = urlParams + p +"="+params[p]+"&";
-			
-				if (urlParams == "?")
-					urlParams = "";
+				for (p in params){
+					urlParams += urlParams + "&"+ p +"="+params[p];
+				}
 			}
 			else
 			{
-				urlParams = "?"+params;
+				urlParams += "&"+params;
 			}
 		}
-		if (this.extraUrlParams)
-			urlParams += "&"+this.extraUrlParams;
-
+		
 		var path = this.baseUrl+url+urlParams;
-
-		
-		if (arguments.length < 8)
-			var dataType = this.dataType;
-		
-		token.dataType = dataType;
-
+	
 		logger.debug("Appel ",method,": ",path,", dataType="+dataType);
-
 
 		var req = $.ajax({ 
 				url: path,
@@ -164,15 +167,14 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 				success: function(data, textStatus, req) {
 					
 					logger.debug("Requête AJAX terminée avec succès: ",url);
-
-
+					
 					if (this.exitCodeFieldName != null)
 					{
 						var status = data[this.exitCodeFieldName];
 
 						if (defined(status))
 						{
-							if ( status != 200)
+							if ( status >= 400)
 							{
 								//C'est une erreur:
 								var e = this._getErrorEvent(req, method,  data[this.errorTextFieldName],path, token);
@@ -192,9 +194,19 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 					if (defined(success))
 						success(e, token);
 				},
-				error: function(req, settings, exception) { 
+				error: function( jqXHR, textStatus, errorThrown) {
+					logger.debug("ECHEC requête AJAX "+errorThrown,url);
+					var readyState = "?";
+					if (jqXHR.readyState == 0) readyState = "request not initialized";
+					if (jqXHR.readyState == 1) readyState = "server connection established";
+					if (jqXHR.readyState == 2) readyState = "request received ";
+					if (jqXHR.readyState == 3) readyState = "processing request";
+					if (jqXHR.readyState == 4) readyState = "request finished and response is ready";
 
-					var e = this._getErrorEvent(req, method, exception,path, token);
+					var headers = JSON.stringify(jqXHR.getAllResponseHeaders());
+
+					logger.error("responseHeaders="+headers+", readyState="+readyState+", jqXHR.responseText = "+jqXHR.responseText +", jqXHR.responseXml = "+jqXHR.responseXML +", textStatus="+textStatus+", errorThrown = "+errorThrown);
+					var e = this._getErrorEvent(jqXHR, method, errorThrown,path, token);
 
 					this.dispatchEvent(e);
 

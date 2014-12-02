@@ -34,17 +34,19 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
   	{
   		this.refreshkeys();
 
-  		//alert(JSON.stringify(this.keys));
-  		return this.keys[owner.hashKey];
+  		var r = this.keys[owner.hashKey] ||null;
+  		return r;
   	},
 	setHash: function(owner, value)
   	{
+  		//if (typeof value == "undefined")
+  		//	value = null;
   		
   		if (this.keys[owner.hashKey] != value)
   		{
   			var oldValue = this.keys[owner.hashKey];
 
-  			this.keys[owner.hashKey] = value;
+  			this.keys[owner.hashKey] = value||null;
   			var encoded = this.encode(this.keys);
   			sendEvents = false;
 			window.location.hash = encoded;
@@ -52,19 +54,22 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 			et n'enverra pas d'evenement donc on envoie l'évènement ici.
 			De plus, c'est plus optimisé.
 			*/
+
 			var r = this._dispatchOnhashchange(owner.hashKey, value);
-			logger.debug("RETOUR Onhashchange="+r);
+			//logger.debug("RETOUR Onhashchange="+r);
 			sendEvents = true;	
 		}
 		else
 		{
-			logger.debug("setHash "+value+" => inchangé");
+			logger.debug("setHash "+value+" => inchangé sur "+owner.id);
 			//this._dispatchOnhashchange(owner.hashKey, value);
 		}
 
   	},
   	_dispatchOnhashchange: function( hashKey, hash)
   	{
+  		if (typeof hash == "undefined")
+			hash = null;
   		var l = this.listeners[hashKey];
   		return l.onhashchange(hash);
   	},
@@ -88,7 +93,7 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 	    				var arr = str[i].split("=");
 	    				k = arr[0];
 	    				v = arr[1];
-	    				if (v.trim() != "")
+	    				//if (v.trim() != "")
 	    				r[k] = v;
 	    			}
 	    		}
@@ -130,17 +135,29 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
   	onhashchange: function(e)
   	{
   		//*Le hash n'est pas codé (il provient de liens):
-
+  		/* Cette fonction est déclenchée uniquement quand on modifie l'Url manuellement ou que l'on avance ou recule dans l'historique */
   		if (!this.sendEvents)
   			return false;
  
 	    this.hash = window.location.hash.droite('#');
 	    this.keysTmp = this.decode(this.hash);
+  		
+  		for (k in this.keys){
+  			logger.debug("keys."+k+" = "+this.keys[k]+", hash."+k+" = "+this.keysTmp[k]);
+  			if (this.keysTmp[k] != this.keys[k])
+	    	{
+	    		this.keys[k] = this.keysTmp[k] ||null;
+	    		if (typeof this.listeners[k] != "undefined"){
+	    			logger.debug("Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]);
+	    			this._dispatchOnhashchange(k, this.keys[k]);   
 
-	    for (k in this.keysTmp)
+	    		}
+	    	}
+  		}
+	   /* for (k in this.keysTmp)
 	    {
 
-	    	logger.debug("keys["+k+"] = "+this.keys[k]+" this.keysTmp[k] = "+this.keysTmp[k]);
+	    	//logger.debug("keys["+k+"] = "+this.keys[k]+" this.keysTmp[k] = "+this.keysTmp[k]);
 	    	if (this.keysTmp[k] != this.keys[k])
 	    	{
 	    		this.keys[k] = this.keysTmp[k];
@@ -151,7 +168,7 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 	    		}
 	    	}
 	    	
-	    }
+	    }*/
 	    
 		var evt = new Tevent(Trouter.HASH_CHANGE,  this.keys);
 	    this.dispatchEvent(evt);

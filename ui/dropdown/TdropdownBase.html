@@ -34,7 +34,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 	labelField: null,
 	nullLabelItem: '                           ',
 	insertNullItem: false,
-	defaultTexte: "Sélectionnez une valeur",
+	placeholder: "Sélectionnez une valeur",
 	capitalizeFirstLetter: true,
 	_dataProvider: null,
 	_selectedItem: null,
@@ -49,14 +49,15 @@ defineClass("TdropdownBase", "core.display.Telement", {
 		if (args)
 		{
 			this.injectParam("labelField", args.labelfield,false);	
-			this.injectParam("defaultTexte", args.defaulttexte,false, this.defaultTexte);
+			this.injectParam("placeholder", args.placeholder,false, this.placeholder);
 			this.injectParam("insertNullItem", args.insertnullitem,false, this.insertNullItem);
 			this.injectParam("nullLabelItem", args.nulllabelitem,false, this.nullLabelItem);
+			this.injectParam("labelFunction", args.labelFunction,false, this.labelFunction);
 			
 		}
 
 		this._setEvents();	
-		this._setLabel(this.defaultTexte);
+		this._setLabel(null);
 	},
 		
 	_onInitialized: function()
@@ -79,7 +80,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 		if (!this._isReady()) return;
 
 		this._empty();
-		this._setLabel(this.defaultTexte);		
+		this._setLabel(null);		
 
 		if (this._dataProvider == null)
 			return;
@@ -94,6 +95,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 		for (var i =0; i< this._dataProvider._source.length; i++)
 		{
 			var item = this._dataProvider._source[i];
+
 			if (this._filterFunction == null){
 				this._addItem(item);
 			}
@@ -134,6 +136,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 	},
 	setSelectedItem:function(value)
 	{
+	
 		if (value != this._selectedItem)
 		{
 
@@ -141,26 +144,17 @@ defineClass("TdropdownBase", "core.display.Telement", {
 			this._selectedItem = value;
 			if (this._selectedItem == null)
 			{
-				this._setLabel(this.defaultTexte);
+				this._setLabel(null);
 			}
 			else
 			{
-				if (this._selectedItem[this.labelField] != "undefined")
-				this._setLabel(this._selectedItem[this.labelField]);
-				else
-				this._setLabel(this.defaultTexte);
-
+				this._setLabel(this._selectedItem);
 			}
+		
 			this.dispatchEvent( new Tevent(Tevent.CHANGE, this._selectedItem));
 		}
 	},
-	selectNullLabel: function()
-	{
-		var itemAvecLabelNull = this._dataProvider.getByProp(this.labelField, null);
-		this.setSelectedItem(itemAvecLabelNull);
-		this._setLabel(this.defaultTexte+" ");
-	},
-		
+			
 	setSelectedItemByLabel:function(label)
 	{
 		var item = this.getItemByLabel(label);
@@ -189,18 +183,16 @@ defineClass("TdropdownBase", "core.display.Telement", {
 		return ((this._dataProvider != null) && (this.labelField != null));
 	},
 
-	getFormatedLabel: function(value)
+	labelFunction: function(item)
 	{
-		if (value != null)
-		{
-			if (this.capitalizeFirstLetter) 
-			value = value.capitalizeFirstLetter();
-		}
-		if (value == null)
-			value = this.defaultTexte;
-
-		return value+" ";
+		var r = "";
+		if ((item != null)&&(item[this.labelField] != null))
+			r = item[this.labelField].capitalizeFirstLetter();
+		else
+			r = this.placeholder;
+		return r;
 	},
+
 /* **************** //ABSTRACT **************************************************************/
 	showError: function()
 	{
@@ -215,7 +207,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 		//ABSTRACT
 	},
 	
-	_setLabel: function(value)
+	_setLabel: function(item)
 	{
 		//ABSTRACT
 	},

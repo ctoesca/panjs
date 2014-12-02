@@ -66,7 +66,13 @@ defineClass("TmaskInput", "core.display.Telement", {
 		
 	
 	},
-	
+	enabled: function(v){
+		if (v)
+			this.container.attr("disabled", "");
+		else
+			this.container.attr("disabled","disabled");
+		
+	},
 	_setEvents: function()
 	{
 		this.container.on("change", this._onChange.bind(this));
@@ -86,6 +92,14 @@ defineClass("TmaskInput", "core.display.Telement", {
 	},
 	hideError: function(v)
 	{
+		this.container.css("color", "");
+	},
+	showError: function(v)
+	{
+		this.container.css("color", "red");
+	},
+	/*hideError: function(v)
+	{
 		if (this.tooltip != null)
 		if (this.tooltip.tooltipIsVisible)
 		{
@@ -99,6 +113,7 @@ defineClass("TmaskInput", "core.display.Telement", {
 		if (this.tooltip == null)
 		{
 			//this.tooltip = $('<a href="#" data-toggle="tooltip" class="red-tooltip" title="Valeur incorrecte" style="visibility:hidden"></a>');
+			
 			this.tooltip = $('<div class="error">'+this.errorText+'</div>');
 
 			//this.tooltip.tooltip({placement: "right"});
@@ -123,7 +138,7 @@ defineClass("TmaskInput", "core.display.Telement", {
 			
 
 		}	
-	},
+	},*/
 	isNumberKey: function(evt)
 	{
 		return isNumberKey(evt);
@@ -155,7 +170,7 @@ defineClass("TmaskInput", "core.display.Telement", {
 			this.showError();
 		}
 		if ((typeof e != "undefined") && ((e.type == 'change') || (e.type == 'keyup')))
-		this.dispatchEvent( new Tevent(Tevent.CHANGE), this);
+		this.dispatchEvent( new Tevent(Tevent.CHANGE, {sender:this, value: this.val()}));
 	},
 
 	_onShow: function(e)
@@ -184,11 +199,4 @@ defineClass("TmaskInput", "core.display.Telement", {
 </script>
 
 </head>
-<body>		 
-	
-	
-	
-	
-	
-</body>
 </html> 
