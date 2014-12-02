@@ -62,18 +62,19 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 				/* On vide l'élément source */
 				//this.sourceElement.innerHTML = "";
 	
-				var tmpStyle = args.elem.getAttribute("data-inline-style");
-				if (tmpStyle != null){
-					this.sourceElementStyle =  tmpStyle;	
-					this.setStyle(tmpStyle);
-				}
+				
 				var tmpClass = args.elem.getAttribute("class");
 				if (tmpClass != null){
 					this.container.addClass(tmpClass);
 				}
 			}	
 		}
-		
+
+		var tmpStyle = args.inlineStyle || null;
+		if (tmpStyle != null){
+				this.sourceElementStyle =  tmpStyle;	
+				this.setStyle(tmpStyle);
+		}
 		/*if (this.visible == false){
 			this.hide();
 		}*/
