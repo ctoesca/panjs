@@ -93,7 +93,7 @@
           html +=         '<div class="panel-heading" role="tab" id="post_'+item.post_id+'">';
           html +=           '<h4 class="panel-title">';
           html +=             '<a data-toggle="collapse" data-parent="#accordion" href="#collapse'+item.post_id+'" aria-expanded="true" aria-controls="collapse'+item.post_id+'">';
-          html +=               this.getDateFromTimestamp(item.creation_date)+ ' - ' + item.title;
+          html +=               getDateFromTimestamp(item.creation_date)+ ' - ' + item.title;
           html +=             '</a>';
           html +=           '</h4>';
           html +=         '</div>';
@@ -105,20 +105,8 @@
           html +=   '</div>';
           var itemHtml = $(html);
           this.accordion.prepend( itemHtml );
-      },
-      
-      getDateFromTimestamp: function(unix_timestamp){
-       
-        var a = new Date(unix_timestamp*1000);
-        var year = a.getFullYear();
-        var month = a.getMonth();
-        var date = a.getDate();
-        var hour = a.getHours();
-        var min = a.getMinutes();
-        var sec = a.getSeconds();
-        var time = date + '/' + month + '/' + year + ' ' + hour + ':' + min + ':' + sec ;
-        return time;
       }
+      
     });
     //]]>
     </script>

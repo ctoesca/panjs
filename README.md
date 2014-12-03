@@ -1,10 +1,10 @@
-#panJS v0.7.0
+#panJS v0.6.1 
 > A 35 ko javascript framework 
 
 panJs is a javascript framework that uses Jquery and allows you to create application easily, by making resusable components.
 <br/>You can integrate panJS in a existing application (only parts of the application can be managed by panJs).
 </p>
-<p><a href="http://www.nexilearn.fr/libs/panjs/0.7.0/examples/"><b>Demo</b></p>
+<p><a href="http://www.nexilearn.fr/libs/panjs/0.6.1/examples/"><b>Demo</b></p>
 ## Feature Highlights
 
 * A component is a HTML file that contains CSS, JS, HTML, css <link> like any Html file

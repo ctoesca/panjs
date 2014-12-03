@@ -33,7 +33,6 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
   	getHash: function(owner)
   	{
   		this.refreshkeys();
-
   		var r = this.keys[owner.hashKey] ||null;
   		return r;
   	},
@@ -41,7 +40,7 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
   	{
   		//if (typeof value == "undefined")
   		//	value = null;
-  		
+
   		if (this.keys[owner.hashKey] != value)
   		{
   			var oldValue = this.keys[owner.hashKey];
@@ -102,10 +101,10 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 				logger.error("Echec decodage de "+str+" en objet: "+err);
 			}
 		}
-		else
+		/*else
 		{
 			logger.error("Echec decodage  de "+str+" en objet: chaine vide");
-		}
+		}*/
 		return r;
   	},
 

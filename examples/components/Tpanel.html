@@ -15,6 +15,7 @@
 
         constructor: function(args){
           this._super.constructor.call(this,args);  
+          this.compoClass.text(this.className);
         }
       });
       //]]>
@@ -24,7 +25,7 @@
   <body>	
     <div class="panel panel-info">
         <div class="panel-heading">
-          <h3 class="panel-title" id="title"><code>Tpanel</code> component</h3>
+          <h3 class="panel-title" id="title"><code id="compoClass"></code> component</h3>
         </div>
         <div class="panel-body" id="body">
           <!--CONTENT-->

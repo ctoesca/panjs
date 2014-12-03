@@ -2,14 +2,13 @@
 <head>
   <style type="text/css">
     .TpanelExt .panel-heading
-    {
-      
+    {    
       background-color:#FFFFC2;
       color:#444444;
       border-color:#EDE275;
     }
 
-    .TpanelExt .panel-primary{
+    .TpanelExt .panel-info{
       border-color:#EDE275;
       background-color:#FFEBCD;
     }
@@ -29,8 +28,7 @@
     defineClass("TpanelExt", "app.Tpanel.html", { 
       constructor: function(args){
         this._super.constructor.call(this,args);  
-
-        this.titre.html("TpanelExt title");
+      
       }
     });
     //]]>
@@ -38,11 +36,12 @@
 
 </head>
 <body>  
-  <div class="externalContent"><strong>External content:</strong><br/>
+  <div class="externalContent">
+    <p><strong>External content:</strong></p>
     <!--CONTENT-->
   </div>
   <div class="internalContent">
-    <strong>This is the internal content of the TpanelExt component</strong><br/>
+    <strong>This is the internal content of the TpanelExt component</strong>
   </div>
 
 </body>

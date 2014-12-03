@@ -10,7 +10,7 @@
 
 //<![CDATA[      
 
-defineClass("Tcontainer_component", "core.display.Telement", { 
+defineClass("Textend_container_component", "core.display.Telement", { 
   
 	baseElement: "div",	
 
@@ -24,20 +24,24 @@ defineClass("Tcontainer_component", "core.display.Telement", {
 
 </head>
 <body>	
-<h1>Container component</h1>
+<h1>Extend a container component</h1>
 
-<h3>Create the file <code>Tpanel.html</code> in "components" directory</h3>
+<h3>Create the file <code>TpanelExt.html</code> in "components" directory</h3>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.Tpanel.html" id="codeCompo1" autoload="true" data-max-height="500px"/>
-    
+    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.TpanelExt.html" id="codeCompo1" autoload="true" data-max-height="500px"/>
+      <h4>Notes:</h4>
+    <ul>
+        <li>The <code>&lt;body&gt;</code> of this component is injected in the <code>&lt;!--CONTENT--&gt;</code> of the parent.</li>
+        <li>Like each container component, it contains a <code>&lt;!--CONTENT--&gt;</code> element.</li>
+    </ul>
 
-    <h3>Put the component in <code>app.html</code></h3>
-    <p>Modify app.html <code>&lt;body&gt;</code></p>
+    <h3>Modify <code>app.html</code></h3>
+    <p>In app.html <code>&lt;body&gt;</code>, replace <code>Tpanel</code> by <code>TpanelExt</code></p>
 
      <div data-compo="ui.TcodeHighlight.html">
 &lt;body&gt;
   &lt;p&gt;&lt;code&gt;app.html&lt;/code&gt; component&lt;/p&gt;
-  &lt;div data-compo="components.Tpanel.html"&gt;
+  &lt;div data-compo="components.TpanelExt.html"&gt;
     &lt;h4&gt;Normal DOM element&lt;/h4&gt;
     &lt;div data-compo="components.TtestButton.html"/&gt;
     &lt;div data-compo="components.TtestButtonExt.html"/&gt;
@@ -45,15 +49,11 @@ defineClass("Tcontainer_component", "core.display.Telement", {
 &lt;/body&gt;
      </div>
 
-    <h4>Notes:</h4>
-    <ul>
-       <li>Tpanel is like another component except that we have added <code>&lt;!--CONTENT--&gt;</code> in the <code>body</code>.</li>
-       <li>When we use <code>Tpanel</code>, we can put others components or DOM elements in the <code>Tpanel</code> element. <code>&lt;!--CONTENT--&gt;</code> is replaced by these elements.</li>
-    </ul>
+  
 
   <h2>Result</h2>
 
-  <div data-compo="components.app4.html"/>
+  <div data-compo="components.app5.html"/>
 
 <!--
     <article>

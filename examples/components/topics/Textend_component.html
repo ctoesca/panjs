@@ -34,6 +34,7 @@ defineClass("Textend_component", "core.display.Telement", {
         <li>In the <code>defineClass</code> function, the component inherits from <code>components.TtestButton.html</code></li>
         <li>We override the style using <code>TtestButtonExt</code> class selector</li>
         <li>We override <code>onSuccess</code> method and call the parent doing: <code>this._super.onSuccess.call(this);</code></li>
+        <li>We access <code>this.btnSubmit</code> defined in the parent component.</li>
         <li>In this example, we don't override the body html</li>
     </ul>
 
