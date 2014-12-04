@@ -15,13 +15,7 @@ defineClass("TgettingStarted", "core.display.Telement", {
 	baseElement: "div",	
 
   	constructor: function(args){
-    	this._super.constructor.call(this,args);  
-      this.codeApp1.on(Tevent.BEFORE_LOAD, function(e){ 
-        e.data.args.processCode = function(code){
-          return code.replace(/app1/g, "app");
-        }
-      });
-     
+    	this._super.constructor.call(this,args);       
  	},
 
 });
@@ -111,7 +105,7 @@ For convenience, we use <b><a target_="_blank" href="http://getbootstrap.com/">b
         </div>
       </div>
       <div label="app.html" id="tab2">
-          <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.app1.html" id="codeApp1" autoload="false"/>
+          <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.app1.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp1" autoload="false"/>
       </div>
   </div>
 

@@ -24,12 +24,18 @@
 
       baseElement: "div", 
       sourceClasspath:null,
+      replaceMask: null,
+      replaceBy: null,
 
       constructor: function(args){  
 
         this._super.constructor.call(this,args);
         if (defined(args, "processCode"))
           this.processCode = args.processCode;
+         if (defined(args, "replaceMask"))
+          this.replaceMask = args.replaceMask;
+         if (defined(args, "replaceBy"))
+          this.replaceBy = args.replaceBy;
 
 
         if (defined(args, "sourceClasspath"))
@@ -47,6 +53,12 @@
             var source = this.sourceElement.innerHTML;
         }
         source = this.processCode(source);
+
+        if ((this.replaceMask != null) && (this.replaceBy != null) )
+        {  
+          var re = new RegExp(this.replaceMask, "g");
+          source = source.replace(re, this.replaceBy);
+        }
 
         if (defined(args,"maxHeight")){
           this.code1.css("max-height", args.maxHeight);

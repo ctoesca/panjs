@@ -1,0 +1,38 @@
+<html>        
+  <head>
+    
+    <style type="text/css">
+    .app6
+    {
+      border: 1px solid #bce8f1;
+      border-radius: 4px;
+      padding:5px;
+    }
+    </style>
+
+    <script type="text/x-class-definition">
+    //<![CDATA[      
+
+    defineClass("app6", "core.display.Telement", { 
+      
+      baseElement: "div", 
+
+      constructor: function(args){
+          this._super.constructor.call(this,args);   
+          this.testButtonExt2.on("SUCCESS", this.onSuccess.bind(this));
+      },
+      onSuccess: function(evt){
+          alert("Success. clickCount="+evt.data);   
+          //evt.currentTarget is the component that sent the event.          
+          this.testButtonExt2.hide("fast");
+      }
+    });
+    //]]>
+    </script>
+
+  </head>
+  <body>  
+      <p><code>app.html</code> component</p>
+      <div id="testButtonExt2" data-compo="components.TtestButtonExt2.html"></div>  
+  </body>
+</html> 
