@@ -6,13 +6,15 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 Panjs is designed for single page applications but you can use it in a existing application (only parts of the application can be managed by panJs).
 </p>
 
+<p><b>One component = XHTML + CSS + JS in one .html file</b></p>
+
 <p><a href="http://www.nexilearn.fr/panjs/trunk/examples" target="_blank"><b>Tutorial</b></p>
 
 ## Feature Highlights
 
 * A component is a HTML file that contains CSS, JS, HTML, css <link> like any Html file
-* Components can be integrated in a page or in other components with html markup
-* Components (and their dependencies) are loaded dynamically and you don't have to add js/css in the `<head>` of the page.
+* Components are based on OOP
+* Components (and their dependencies) are loaded dynamically and you don't have to manage dependcies (js/css) in the `<head>` of the main page.
 * Cache management (Js/css/html)
 * Inheritance on classes and components (HTML / CSS / JS)
 * Encapsulation
