@@ -8,7 +8,7 @@ Panjs is designed for single page applications but you can use it in a existing 
 
 <p><b>One component = one .html file = HTML + CSS + JS</b></p>
 
-<p><a href="http://www.nexilearn.fr/panjs/trunk/examples" target="_blank"><b>Tutorial</b></p>
+<p><a href="http://www.nexilearn.com/panjs/trunk/doc/tutorial" target="_blank"><b>Getting started</b></p>
 
 ## Feature Highlights
 
@@ -80,6 +80,6 @@ You put a component in HTML page (or in another HTML component) like this:
 
 ##Getting started
 
-<p><a href="http://www.nexilearn.fr/panjs/trunk/examples" target="_blank"><b>Tutorial</b></p>
+<p><a href="http://www.nexilearn.com/panjs/trunk/doc/tutorial" target="_blank"><b>Tutorial</b></p>
 
 
