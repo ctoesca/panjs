@@ -1,10 +1,13 @@
-#panJS v0.6.1 
-> A 35 ko javascript framework 
+#panJS v0.7.0 
+> A 37 ko javascript framework 
 
-panJs is a javascript framework that uses Jquery and allows you to create application easily, by making resusable components.
-<br/>You can integrate panJS in a existing application (only parts of the application can be managed by panJs).
+panJs is a javascript framework that uses Jquery and allows you to create application easily, by making resusable classes and HTML components.
+<br/>
+Panjs is designed for single page applications but you can use it in a existing application (only parts of the application can be managed by panJs).
 </p>
-<p><a href="http://www.nexilearn.fr/libs/panjs/0.6.1/examples/"><b>Demo</b></p>
+
+<p><a href="http://www.nexilearn.fr/panjs/trunk/examples" target="_blank"><b>Tutoriel</b></p>
+
 ## Feature Highlights
 
 * A component is a HTML file that contains CSS, JS, HTML, css <link> like any Html file
@@ -12,12 +15,12 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 * Components (and their dependencies) are loaded dynamically and you don't have to add js/css in the `<head>` of the page.
 * Cache management (Js/css/html)
 * Inheritance on classes and components (HTML / CSS / JS)
-* Encapsulation</li>
+* Encapsulation
 * Lazy loading of components and classes
 * You can use LESS in components. panJs converts LESS to CSS.
 * Includes Ajax facilities (Class TrestClient.js)
 * Easy to make a one page application (but not mandatory)
-* States, hash routing (work in progress)
+* States, hash routing
 * ...
 
 
@@ -75,36 +78,6 @@ You put a component in HTML page (or in another HTML component) like this:
 
 ##Getting started
 
-```
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-
-<script>
-//<![CDATA[  
-
-      var panjs = {
-        logLevel: "DEBUG",
-        env: "dev", // dev or prod
-        appVersion: "0.1", 
-        version: "0.6", //panjs version
-        
-        namespaces:[
-        {name: "core", path: "../core"},    //panjs "core" directory
-        {name: "ui", path: "../ui"},        //panjs "ui" directory (optionnal)
-        {name: "app", path: "components"}   //path on your app components (example)
-        ]
-      };
-     
-      $(document).ready(function() 
-      {
-        logger.debug("READY");
-        panjs.load($(document.body));           
-      });
-
-//]]>
-</script>
-
-<script src="../core/panjs_core.min.js"></script>
-<!-- Use panjs_core_with_less.min.js if you want to enable LESS-->
-```
+<p><a href="http://www.nexilearn.fr/panjs/trunk/examples" target="_blank"><b>Tutorial</b></p>
 
 
