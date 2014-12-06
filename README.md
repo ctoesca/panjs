@@ -6,7 +6,7 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 Panjs is designed for single page applications but you can use it in a existing application (only parts of the application can be managed by panJs).
 </p>
 
-<p><a href="http://www.nexilearn.fr/panjs/trunk/examples" target="_blank"><b>Tutoriel</b></p>
+<p><a href="http://www.nexilearn.fr/panjs/trunk/examples" target="_blank"><b>Tutorial</b></p>
 
 ## Feature Highlights
 
