@@ -25,43 +25,69 @@ defineClass("Tuse_arguments", "core.display.Telement", {
 </head>
 <body>	
 <h1>Pass arguments</h1>
-<!--
-<p>Each component can send event : </p>
-<p><code>
-    this.dispatchEvent( new Tevent("ON_CLICK"));
- </code>
- </p>
 
-<p>To listen for a event : </p>
-<p><code>
-    this.compo.on("ON_CLICK", function(evt){
-      alert("Click !");
-    });
- </code>
- </p>
+<h3>Passing arguments in the component HTML markup</h3>
 
-<h3>Create a component <code>TtestButtonExt2.html</code> that inherits from TtestButton</h3>
+<p>You can pass argument directly in the HTML markup, adding attributes prefixed by <code>data-</code>.
+<br/>
+Attributes without <code>-data</code> are allowed but we recommend to use <code>-data</code>.
+<br/>
+Use small letters for attributes names.
+</p>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.TtestButtonExt2.html" id="codeCompo1" autoload="true" data-max-height="500px"/>
-      <h4>Notes:</h4>
-    <ul>
-        <li><code>TtestButtonExt2</code> send a event with <code>clickCount</code> in the <code>data</code> field of the event. The callback function can get this data in <code>evt.data</code></li>
-       
-    </ul>
+<h4>Example : </h4>
+<div data-compo="ui.TcodeHighlight.html" >&lt;body&gt;
+    &lt;div data-max-clicks="3" data-compo="components.TtestButton.html"&gt;&lt;/div&gt;
+&lt;/body&gt;
+</div>
+<br/>
 
-    <h3>Modify the <code>app.html</code> component</h3>
-    <p>Modify app.html <code>&lt;body&gt;</code></p>
+<h4>Getting arguments in the component : </h4>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.app6.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp" data-max-height="500px"/>
-    <ul>
-         <li>In the callback function  <code>this</code> will be the <code>app</code> component because we used <code>bind(this)</code></li>
-    </ul>
+<p>Arguments are available in the <code>args</code> object, in the contructor.
+
+</p>
+<div data-compo="ui.TcodeHighlight.html" >&lt;script type="text/x-class-definition"&gt;
+//&lt;![CDATA[      
+defineClass("TtestButton", "core.display.Telement", {  
+  baseElement: "div", 
+    constructor: function(args){
+      this._super.constructor.call(this,args);  
+      alert( "maxClicks = "+ args.maxClicks );
+  }
+});
+//]]&gt;
+&lt;/script&gt;
+</div>
+<p>
+In the <code>args</code> object, the arguments names are not the same as the attributes names :
+</p>
+<ul>
+  <li><code>data-</code> is removed</li>
+  <li>The name always starts with a lower case letter</li>
+  <li>Letters after each <code>-</code> are upper case letters</li>
+</ul>
+
+<p>Exemples:</p>
+
+<ul>
+  <li><code>data-max-clicks</code> will be renamed to <code>maxClicks</code></li>
+  <li><code>data-maxclicks</code> will be renamed to <code>maxclicks</code></li>
+  <li><code>data-maxClicks</code> will be renamed to <code>maxclicks</code></li>
+</ul>
+
+<h3>Passing arguments when you call <code>load()</code></h3>
+
+<p>
+When you load a component lazily, you can pass arguments:</p>
+<div data-compo="ui.TcodeHighlight.html" >load({args1: "bla", arg2: 3})</div>
 
 
-  <h2>Result</h2>
+<h3>Passing arguments when you create a component programmatically</h3>
 
-  <div data-compo="components.app6.html"/>
--->
+<div data-compo="ui.TcodeHighlight.html" > var compo = panjs.createComponent("components.TtestButton.html",{args1: "bla", arg2: 3});</div>
+
+
 </body>
 
 

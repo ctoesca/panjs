@@ -48,6 +48,8 @@
             source = source.replace(/&/g, "&amp;");
             source = source.replace(/</g, "&lt;");
             source = source.replace(/>/g, "&gt;");
+            source = source.replace(/\t/g, "  ");
+
             source = source.trim();
         }else{
             var source = this.sourceElement.innerHTML;
@@ -80,6 +82,6 @@
 
 </head>
 <body>  
-      <pre><code class="html" id="code1"></code></pre>
+      <pre><code class="javascript" id="code1"></code></pre>
 </body>
 </html> 

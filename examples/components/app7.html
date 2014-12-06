@@ -1,0 +1,37 @@
+<html>        
+  <head>
+    
+    <style type="text/css">
+    .app7
+    {
+      border: 1px solid #bce8f1;
+      border-radius: 4px;
+      padding:5px;
+    }
+    </style>
+
+    <script type="text/x-class-definition">
+    //<![CDATA[      
+
+    defineClass("app7", "core.display.Telement", { 
+      
+      baseElement: "div", 
+
+      constructor: function(args){
+          this._super.constructor.call(this,args);   
+          this.buttonLoad.on("click", this.onButtonLoadClick.bind(this));
+      },
+      onButtonLoadClick: function(evt){     
+          this.testButton.load();
+      }
+    });
+    //]]>
+    </script>
+
+  </head>
+  <body>  
+      <p><code>app.html</code> component</p>
+      <button class="btn btn-primary" id="buttonLoad">Load testButton</button>
+      <div id="testButton" data-compo="components.TtestButton.html" autoload="false"></div>  
+  </body>
+</html> 

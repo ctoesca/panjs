@@ -1,0 +1,55 @@
+﻿<html>        
+  <head>
+
+    <style type="text/css">
+        
+
+    </style>
+
+<script type="text/x-class-definition">
+
+//<![CDATA[      
+
+defineClass("Tcreate_simple_class", "core.display.Telement", { 
+  
+	baseElement: "div",	
+
+  	constructor: function(args){
+    	this._super.constructor.call(this,args);  
+ 	}
+});
+//]]>
+</script>
+
+</head>
+<body>	
+<h1>Create a simple class</h1>
+
+<p>
+  We have seen how to create HTML components but you can also create pure javascript classes using <code>defineClass()</code>.
+  <br/>
+  The same principle is applicable, except that you can't put CSS or HTML in the javascript file.
+</p>
+<h3>Example : the <code>core.helpers.Ttimer.js</code> class</h3>
+<div data-compo="ui.TcodeHighlight.html" data-source-classpath="core.helpers.Ttimer" id="code1" autoload="true" data-max-height="500px"/>
+
+<p>
+  This class is a timer. When <code>start()</code> is called, it that send a <code>Ttimer.ON_TIMER</code> each <code>delay</code> seconds.
+</p>
+
+<h3>Instantiating the class</h3>
+
+<div data-compo="ui.TcodeHighlight.html">uses("core.helpers.Ttimer");
+var timer = new Ttimer({delay: 1000});
+</div>
+
+<!--<h4>Notes:</h4>
+    <ul>
+    </ul>
+-->
+
+</body>
+
+
+
+</html>	

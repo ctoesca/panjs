@@ -1,0 +1,33 @@
+<html>        
+  <head>
+    
+    <style type="text/css">
+    .app8
+    {
+      border: 1px solid #bce8f1;
+      border-radius: 4px;
+      padding:5px;
+    }
+    </style>
+
+    <script type="text/x-class-definition">
+    //<![CDATA[      
+
+    defineClass("app8", "core.display.Telement", { 
+      
+      baseElement: "div", 
+
+      constructor: function(args){
+          this._super.constructor.call(this,args);   
+          this.testButton = panjs.createComponent("components.TtestButton.html");
+          this.testButton.appendTo(this.container);
+      }
+    });
+    //]]>
+    </script>
+
+  </head>
+  <body>  
+      <p><code>app.html</code> component</p>
+  </body>
+</html> 

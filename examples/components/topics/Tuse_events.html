@@ -26,19 +26,14 @@ defineClass("Tuse_events", "core.display.Telement", {
 <body>	
 <h1>Events</h1>
 
-<p>Each component can send event : </p>
-<p><code>
-    this.dispatchEvent( new Tevent("ON_CLICK"));
- </code>
- </p>
+<p>Each component inherits from <code>TeventDispatcher</code> and can send events : </p>
+<div data-compo="ui.TcodeHighlight.html">this.dispatchEvent( new Tevent("CLICK"));</div>
+
 
 <p>To listen for a event : </p>
-<p><code>
-    this.compo.on("ON_CLICK", function(evt){
-      alert("Click !");
-    });
- </code>
- </p>
+<div data-compo="ui.TcodeHighlight.html">this.compo.on("CLICK", function(evt){
+  alert("Click !");
+});</div>
 
 <h3>Create a component <code>TtestButtonExt2.html</code> that inherits from TtestButton</h3>
 
@@ -58,7 +53,7 @@ defineClass("Tuse_events", "core.display.Telement", {
     </ul>
 
 
-  <h2>Result</h2>
+  <h3>Result</h3>
 
   <div data-compo="components.app6.html"/>
 

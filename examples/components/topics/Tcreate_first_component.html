@@ -36,7 +36,8 @@ defineClass("Tcreate_first_component", "core.display.Telement", {
 
     <h4>Notes:</h4>
     <ul>
-      <li><code>this.btnSubmit</code> and <code>this.result</code> are jQuery objects. You can access them like this because they have <code>id="btnSubmit"</code> and <code>id="result"</code>.<br/>
+      <li>The DOM element of the component will be a <code>div</code> element because we have set <code>baseElement: "div"</code> in the component properties.</li>
+      <li><code>this.btnSubmit</code> and <code>this.result</code> are jQuery objects. You can access them like this because the framework map HTML elements with <code>id="btnSubmit"</code> and <code>id="result"</code> on <code>this</code> object.<br/>
       </li>
       <li>The component container is a <code>div</code> because we have set the property <code>baseElement="div"</code></li>      
     </ul>
@@ -53,9 +54,26 @@ defineClass("Tcreate_first_component", "core.display.Telement", {
 
     
 
-  <h2>Result</h2>
+  <h3>Result</h3>
 
   <div data-compo="components.app2.html"/>
+
+<!--
+<h2>Show the HTML markup in the browser</h2>
+<p>If you right-click on the component, and click on "Inspect element", you can see : </p>
+<div data-compo="ui.TcodeHighlight.html">
+&lt;div id="ctncompo1" class="TtestButton" data-compo="components.TtestButton.html" data-class-name="TtestButton">&lt;p&gt;&lt;code id="compoClass">TtestButton&lt;/code&gt; component&lt;/p&gt;
+  &lt;a type="submit" id="btnSubmit" class="btn btn-danger">Click here&lt;/a&gt;
+  &lt;span id="result" class="result"&gt;&lt;/span&gt;
+&lt;/div&gt;
+</div>
+
+<ul>
+<li>
+  The id <code>ctncompo1</code> has been set automatically.
+</li>
+</ul>
+-->
 
 <!--
     <article>

@@ -109,8 +109,8 @@
                   var name = attr.nodeName.toLowerCase();
                   var value = attr.value;
 
-                  if ((name != "id")&&(name != "data-compo"))
-                  {
+                  //if ((name != "id")&&(name != "data-compo"))
+                 // {
                     if (name.startsWith("data-")){
                       //name = name.droite("-");
                       name = panjs.getFormatedArgName(name);
@@ -119,13 +119,13 @@
                     
                     if (value == "true")
                       value = true;
-                    if (value == "false")
+                    else if (value == "false")
                       value = false;
 
                     args[name] = value;
                     //ATTENTION: attr.nodeName est toujours en lowerCase!
                     //logger.info("Attribut "+this.id+" , "+name+"="+attr.value);
-                  }       
+                 // }       
         }
       }
         
@@ -1035,6 +1035,10 @@ defineClass("Tloader", "core.Tobject", {
       {
           r.data = this.processCode(r.data, className);
           exec(r.data);
+
+          if (panjs.setSourceInComponents)
+          window[className].prototype.source = r.data;
+
           window[className].prototype.classPath = classPath;    
           window[className].prototype.className = className;  
           window[className].prototype.classPathDir = this.getClassPathDir(classPath);
@@ -1054,7 +1058,11 @@ defineClass("Tloader", "core.Tobject", {
         logger.debug(h," END USES ",classPath,h);     
 
       logger.groupEnd();
-      return true;
+      return {result:true, message:"ok", className: className, classPath:classPath, url: url, path:path, Class: window[className]}; 
+
+      
+    }else{
+      return  {result:true, message:"Already loaded", className: className, classPath:classPath, url: url, path:path, Class: window[className]}; 
     }
     
     },

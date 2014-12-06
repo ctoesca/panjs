@@ -43,13 +43,13 @@
         },
 
         onFailure: function(){
-            this.result.addClass("failure").removeClass("success");
-            this.result.html("You have clicked only "+this.clickCount+" times");
+          this.result.addClass("failure").removeClass("success");
+          this.result.html("You have clicked only "+this.clickCount+" times");
         },
             
         onSuccess: function(){
-            this.result.addClass("success").removeClass("failure");         
-            this.result.html("Great! You have clicked "+this.clickCount+" times");
+          this.result.addClass("success").removeClass("failure");         
+          this.result.html("Great! You have clicked "+this.clickCount+" times");
         },
       });
       //]]>
