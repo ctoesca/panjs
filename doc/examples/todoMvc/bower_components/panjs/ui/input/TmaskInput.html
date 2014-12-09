@@ -1,0 +1,202 @@
+<html>        
+<head>
+
+<style type="text/less">	
+
+.TmaskInput
+{
+
+}
+.error{
+		color:#CC0000;
+	}
+/*width:100px;*/
+	.red-tooltip + .tooltip > .tooltip-inner {background-color: #aa0000;}
+	.red-tooltip + .tooltip > .tooltip-arrow {border-bottom-color: #aa0000;}
+	.red-tooltip{
+		margin-top:-30px; margin-left: 0px
+	}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("TmaskInput", "core.display.Telement", { 
+
+	/* PROPRIETES */
+
+	baseElement: "input",
+	errorText: null,
+	mask: null,
+	placeholder: "",
+	/* METHODES */
+	tooltip: null,
+
+	constructor: function(args){
+		
+		this._super.constructor.call(this,args);
+
+		this.input = this.container;
+
+		if (args)
+		{
+			this.injectParam("placeholder", args.placeholder,false, this.placeholder);
+			if (args.style)
+				this.container.attr("style", args.style);
+		}
+
+		if (defined(args, "size"))
+		{
+			var size = args.size;
+			this.container.attr("size", size);
+			this.container.css("width", (size*25)+"px")
+			//this.input.attr("maxLength", args.elem.getAttribute("size")); // ne fonctionne que sur input type="text"
+		}
+
+		this.container.attr("type","text");
+		this.container.addClass("form-control");
+		this.container.attr("placeholder", this.placeholder);
+
+		var v = "";
+		if (defined(args, "value"))
+			v = args.value;
+		this.val(v);
+		this._setEvents();
+
+		
+	
+	},
+	enabled: function(v){
+		if (v)
+			this.container.attr("disabled", "");
+		else
+			this.container.attr("disabled","disabled");
+		
+	},
+	_setEvents: function()
+	{
+		this.container.on("change", this._onChange.bind(this));
+		this.container.on("keyup", this._onChange.bind(this));
+		this.container.on("keydown", this._onKeyDown.bind(this));
+		this.container.on("focusout", this._onFocusOut.bind(this));
+	},
+
+	_onKeyDown:function(e)
+	{
+		if (!this.isCharAccepted(e))
+			e.preventDefault();
+	},
+	_onFocusOut:function(e)
+	{
+		this.container.val( this.getFormatedVal());
+	},
+	hideError: function(v)
+	{
+		this.container.css("color", "");
+	},
+	showError: function(v)
+	{
+		this.container.css("color", "red");
+	},
+	/*hideError: function(v)
+	{
+		if (this.tooltip != null)
+		if (this.tooltip.tooltipIsVisible)
+		{
+			//this.tooltip.tooltip('hide');
+			this.tooltip.hide();
+			this.tooltip.tooltipIsVisible = false;
+		}
+	},
+	showError: function(v)
+	{
+		if (this.tooltip == null)
+		{
+			//this.tooltip = $('<a href="#" data-toggle="tooltip" class="red-tooltip" title="Valeur incorrecte" style="visibility:hidden"></a>');
+			
+			this.tooltip = $('<div class="error">'+this.errorText+'</div>');
+
+			//this.tooltip.tooltip({placement: "right"});
+
+			//this.container.parent().append(this.tooltip);
+			
+			this.container.parent().append(this.tooltip);
+			
+			this.tooltip.tooltipIsVisible = false;
+
+		}
+
+		if (!this.tooltip.tooltipIsVisible)
+		{
+			if (this.errorText != null)
+			this.tooltip.attr("title", this.errorText);
+			//this.tooltip.tooltip('show');
+			this.tooltip.show();
+			
+			logger.info("tooltip "+this.errorText);
+			this.tooltip.tooltipIsVisible = true;
+			
+
+		}	
+	},*/
+	isNumberKey: function(evt)
+	{
+		return isNumberKey(evt);
+	},
+	isCharAccepted: function(evt)
+	{	
+		return isControlKey(evt);
+	},
+	isCorrectValue: function()
+	{
+		var isOk = false;
+		var v = this.container.val();
+
+		if (v == "")
+			return true;
+
+		if (this.mask.test(v)) 
+		{
+			isOk = true;			
+		}
+		return isOk;
+	},
+	_onChange:function(e)
+	{	
+		if (this.isCorrectValue()){
+			this.hideError();
+		}
+		else{
+			this.showError();
+		}
+		if ((typeof e != "undefined") && ((e.type == 'change') || (e.type == 'keyup')))
+		this.dispatchEvent( new Tevent(Tevent.CHANGE, {sender:this, value: this.val()}));
+	},
+
+	_onShow: function(e)
+	{
+	},
+
+	getFormatedVal: function()
+	{
+		var r = this.container.val();
+		return r;
+	},
+	
+	val: function(value)
+	{
+		if (arguments.length == 0)
+		{
+			return this.getFormatedVal();
+		}else
+		{
+			this.container.val(value);
+			setTimeout(this._onChange.bind(this), 500);
+		}
+	}
+});
+//]]>
+</script>
+
+</head>
+</html> 

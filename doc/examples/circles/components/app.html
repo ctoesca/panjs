@@ -1,0 +1,74 @@
+<html>        
+<head>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+uses("core.helpers.Ttimer");
+defineClass("app", "core.display.Telement", { 
+
+	baseElement: "div",	
+	circles: null,
+	N: 10,
+	timer: null,
+	frameRateTimer: null,
+	counter: 0,
+	lastCounter: 0,
+	delay: 1,
+
+	constructor: function(args){ 
+		this._super.constructor.call(this,args);
+		this.btnStart.on("click", this.onStartClick.bind(this));
+		this.btnStop.on("click", this.onStopClick.bind(this));
+		this.btnAdd.on("click", this.addCircle.bind(this));
+
+		this.frameRateTimer = new Ttimer({delay: 2000, onTimer: this.onFrameRateTimer.bind(this)});
+		this.frameRateTimer.start();
+
+		this.circles = [];
+
+		for (var i = 0; i< this.N; i++){
+			this.addCircle();
+		}
+		this.timer = new Ttimer({delay: this.delay, onTimer: this.onTimer.bind(this)});
+
+	},
+	addCircle: function(){
+		var circle = new panjs.createComponent("components.Tcircle.html");
+		circle.appendTo(this.container);
+		this.circles.push(circle);
+		this.numCircles.text( this.circles.length );
+	},
+	onStartClick: function(){
+		this.timer.start();
+	},
+	onStopClick: function(){
+		this.timer.stop();
+	},
+	onTimer: function(e){
+		for (var i = 0; i< this.circles.length; i++){
+			var circle = this.circles[i];
+			circle.tick();
+		}
+		this.counter ++;
+	},
+	onFrameRateTimer: function(e){
+		var f = (this.counter - this.lastCounter) / 2;
+		this.lastCounter = this.counter;
+		this.framerate.text( f +"/sec" );
+	}
+});
+
+//]]>
+</script>
+
+</head>
+
+<body>	
+	
+	<button id="btnStart">Start</button>
+	<button id="btnStop">Stop</button>
+	<button id="btnAdd">Add circle</button>
+
+	<span id="framerate">0/sec</span> - <span id="numCircles"></span> circles
+</body>
+</html> 

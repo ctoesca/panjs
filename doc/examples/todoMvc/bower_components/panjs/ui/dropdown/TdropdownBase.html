@@ -1,0 +1,263 @@
+<!--
+	***** TdropdownBase: *****
+	Composant ABSTRAIT.
+
+	Ce composant prend un dataProvider en paramètre (type TarrayCollection), contenant des objets.
+	Le type TarrayCollection est partiellement Bindable: les changements suivants sont répercutées dans la liste:
+	- Suppression, Ajout/insertion, replace
+	Le changement sur les propriétés du dataprovider ne sont pas répercutées dans la liste.
+
+	Pour étendre ce composant:
+	- implémenter _addItem, _empty, _setEvents
+
+-->
+
+<html>        
+<head>
+
+<style>	
+.TdropdownBase
+{
+	
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+
+uses("core.collections.TarrayCollection");
+             
+defineClass("TdropdownBase", "core.display.Telement", { 
+
+	/* PROPRIETES */
+	baseElement: "div",	
+	labelField: null,
+	nullLabelItem: '                           ',
+	insertNullItem: false,
+	placeholder: "Sélectionnez une valeur",
+	capitalizeFirstLetter: true,
+	_dataProvider: null,
+	_selectedItem: null,
+	_readonly: false,
+	_filterFunction: null,
+
+	_itemsCount: 0,
+
+	/* METHODES */
+	constructor: function(args){
+		TdropdownBase._super.constructor.call(this,args);
+		if (args)
+		{
+			this.injectParam("labelField", args.labelfield,false);	
+			this.injectParam("placeholder", args.placeholder,false, this.placeholder);
+			this.injectParam("insertNullItem", args.insertnullitem,false, this.insertNullItem);
+			this.injectParam("nullLabelItem", args.nulllabelitem,false, this.nullLabelItem);
+			this.injectParam("labelFunction", args.labelFunction,false, this.labelFunction);
+			
+		}
+
+		this._setEvents();	
+		this._setLabel(null);
+	},
+		
+	_onInitialized: function()
+	{
+	},
+	
+	setFilterFunction: function(f, bind)
+	{
+		if (this._filterFunction != f)
+		{
+			if (arguments.length>1)
+				this._filterFunction = f.bind(bind);
+			else
+				this._filterFunction = f;
+			this.refresh()
+		}
+	},
+	refresh: function()
+	{
+		if (!this._isReady()) return;
+
+		this._empty();
+		this._setLabel(null);		
+
+		if (this._dataProvider == null)
+			return;
+
+		if (this.insertNullItem)
+		{
+			var obj = {isNullItem: true};
+			obj[this.labelField] = null;
+			this._addItem(obj);
+		}
+
+		for (var i =0; i< this._dataProvider._source.length; i++)
+		{
+			var item = this._dataProvider._source[i];
+
+			if (this._filterFunction == null){
+				this._addItem(item);
+			}
+			else
+				if (this._filterFunction(item))
+				{
+					this._addItem(item);
+				}
+		}	
+
+		if (this._itemsCount == 0)
+			this.enabled(false)
+		else
+			this.enabled(true);
+	},
+	setDataProvider: function(dp)
+    {
+        this.setSelectedItem(null);
+
+        this._dataProvider = dp;
+        if (this._dataProvider != null)
+            this._dataProvider.on(Tevent.CHANGE, this._doDataproviderChange.bind(this));
+        
+        this.refresh(); 
+    },
+	getDataProvider: function()
+	{
+		return this._dataProvider;
+	},
+	getSelectedItem:function()
+	{
+		var r = this._selectedItem;
+
+		if ((r != null)&& (r.isNullItem == true))
+			r = null;
+
+		return r;
+	},
+	setSelectedItem:function(value)
+	{
+	
+		if (value != this._selectedItem)
+		{
+
+			var oldItem = this._selectedItem;
+			this._selectedItem = value;
+			if (this._selectedItem == null)
+			{
+				this._setLabel(null);
+			}
+			else
+			{
+				this._setLabel(this._selectedItem);
+			}
+		
+			this.dispatchEvent( new Tevent(Tevent.CHANGE, this._selectedItem));
+		}
+	},
+			
+	setSelectedItemByLabel:function(label)
+	{
+		var item = this.getItemByLabel(label);
+		this.setSelectedItem(item);
+	},
+	getItemByLabel:function(label)
+	{
+		if ((this._dataProvider == null)|| (this._dataProvider._source == null))
+			return null;
+
+		for (var i =0; i< this._dataProvider._source.length; i++)
+		{
+			var item = this._dataProvider._source[i];
+		 	if ((item[this.labelField]!= null) && (item[this.labelField] == label))
+		 		return item;
+		}
+		return null;
+	},
+
+	_doDataproviderChange: function(e)
+	{
+		this.refresh(); 
+	},
+	_isReady:function()
+	{
+		return ((this._dataProvider != null) && (this.labelField != null));
+	},
+
+	labelFunction: function(item)
+	{
+		var r = "";
+		if ((item != null)&&(item[this.labelField] != null))
+			r = item[this.labelField].capitalizeFirstLetter();
+		else
+			r = this.placeholder;
+		return r;
+	},
+
+/* **************** //ABSTRACT **************************************************************/
+	showError: function()
+	{
+		//ABSTRACT
+	},
+	hideError: function()
+	{
+		//ABSTRACT
+	},
+	setReadonly: function(value)
+	{
+		//ABSTRACT
+	},
+	
+	_setLabel: function(item)
+	{
+		//ABSTRACT
+	},
+	_close: function()
+	{
+		//ABSTRACT
+	},
+	_open: function()
+	{
+	},
+	_empty: function()
+	{
+		//ABSTRACT
+	},
+
+	_setEvents: function()
+	{
+		//ABSTRACT
+	},
+
+	_addItem:function(obj)
+	{
+		//ABSTRACT
+
+	},
+	
+	enabled: function(value)
+	{
+		//ABSTRACT
+	}
+	
+
+});
+
+//]]>
+</script>
+
+</head>
+
+<body>	 
+<!--CONTENT-->
+
+<!--
+  <button id="button" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    <span id="label"/> <span class="caret" id="caret"></span>
+  </button>
+  <ul class="dropdown-menu " role="menu" id="ul">
+  </ul>
+-->
+
+</body>
+</html>
+

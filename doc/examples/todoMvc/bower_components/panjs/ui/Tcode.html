@@ -1,0 +1,198 @@
+<html>        
+<head>
+
+
+<script src="/libs/js-beautify/1.4.2/js/lib/beautify-css.js"></script>
+<script src="/libs/js-beautify/1.4.2/js/lib/beautify-html.js"></script>
+<script src="/libs/js-beautify/1.4.2/js/lib/beautify.js"></script>
+<!--
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/lib/codemirror.css"/>
+
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/addon/fold/foldgutter.css">
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/addon/dialog/dialog.css">
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/theme/monokai.css">
+
+
+<script src="/libs/CodeMirror/4.2/lib/codemirror.js"></script>
+<script src="/libs/CodeMirror/4.2/mode/javascript/javascript.js"></script>
+<script src="/libs/CodeMirror/4.2/mode/xml/xml.js"></script>
+
+<script src="/libs/CodeMirror/4.2/addon/search/searchcursor.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/search/search.js"></script>
+
+<script src="/libs/CodeMirror/4.2/keymap/sublime.js"></script>-->
+
+
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/lib/codemirror.css"/>
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/addon/fold/foldgutter.css"/>
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/addon/dialog/dialog.css"/>
+<link rel="stylesheet" href="/libs/CodeMirror/4.2/theme/monokai.css"/>
+<script src="/libs/CodeMirror/4.2/lib/codemirror.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/search/searchcursor.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/search/search.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/dialog/dialog.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/edit/matchbrackets.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/edit/closebrackets.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/comment/comment.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/wrap/hardwrap.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/fold/foldcode.js"></script>
+<script src="/libs/CodeMirror/4.2/addon/fold/brace-fold.js"></script>
+<script src="/libs/CodeMirror/4.2/mode/javascript/javascript.js"></script>
+<script src="/libs/CodeMirror/4.2/mode/xml/xml.js"></script>
+<script src="/libs/CodeMirror/4.2/keymap/sublime.js"></script>
+
+
+<style type="text/css">
+
+	
+.Tcode .CodeMirror {
+	  border: 1px solid #eee;
+	  max-width: 1200px;
+	 /* height: auto;*/
+	  /*max-height:500px;*/
+	  font-size: 16px;
+	  height: 400px;
+}
+
+.Tcode .CodeMirror-scroll {
+	  overflow-y: auto;
+	  overflow-x: auto;
+}
+	
+
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+    
+defineClass("Tcode", "core.display.Telement", { 
+
+	baseElement: "div",	
+	render: false,
+	titleResult: "Result:",
+	editor: null,
+	readOnly: false,
+	mode: "javascript",
+	height: null,
+	_minHeight: 200,
+	_source: "",
+
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+  
+     	if (defined(args, "height"))
+     		this.height = args.height;
+
+     	if (defined(args, "mode"))
+     		this.mode = args.mode;
+
+		if (this.mode == "html")
+			this.mode = "xml";
+
+		if (defined(args, "style"))
+			this.container.attr("style", args.style);
+
+
+		this.editor = CodeMirror.fromTextArea(this.editor1[0], {
+				mode:  this.mode,
+				lineNumbers: true,
+				indent: true,
+				readOnly: this.readOnly,
+				keymap: "sublime",
+				theme: "monokai",
+			}
+  		);
+
+
+		var s = this.content[0].innerHTML.trim();	
+		
+		if (s != "")
+		{
+			s = s.droite("<!--");
+			s = s.removeEnd("-->");
+
+			s = s.replace(/&lt;!--/g, "<!--");
+			s = s.replace(/--&gt;/g, "-->");
+			
+			s = s.replace(/\[COMMENT\]/gi, "<!--");
+			s = s.replace(/\[\/COMMENT\]/gi, "-->");
+
+			s = s.replace(/<commentaire>/gi, "<!--");
+			s = s.replace(/<\/commentaire>/gi, "-->");
+			s = html_beautify(s);
+			this._source = s;
+			
+			this.setSource(this._source);
+	
+			if (this.render){
+				this.labelRendu.html(this.titleresult);
+				this.rendu.html(this._source);
+				this.rendu.show();
+				this.labelRendu.show();
+				panjs.load(this.rendu);
+			}
+
+		}
+	},
+	getSource: function(s){
+		return this.editor.getDoc().getValue();
+	},
+	getDoc: function(){
+		var r = null;
+		if (this.editor != null)
+		r = this.editor.getDoc();
+		return r;
+	},
+	setSource: function(s){
+		
+		this._source= s;
+		this.editor.getDoc().setValue(s);
+		
+		setTimeout(	function(){
+			
+			/*if (this.height == null)
+			{
+
+				var n = this._source.nbsouschaine("\n", this._source);
+				//logger.info("this.codeMirror.defaultTextHeight = "+this.codeMirror.defaultTextHeight());
+				var h = n* this.editor.defaultTextHeight() + 43;
+				
+				if (h<this._minHeight) h=this._minHeight;
+				this.editor.setSize("100%", h+"px");
+			}
+			else
+			{
+				var h = this.height;
+				if (h<this._minHeight) h=this._minHeight;
+				this.editor.setSize("100%", h);	
+			}*/
+		}.bind(this),200);
+
+		
+	}
+
+	
+});
+
+//]]>
+</script>
+
+</head>
+
+<body>	 
+
+<textarea id="editor1">
+	
+</textarea>
+
+	 <pre id="codeContainer" class="prettyprint linenums" style="display:none"><content id="content"></content></pre>
+	 <p class="labelRendu" id="labelRendu" style="display:none">Result:</p>
+	 <div id="rendu" class="rendu" style="display:none">
+
+	 </div>
+
+
+</body>
+</html>
+

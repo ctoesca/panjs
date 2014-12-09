@@ -1,0 +1,94 @@
+<html>        
+<head>
+
+<style type="text/css"> 
+.TerrorElement .message
+{
+    font-family:Consolas;
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+
+defineClass("TerrorElement", "core.display.Telement",
+{ 
+    baseElement: "div",
+    compoClassName: '?',
+    message: "?",
+
+    constructor: function(args) { 
+        
+        TerrorElement._super.constructor.call(this,args);
+        if (typeof args != "undefined"){
+        
+         
+            var path = "?";
+            var url = "?";
+            
+        
+            if (typeof args.message == "string")
+            {
+                this.message = args.message;   
+            }
+            else{
+                if (defined( args, "message" ,"message"))
+                    this.message =  args.message.message;
+                else
+                    this.message = args.message;
+            }
+
+            var messHtml = this.message;
+            if (typeof this.message == "string")
+            {
+                messHtml =  this.message.htmlEntities();
+                messHtml = messHtml.replace(/\n/g, '<br/>');
+            }
+
+
+            if (typeof args.path == "string")
+                path = args.path;
+
+            if (typeof args.url == "string")
+                url = args.url;
+
+             if (typeof args.className == "string")
+                this.compoClassName = args.className;
+
+            messHtml += "<br/>Fichier: "+path;
+            messHtml += "<br/>URL: "+url;
+
+            messHtml += "<br/>Previous errors:";
+                for (var i = 0; i< panjs.stack.length; i++)
+                    messHtml += "<br/>"+panjs.stack[i].htmlEntities().replace(/\n/g, '<br/>');
+
+            this.titre.html (this.titre.html().replace("{compoClassName}", this.compoClassName));
+            this.messageContent.html(messHtml);
+
+        }
+                
+
+      },
+      init: function(){
+        
+      }
+});
+
+
+//]]>
+</script>
+
+</head>
+
+<body>   
+    
+    <div class="alert alert-danger fade in">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h4 id="titre">Unable to load the component <em>{compoClassName}</em> !</h4>
+        <pre id="messageContent" class="message">
+        </pre>
+    </div>
+
+    
+</body>
+</html>

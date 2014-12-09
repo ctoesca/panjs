@@ -1,0 +1,243 @@
+<html>        
+<head>
+<!--
+Utilise extends/jquery.js
+-->
+
+<style type="text/css">
+.TslideControl
+{
+display: inline;
+}
+.TslideControl label{
+	display:inline; 
+	float:left; 
+	margin-top:5px; 
+	font-weight: bold; 
+	text-align:right;
+	padding-right:15px;
+}
+
+.TslideControl .slideControlContainer {
+
+	height:10px; 
+	background: #efefef; /* Old browsers */
+	background: -moz-linear-gradient(top, #efefef 0%, #ffffff 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#efefef), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #efefef 0%,#ffffff 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #efefef 0%,#ffffff 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #efefef 0%,#ffffff 100%); /* IE10+ */
+	border:1px solid #ccc; box-shadow:inset 0 1px 0 #fff;
+	border-radius:7px;
+	cursor:pointer;
+	width:340px;
+	float:left;
+	margin:12px 15px 0 0;
+}
+
+.TslideControl .slideControlFill {
+	background: #ea5507; /* Old browsers */
+	background: -moz-linear-gradient(top, #feccb1 0%, #f17432 50%, #ea5507 51%, #fb955e 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#feccb1), color-stop(50%,#f17432), color-stop(51%,#ea5507), color-stop(100%,#fb955e)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #feccb1 0%,#f17432 50%,#ea5507 51%,#fb955e 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #feccb1 0%,#f17432 50%,#ea5507 51%,#fb955e 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #feccb1 0%,#f17432 50%,#ea5507 51%,#fb955e 100%); /* IE10+ */
+	display:block;
+	height:100%;
+	border-radius:7px;
+	box-shadow:inset 0 1px 0 #F9D7C5;
+	position:relative;
+	z-index:1;
+	overflow:visible !important;
+}
+
+.TslideControl .slideControlHandle {
+	display:block; 
+	background: #ea5507; /* Old browsers */
+	background: -moz-linear-gradient(top, #feccb1 0%, #f17432 50%, #ea5507 51%, #fb955e 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#feccb1), color-stop(50%,#f17432), color-stop(51%,#ea5507), color-stop(100%,#fb955e)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #feccb1 0%,#f17432 50%,#ea5507 51%,#fb955e 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #feccb1 0%,#f17432 50%,#ea5507 51%,#fb955e 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #feccb1 0%,#f17432 50%,#ea5507 51%,#fb955e 100%); /* IE10+ */
+	border-radius:15px;
+	border:5px solid #fff;
+	width:20px;
+	height:20px;
+	box-shadow:0 0 1px #555;
+	position:absolute;
+	right:-10px;
+	top:-5px;
+	z-index:5;
+	cursor:pointer;
+}
+
+.TslideControl .ieShadow {
+	zoom: 1;
+	filter: progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=0,strength=1), 
+  progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=45,strength=1), 
+  progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=90,strength=1), 
+  progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=135,strength=1), 
+  progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=180,strength=1), 
+  progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=225,strength=1), 
+  progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=270,strength=1), 
+  progid:DXImageTransform.Microsoft.Shadow(color=#aaaaaa,direction=315,strength=1);
+	top:-8px;
+	right:-4px;
+}
+
+.TslideControl .slideControlInput {
+	width:60px;
+	font-size:1.3em;
+
+	border:1px solid #ccc;
+	border-radius:5px;
+	text-align:center;
+	color:#333;
+	font-weight:bold;
+}
+
+
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+             
+defineClass("TslideControl", "core.display.Telement", { 
+
+	/* PROPRIETES */
+	baseElement: "span",	
+	speed: 400,
+	step: 1,
+
+	_value: "50",	
+	_offset: 0,
+	_percentPosition: 0, 
+	_handleWidth: 0,
+	_containerWidth:0,
+	_mouseIsDown : false,
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+		this.injectParam("speed", args.speed,false);
+		this.injectParam("_value", args.value,false);
+		this.injectParam("step", args.step,false);	
+	
+		this._refreshSizeData();
+			
+		if (panjs.iever < 9 && panjs.iever > -1) 
+			this.slideControlHandle.addClass('ieShadow');
+			
+		if (panjs.iever != -1)
+			this.input.css("padding-top", "3px");
+
+		this.setValue(this._value, false, true);
+		this._setEvents();
+	},
+
+	getValue:function(value, animate)
+	{
+		return this._value;
+	},
+	setValue:function(value, animate, force)
+	{		
+		if (value > 100) value = 100;
+		if (value < 0) value = 0;
+		value = value - value % this.step;
+
+		if ((this._value == value)&&(force !== true))
+			return;
+
+		this._value = value;
+		this._percentPosition = value;
+
+		this.input.val(value);
+	
+		if (animate !== false)
+			this.animate(this._percentPosition);
+		else
+			this.slideControlFill.width((this._percentPosition) + "%");
+	},
+
+	_setEvents: function()
+	{
+		this.slideControlContainer.on("click", {$this:this}, this._onContainerClick);
+		this.slideControlHandle.on("mousedown", {$this:this}, this._onButtonMouseDown);
+		this.input.on("change", {$this:this}, this._onInputChange);
+		this.input.on("keydown", {$this:this}, this._onInputKeyDown);
+	},
+
+	animate: function(value)
+	{
+		this.slideControlFill.animate({ width: value + "%"}, this.speed);
+	},
+	_refreshSizeData: function()
+	{
+		this._offset = this.slideControlContainer.offset();
+		this._containerWidth = this.slideControlContainer.outerWidth() + 1;
+		this._handleWidth = this.slideControlHandle.outerWidth();
+	},
+
+	_onInputKeyDown: function(e) {
+		return isNumberKey(e)||isControlKey(e);
+	},
+
+	_onInputChange: function(e) {
+		var $this = e.data.$this;
+		var v = $this.input.val();
+		$this.setValue(v,true,true);
+	},
+
+	_onButtonMouseDown: function(e)
+	{
+		var $this = e.data.$this;
+		$this._refreshSizeData();
+		e.preventDefault();
+		$this._mouseIsDown = true;
+		$(document).on("mousemove", {$this:$this}, $this._onMouseMove);
+		$(document).on("mouseup", {$this:$this}, $this._onMouseUp);
+	},
+
+	_onMouseUp: function(e) 
+	{
+		var $this = e.data.$this;
+		e.preventDefault();
+		$(document).off("mousemove", $this._onMouseMove);
+		$(document).off("mouseup", $this._onMouseUp);
+		$this._mouseIsDown = false;
+	},
+
+	_onMouseMove: function(e) 
+	{	
+		var $this = e.data.$this;
+		e.preventDefault();
+		$this._percentPosition = Math.round(((e.pageX - $this._offset.left + $this._handleWidth/2-8)/$this._containerWidth)*100);
+		if ($this._mouseIsDown) 
+			$this.setValue($this._percentPosition, false);
+	},
+
+	_onContainerClick: function(e)
+	{
+		var $this = e.data.$this;
+		$this._refreshSizeData();
+		e.preventDefault();
+		$this._percentPosition = Math.round(((e.pageX - $this._offset.left + $this._handleWidth/2-8)/$this._containerWidth)*100);		
+		$this.setValue($this._percentPosition, true);
+	}	
+});
+//]]>
+</script>
+
+</head>
+<body>
+
+	<span id="slideControlContainer" class="slideControlContainer">
+			<span id="slideControlFill" class="slideControlFill">
+				<span id="slideControlHandle" class="slideControlHandle">
+				</span>
+			</span>
+	</span>
+		<input id="input" type="text" class="slideControlInput form-control"/>
+	
+</body>
+</html>
+

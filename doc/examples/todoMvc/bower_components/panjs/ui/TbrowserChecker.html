@@ -1,0 +1,102 @@
+<html>        
+<head>
+<script>
+</script>
+
+<style type="text/less">
+.TbrowserChecker
+{
+	.warning{
+		display:none;
+		color:#CC0000;
+		margin:auto;
+		width:500px;
+		padding:20px;
+	}
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+             
+defineClass("TbrowserChecker", "core.display.Telement", { 
+
+	/* PROPRIETES */
+	baseElement: "div",	
+
+	minIE: null,
+	minFF: null,
+	minCHROME: null,
+	
+	ieVersion: null,
+	firefoxVersion: null,
+	chromeVersion: null,
+
+	isIe: false,
+	isFirefox: false,
+	isChrome: false,
+
+    
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+
+		this.injectParam("minIE", args.minie,false);
+		this.injectParam("minFF", args.minff,false);
+		this.injectParam("minCHROME", args.minchrome,false);
+
+		this.ieVersion = getIEVersion();
+		this.firefoxVersion = getFirefoxVersion();
+		this.chromeVersion = getChromeVersion();
+
+		this.isIe = (this.ieVersion != -1);
+		this.isFirefox = (this.firefoxVersion != -1);
+		this.isChrome = (this.chromeVersion != -1);
+
+		if ((this.minIE != null)&& (this.isIe))
+		{
+			if ( this.ieVersion < this.minIE )
+				this.showWarning("Internet Explorer "+this.minIE);
+		}
+		if ((this.minFF != null)&& (this.isFirefox)){
+			if (this.firefoxVersion < this.minFF )
+				this.showWarning("Firefox "+this.minFF);
+		}
+		if ((this.minCHROME != null)&& (this.isChrome)){
+			if (this.chromeVersion < this.minCHROME )
+				this.showWarning("Chrome "+this.minCHROME);
+		}
+
+	},
+
+	showWarning: function(message)
+	{
+		var m = "";
+		if (this.minIE != null)
+			m += "Internet Explorer "+this.minIE+"<br/>";
+		if (this.minFF != null)
+			m += "Firefox "+this.minFF+"<br/>";
+		if (this.minCHROME != null)
+			m += "Chrome "+this.minCHROME+"<br/>";
+
+		var html = $("<div>L'application est compatible à partir de <br/>"+m+"</div>");
+		this.warning.prepend(html);
+		this.warning.show();
+		this.dispatchEvent(new Tevent(Tevent.ERROR));
+
+	}
+
+});
+//]]>
+</script>
+
+</head>
+<body>
+
+	<h3 id="warning" class="warning">
+		
+		<!--CONTENT-->
+	</h3>
+	
+</body>
+</html>
+

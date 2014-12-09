@@ -1,0 +1,87 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>  
+   <title>panjs - Tutorial</title>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+   <link rel="shortcut icon" href="favicon.png"/>
+   <META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="en-EN,en"/>
+
+   <script src="bower_components/jquery/2.1.1/jquery.min.js"></script>
+
+   <script>
+    //<![CDATA[  
+    var panjs = {
+      logLevel: "DEBUG", //DEBUG / INFO / WARN / ERROR
+        env: "dev", // dev or prod
+        appVersion: "1.0.0", 
+        version: "0.7.0", 
+
+        namespaces:[
+        {name: "core", path: "bower_components/panjs/core"},
+        {name: "ui", path: "bower_components/panjs/ui"},
+        {name: "app", path: "components"},
+        {name: "components", path: "components"},
+        {name: "model", path:"model"},
+        {name: "services", path:"services"} 
+        ]
+      };  
+    //]]>
+  </script>
+
+  <!-- For debug, load theses 3 files -->   
+  <!--<script src="bower_components/panjs/core/helpers/base.js"></script>
+  <script src="bower_components/panjs/core/helpers/jquery.js"></script>
+  <script src="bower_components/panjs/core/starter.js"></script>-->
+
+
+  <!-- For production, load this file -->
+  <!--<script src="bower_components/panjs/core/panjs_core.min.js"></script>-->
+
+  <!-- panjs + less (not for production) -->
+  <!--<script src="bower_components/panjs/core/panjs_core_with_less.min.js"></script>-->
+
+  <script src="bower_components/panjs/core/helpers/base.js"></script>
+  <script src="bower_components/panjs/core/helpers/jquery.js"></script>
+  <script src="bower_components/panjs/core/starter.js"></script>
+
+  <script>
+    $(document).ready(function() 
+    {
+      uses("model.Tmodel");
+     
+      panjs.model = new Tmodel();
+            
+      panjs.load($(document.body)) ;  
+      //panjs.root.todoList1.setListe(panjs.model.liste);   
+    });
+  </script>
+</head>
+
+<body data-framework="backbonejs">
+
+    <div id="todoList1" data-compo="app.app.html" autoload="true">  </div>     
+
+    <footer id="info">
+      <p>Double-click to edit a todo</p>
+      <!-- Change this out with your name and url ↓ -->
+      <p>Created by <a href="http://todomvc.com">you</a></p>
+      <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+    </footer>
+    <!-- Scripts here. Don't remove this ↓ -->
+    <script src="bower_components/todomvc-common/base.js"></script>
+    <script src="js/app.js"></script>  
+
+
+     <!--<div id="todoList1" data-compo="app.TtodoList.html" autoload="true">  </div>  -->   
+   
+       
+</body>
+
+</html>
+
+
+
+
+

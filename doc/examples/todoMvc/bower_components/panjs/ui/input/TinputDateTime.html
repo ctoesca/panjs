@@ -1,0 +1,174 @@
+<html>        
+<head>
+
+<link href="./css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+<script type="text/javascript" src="/libs/moment/2.6.0/moment-with-langs.js"></script>
+<script type="text/javascript" src="./js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="./js/bootstrap-datetimepicker.fr.js"></script>
+
+<style>
+
+.TinputDateTime
+{
+
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("TinputDateTime", "core.display.Telement", { 
+
+	/* PROPRIETES */
+	value: null,
+	baseElement: "div",
+	widget: null,
+	format: "DD/MM/YYYY",
+	pickTime: false,
+	useCurrent: false,    
+	minuteStepping: 15,
+
+	/* METHODES */
+	
+	constructor: function(args){
+		
+		this._super.constructor.call(this,args);
+		
+		if ( typeof args != "undefined"){
+			if (typeof args.format != "undefined")
+				this.format = args.format;
+			
+			if (typeof args.picktime != "undefined")
+				this.pickTime = args.picktime;
+
+			if (typeof args.minutestepping != "undefined")
+				this.minuteStepping = parseInt(args.minutestepping);
+		}
+		
+
+		this.datePicker.attr("data-date-format", this.format);
+
+		this.datepicker = this.datePicker.datetimepicker({
+			language: 'fr',
+			pickTime: this.pickTime,
+			useCurrent: this.useCurrent,
+			minuteStepping: this.minuteStepping
+		});
+		this.widget = this.datepicker.data("DateTimePicker").widget;
+		this.widget.attr("style", "z-index: 1000000");
+
+		this._setEvents();
+	},
+	
+	_setEvents: function()
+	{
+		//this.datePicker.on("dp.change", this._onChangeDate.bind(this));
+		this.datePicker.on("dp.hide", this._onHideDate.bind(this));
+		this.datePicker.on("dp.show", this._onShowDate.bind(this));
+		this.datePicker.on("dp.error", this._onErrorDate.bind(this));
+		this.input.on("change", this._onChangeDate.bind(this));
+
+	},
+	free: function(){
+		this._super.free.call(this);
+		this.widget.remove();
+	},
+	_onErrorDate: function(e)
+	{
+	},
+	_onHideDate: function(e)
+	{	
+
+	},
+	_onChangeDate: function(e)
+	{
+		this.checkDate();
+	},
+	checkDate : function()
+	{
+		this.input.css("color", "");
+		try{
+			if (this.input.val().trim() == "")
+				return true;
+			var isValide = moment(this.getInputText(), this.format).isValid();
+
+			if (!isValide){
+				this.input.css("color", "red");
+				return false;
+			}
+			else{
+				return true;
+			}
+		}catch(err){
+			this.input.css("color", "red");
+			return false;
+		}
+	},
+	_onShowDate: function(e)
+	{
+	
+	},
+
+	val: function(value)
+    {
+        //type value: String YYYY-MM-DD HH:mm:ss"
+
+        if (arguments.length == 0)
+        {
+  		
+            var r = this.datePicker.data("DateTimePicker").getDate();
+            if (this.input.val().trim() == "")
+            r = null;
+
+        	if (this.checkDate() == false)
+				throw "Date incorrecte";
+
+            return r;
+
+        }else
+        {	
+        	
+
+        	if (value == null){
+        		this.datePicker.data("DateTimePicker").setDate(null);
+        	}
+        	else{
+
+            	this.datePicker.data("DateTimePicker").setDate(moment(value).format(this.format));
+				if (this.checkDate() == false)
+				throw "Date incorrecte";
+        	}
+        }
+    },
+    getInputText: function(){
+    	return this.input.val().trim();
+    },
+	setTimeStamp: function(v)
+	{
+		if (v == null)
+			return;
+		this.val( new Date(v.replace(" ","T")));
+	},
+	getTimeStamp: function()
+    {
+    	
+        var r = this.val();
+        
+        if (r !=null)
+        r = moment(r).format("YYYY-MM-DD HH:mm:00");
+
+        return r;
+    }
+});
+//]]>
+</script>
+
+</head>
+<body>		 
+                <div class="input-group date" id="datePicker" data-date-format="YYYY-MM-DD HH:mm:ss">
+                    <input type='text' class="form-control" id="input"/>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+</body>
+</html> 

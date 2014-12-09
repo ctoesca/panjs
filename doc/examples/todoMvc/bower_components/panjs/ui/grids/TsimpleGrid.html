@@ -1,0 +1,980 @@
+<html>        
+<head>
+<!--
+Attention, le fait de valoriser "cellClass" sur une colonne est consommateur de CPU:
+la classe est ajoutée sur chaque TD correspondante.
+Il est préférable parfois d'utiliser un item renderer.
+
+Pour affecter un style sur toutes les cellules, valoriser "tableClass" sur le composant.
+Exemple: 
+
+.classe_de_la_grille
+{	
+		//Toutes les cellules de la grille: */
+		td{
+			color: #FF0000;
+		}
+		/* cellClass="classe_cellules_colonne_3" affecté sur une colonne seulement:
+		cette classe écrase le style "td" car il est mis sur les cellules directement */
+		.classe_cellules_colonne_3{
+			color: #00CC00;
+		}
+}
+
+
+-->
+<style type="text/css">
+
+.TsimpleGrid table.allowSelection td {
+	cursor:pointer;
+}
+
+.TsimpleGrid table.table-hover tbody tr.selected td {
+  background-color: #dff0d8 !important;
+}
+.TsimpleGrid table.table-hover tbody tr.selected:hover > td {
+  background-color: #d0e9c6 !important;
+}
+
+
+/*******************************************************************/
+.TsimpleGrid table.table-hover tbody tr.success td {
+  background-color: #dff0d8 !important;
+}
+.TsimpleGrid table.table-hover tbody tr.error td {
+  background-color: #f2dede !important;
+}
+
+.TsimpleGrid table.table-hover tbody tr.warning td {
+  background-color: #fcf8e3 !important;
+}
+
+.TsimpleGrid table.table-hover tbody tr.info td {
+  background-color: #d9edf7 !important;
+}
+
+.TsimpleGrid table.table-hover tbody tr.success:hover > td {
+  background-color: #d0e9c6 !important;
+}
+
+.TsimpleGrid table.table-hover tbody tr.error:hover > td {
+  background-color: #ebcccc !important;
+}
+
+.TsimpleGrid table.table-hover tbody tr.warning:hover > td {
+  background-color: #faf2cc !important;
+}
+
+.TsimpleGrid table.table-hover tbody tr.info:hover > td {
+  background-color: #c4e3f3 !important;
+}
+
+
+.TsimpleGrid .imgWait
+{
+	/*overflow: auto;
+	height:500px;*/
+
+	display:none;
+	left:25%;
+	text-align:center;
+	padding:20px;
+	width:50%;
+	position:fixed;
+	bottom:0;
+	color:white;
+	background-color: #222222;
+	opacity:0.7;
+
+
+}
+.TsimpleGrid tr.detailRow td{
+	background-color: white;
+	cursor: default;
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+
+
+defineClass("TsimpleGrid", "core.display.Telement", { 
+
+	/* PROPRIETES */
+
+	baseElement: "div",	
+	_cols:[],
+	_dataProvider: null,
+	_isEmpty: true,
+	_tableClass: null, //Style affecté sut la table
+	loaded: false,
+	sectionRecordsCount: 100,
+	linesCount: 0,
+	onBeforeRenderLine: null,
+	detailRowRenderer: null,
+
+	progressiveLoad: true,
+	_progressiveLoadHandledIsSet: false,
+	visibleColsCount: 0,
+
+	/* Selection */
+	_allowSelection: false,
+	selectedDataField: null,
+	_itemsSelected: null,
+	detailRenderer: null,
+
+	primaryKeyFields:null,
+
+	/* METHODES */	
+	constructor: function(args){
+
+		this.primaryKeyFields = ["id"];
+
+		this._itemsSelected = new TarrayCollection();
+		this._super.constructor.call(this,args);	
+		TsimpleGrid.ON_SORT_CHANGED = "ON_SORT_CHANGED";
+		TsimpleGrid.ON_CELL_CLICK = "ON_CELL_CLICK";
+		TsimpleGrid.ON_ROW_CLICK = "ON_ROW_CLICK";
+
+		this._tableClass = args["class"] || this._tableClass;
+
+		this._allowSelection = args["allow-selection"] || args["allowSelection"]|| this._allowSelection;
+		this.selectedDataField = args["selected-data-field"] || this.selectedDataField;
+		
+
+		/*
+		Récup des colonnes définies dans <CONTENT>
+		*/
+		this._cols = [];
+		
+		if (this.content != null){
+			var listeCol = this.content.getElements("div");
+			
+			for (var i=0; i< listeCol.length; i++)
+			{
+				var el = listeCol[i];
+				var datafield = el.attr("field");
+				var title = el.html();
+				var itemRenderer = el.attr("itemRenderer")||null;
+				var visible = el.attr("visible")||true;
+			
+				
+				var col = {
+
+					"index": i,
+					"sortable": el.attr("sortable")||false,
+					"sorted": false, 
+					"sortField": el.attr("sortField")||datafield,
+					"visible": visible,
+					"field": datafield,
+					"title": title,
+					"nullLabel": "",
+					"headerClass": el.attr("headerClass")||null,
+					"cellClass": el.attr("cellClass")||null,
+					"itemRenderer": itemRenderer,
+					"functionRenderer": el.attr("functionRenderer")||null,
+					"headerFunctionRenderer": el.attr("headerFunctionRenderer")||null,
+
+					"titleInfo": el.attr("titleInfo")||null,
+			
+				};
+				
+				
+				this._cols.push(col);
+			}
+
+			this.content.remove();			
+		}
+
+		if (this._tableClass != null)
+		this.table.addClass(this._tableClass);
+
+		this.setAllowSelection(this._allowSelection);
+			
+		this._setEvents();
+
+	},
+	setAllowSelection: function(v){
+		this._allowSelection = v;
+		if (v)
+			this.table.addClass("allowSelection table-hover");//table-hover
+		else
+			this.table.removeClass("allowSelection table-hover");//table-hover
+
+		this.refresh();
+	},
+
+	getSelectedItems: function(){
+		return this._itemsSelected;
+	},
+	setSelectedItem: function(item){
+		var tr = this.getTr(item);
+		if (tr)
+		{
+			$(tr).addClass('selected');
+			this._itemsSelected.addItem(item);
+		}
+	},
+	setSelectedItems: function(items){
+		for(var i=0; i< items.length; i++){
+			var item = items[i];
+			var tr = this.getTr(item);
+			if (tr)
+			{
+				$(tr).addClass('selected');
+				this._itemsSelected.addItem(item);
+			}
+		}	
+	},
+
+	_onHide: function()
+	{
+		logger.debug("_onHide table");
+	},
+	_onBottom:function(e)
+	{
+
+		if($(window).scrollTop() + $(window).height() == getDocHeight()) {
+			
+			if (this._dataProvider == null)
+			return;
+
+			if (this.linesCount == this._dataProvider.length)
+				return;
+
+			if ( this.container.is(":visible") == false)
+				return;
+						
+			this.imgWait.show();
+			setTimeout(this.showMore.bind(this),500);		
+       	}
+	},
+
+	showMore: function(count)
+	{	
+		if(arguments.length == 0)
+			var count = 999999;
+
+		var start = this.linesCount;
+
+		var end = this.linesCount+this.sectionRecordsCount-1;
+		
+		if (end >= this._dataProvider.length)
+			end = this._dataProvider.length-1;
+		if (end<start){
+			this.imgWait.hide();
+			return;
+		}
+		var debut = new Date();
+			
+		var docFragment = document.createDocumentFragment();
+		var added = 0;
+		for (var i=start; i<= end; i++)
+		{
+			if (added < count){
+				var d = this._dataProvider.getItemAt(i);	
+				this._addLine(d, docFragment);
+				added ++;
+			}
+		}
+
+		this.tbody[0].appendChild(docFragment);
+		this.imgWait.hide();
+		logger.debug("Temps exécution showMore : "+(new Date() - debut)+" ms");
+	},
+
+	getColByField: function(field)
+	{
+		var r = [];
+		for (var i=0; i< this._cols.length; i++)
+		{
+			var c = this._cols[i];
+			if (c.field == field)
+				r.push(c);
+		}
+		return r;
+	},
+	
+	hideCol: function(col)
+	{
+		col.visible = false;
+		this._createTable();
+	},
+
+	showCol: function(col)
+	{
+		col.visible = true;
+		this._createTable();
+	},
+	getColAt: function(indx)
+	{
+		if (!this._cols)
+			return null;
+		return this._cols[indx];
+	},
+	addCols : function(cols)
+	{
+		//Col exemple: { field: "warning" , searchable:false, title:"Warning", cellClass:"cellWarning",  headerClass:"cellWarning", itemRenderer:"TdateItemRenderer"}
+		for (var i=0; i< cols.length; i++)
+		{
+			var col = cols[i];
+			col.index = i;
+			var u = "undefined";
+			if (typeof col.sortable == u) col.sortable = false;
+			if (typeof col.nullLabel == u) col.nullLabel = "";
+			if (typeof col.visible == u) col.visible = true;
+			if (typeof col.sorted == u) col.sorted = false;
+			if (typeof col.field == u) col.field = null;
+			if (typeof col.title == u) col.title = null;
+			if (typeof col.cellClass == u) col.cellClass = null;
+			if (typeof col.headerClass == u) col.headerClass = null;
+			if (typeof col.itemRenderer == u) col.itemRenderer = null;
+			if (typeof col.titleInfo == u) col.titleInfo = null;	
+			if (typeof col.sortField == u) col.sortField = col.field;		
+			this._cols.push(col);
+		}
+	},
+	_onShow: function()
+	{
+	},
+
+	setDataProvider: function(dataProvider)
+	{
+		if (!this.progressiveLoad){
+			this.sectionRecordsCount = 100000;
+		}else{
+			if (!this._progressiveLoadHandledIsSet){
+      			$(window).scroll( this._onBottom.bind(this));
+      			this._progressiveLoadHandledIsSet = true;
+
+      			this.tableContainer.scroll( this._onTableScroll.bind(this));
+      			
+      		}
+		}
+
+		if (this._dataProvider != dataProvider)
+		{
+			this._dataProvider = dataProvider;
+			this._dataProvider.on(Tevent.UPDATE, this._onItemUpdated.bind(this));
+			this._dataProvider.on(Tevent.DELETE, this._onItemRemoved.bind(this));
+			this._dataProvider.on(Tevent.ADDED, this._onItemAdded.bind(this));
+			this._dataProvider.on(Tevent.REFRESH, this.refresh.bind(this));
+			this._dataProvider.on(Tevent.REPLACE, this._onItemReplaced.bind(this));
+		}
+		this._createTable();
+	},
+	_onTableScroll: function(e)
+	{
+		//logger.debug("SCROLLTOP="+this.tableContainer.scrollTop()+", tableContainer.height()="+this.tableContainer.height()+", table.height()="+this.table.height());
+
+		if(this.tableContainer.scrollTop() + this.tableContainer.height() >= this.table.height()) {
+			
+			if (this._dataProvider == null)
+			return;
+
+			if (this.linesCount == this._dataProvider.length)
+				return;
+
+			if ( this.container.is(":visible") == false)
+				return;
+						
+			this.imgWait.show();
+			setTimeout(this.showMore.bind(this),500);		
+       	}
+	},
+	getDataProvider: function()
+	{
+		return this._dataProvider;
+	},
+
+	_setEvents: function()
+	{
+
+	},
+	getTr: function(item)
+	{
+		//!! PB ID
+		var r = null;
+		
+		var id = this.getPrimaryKeyValue(item);
+
+		if (typeof id == "undefined")
+		{
+			logger.error(this.className+" : no item.ID or item.id property on object");
+		}else{
+			r = this.container.getElement('tr[itemId="'+id+'"]');
+		    if (r!= null)
+		    	r = r[0];
+		}
+		return r;
+	},
+
+	getPrimaryKeyValue: function(item)
+	{
+		if (this.primaryKeyFields.length == 1)
+		{
+			var r = item[this.primaryKeyFields[0]];
+		}
+		else
+		{
+			var r = "";	
+			for (var i=0; i< this.primaryKeyFields.length; i++)
+			{
+				r += item[this.primaryKeyFields[i]]+"_";
+			}
+			r = r.removeEnd("_");
+		}	
+		return r;
+	},
+
+	getItemByPrimaryKey: function(key)
+	{
+		if (this._dataProvider == null)
+			return null;
+
+		var r = null;
+		for (var i=0; i< this._dataProvider._source.length; i++)
+		{
+			var item = this._dataProvider._source[i];
+			var keyValue = this.getPrimaryKeyValue(item);
+			if (keyValue == key)
+			{
+				r = item;
+				break;
+			}
+		}
+		return r;
+	},
+
+	_onItemReplaced: function(e)
+	{
+		var item = e.data.item;
+		var newItem = e.data.newItem;	
+		this._itemsSelected.replaceItem(item, newItem);
+		this._setTr(this.getTr(item), newItem, false);
+	},
+
+	refreshItem: function( item )
+	{
+		var tr = this.getTr(item);		
+		this._setTr(tr, item, false);
+	},
+	_removeItem:function(item)
+	{
+
+		var tr = this.getTr(item);
+		var detailTr = $.data(tr, "detailTr");
+		tr = $(tr);
+		tr.remove();
+		
+		if (typeof detailTr != "undefined")
+			$(detailTr).remove();
+
+		this._itemsSelected.removeItem(item);
+		this.linesCount --;
+	},
+
+	_onItemUpdated: function(e)
+	{
+		var item = e.data;
+		this.refreshItem(item);
+	},
+
+	_onItemAdded: function(e)
+	{
+		var item = e.data.item;
+		var indx = e.data.index;
+		this._insertLineAt(item, indx);
+	},
+
+	_onItemRemoved: function(e)
+	{
+		var item = e.data;
+		this._removeItem(item);
+	},
+	emptyTable: function()
+	{
+		if (this._isEmpty == false)
+		{			
+			this.tbody.html("");
+			this._isEmpty = true;
+		}
+
+	},
+	
+	_addHeader: function(col)
+	{
+		var th = $('<th colIndx="'+col.index+'"></th>');
+		if (col.headerClass) 
+			th.addClass(col.headerClass);
+
+		th = this._updateHeader(th, col, this.trHeader);
+		
+		this.trHeader.append(th);
+		return th;
+	},
+	_updateHeader: function(th, col, tr)
+	{
+		th.html("");
+
+		if (col.headerFunctionRenderer)
+		{							
+			var html = col.headerFunctionRenderer(col, this, {th:th, tr: tr, col:col});
+			if (html == null){
+
+			}else
+			if (typeof html == 'object')
+			{
+				if (html.nodeName == "TD")
+				{
+					th = $(html);//!!on a créé le td pour rien.
+				}else
+				{
+					th.append(html);
+				}								
+				
+			}else{
+				th.html(html);
+			}
+		}
+		else
+		{
+			
+			if (col.sortable == true)
+			{
+				var a = $('<a href="#">'+col.title+'</a>');
+
+				if (col.titleInfo != null)
+					a.attr("title", col.titleInfo);
+				
+				if (col.sorted !== false)
+				{
+					if (col.sorted == "ASC")
+						a.append('<i class="glyphicon glyphicon-chevron-up pull-right"></i>');
+					if (col.sorted == "DESC")
+						a.append('<i class="glyphicon glyphicon-chevron-down pull-right"></i>')
+					a.append($('<span style="margin-left:10px"></span>'));
+				}
+
+				a.on("click", this._onHeaderClick.bind(this));		
+				th.append(a);
+
+			}
+			else
+			{
+				th.html(col.title);
+			}
+		}
+		return th;
+	},
+
+	_onHeaderClick: function(e)
+	{
+		var a = $(e.target);
+		if (a[0].nodeName != "A")
+			a = a.parent();
+		var th = a.parent();
+		col = this._cols[th.attr("colIndx")];
+
+		if (col.sorted == "ASC")
+			col.sorted = "DESC";
+		else
+			if (col.sorted == "DESC")
+				col.sorted = false;
+			else
+				if (col.sorted === false)
+					col.sorted = "ASC";
+
+		this._updateHeader(th, col);
+
+
+		for (var i=0; i< this._cols.length; i++)
+		{
+			var _col = this._cols[i];
+			var _th = this.table.getElement('th[colIndx="'+_col.index+'"]');
+
+			if (_th != null){
+				this._updateHeader(_th, _col);
+			}
+
+			if (_col != col){
+				_col.sorted = false;
+			}
+		}
+		this.dispatchEvent(new Tevent( TsimpleGrid.ON_SORT_CHANGED,col));
+		return false;
+	},
+	_createHeaders: function()
+	{			
+		this.trHeader = $('<tr>');
+		this.tbody.append(this.trHeader);
+		this.visibleColsCount = 0;
+		for (var i =0; i< this._cols.length; i++)
+		{
+			var col = this._cols[i];
+			var th = null;
+			if (col.visible){
+				var th = this._addHeader(col);
+				this.visibleColsCount ++;
+			}
+
+			if ((i == 0)&&(th!=null))
+				th.addClass('topLeftCell');
+
+		}
+
+	},
+	refresh: function()
+	{
+		this._createTable();
+	},
+	
+	_createTable: function()
+	{		
+		if (this._dataProvider == null)
+			return;
+
+		this._itemsSelected.removeAll();
+		var renderTime = 0;
+		var s1 = new Date().getTime();
+		this.linesCount = 0;
+		this.emptyTable();
+		this.table.remove();
+
+	
+		//if (!this.loaded)
+			this._createHeaders();		
+		
+		var docFragment = document.createDocumentFragment();
+		for (var i =0; i< this._dataProvider.length; i++)
+		{
+			var d = this._dataProvider.getItemAt(i);	
+			if (i<this.sectionRecordsCount)
+			this._addLine(d, docFragment);
+		}	
+
+		this.tbody[0].appendChild(docFragment);
+
+		
+		this.tableContainer.append(this.table);
+		this.table.on("click", this.onTableClick.bind(this));
+
+		this.imgWait.remove();
+		this.container.append(this.imgWait);
+
+		this.loaded = true;  
+		this._isEmpty = false;
+
+		var s2 = new Date().getTime();
+		renderTime = renderTime + (s2 - s1);
+		logger.debug("table renderTime = "+renderTime+" ms");
+	},
+
+	_setTr: function( tr, obj , trIsEmpty)
+	{
+		if (tr == null) return;
+		
+		if (this.onBeforeRenderLine != null)
+			this.onBeforeRenderLine(tr, obj);
+
+		var detailTr = $.data(tr, "detailTr");
+
+		//tr.innerHTML = "";
+		if (!trIsEmpty)
+			$(tr).empty();
+
+		//!!Redondance. faire fonction _renderDetail(obj)
+		if (typeof detailTr != "undefined")
+		{
+			if (typeof this.detailRowRenderer == "function")
+			{
+				//functionRenderer
+				var content = this.detailRowRenderer(obj);
+
+				if (typeof content == "object"){
+					var detailTd = $(content);
+				}
+				else{
+					var detailTd = $('<td colspan="'+this.visibleColsCount+'">'+content+'</td>');
+				}
+
+				var _detailTr= $(detailTr);
+				_detailTr.html('');
+				_detailTr.append(detailTd);
+
+			}else
+			if (typeof this.detailRowRenderer == "string")
+			{
+				//itemRenderer	
+				var compo = $(detailTr).getElement('td')[0].owner;
+				if (typeof compo == "object"){
+					compo.setData(obj);
+				}
+			}
+		}
+		//!!on recrée tout, y compris les itemsrenderer => il faut stocker les itemsRenderers sur cols, et juste appeler setData().
+		for (var i=0; i< this._cols.length; i++)
+		{
+			var html = "";
+			var col = this._cols[i];
+		
+			if (col.visible)
+			{	
+				if (col.field != null)
+				{					
+					if (col.itemRenderer)
+					{		
+						var compo = panjs.createComponent(col.itemRenderer,{datafield: col.field}); 	
+						var td = compo.container[0];	
+						compo.container[0].owner = compo;
+						compo.owner = this;
+						compo.init();			
+						
+						if (typeof compo.setData != "undefined")	
+							compo.setData(obj, col.field);									
+					}
+					else
+					{
+						var td = document.createElement("td");
+						if (col.functionRenderer)
+						{							
+							html = col.functionRenderer(obj, col.field, this, {td:td, tr:tr});
+
+							if ((typeof html == 'object') && (html != null))
+							{
+								if (html.nodeName == "TD")
+								{
+									td = html;//!!on a créé le td pour rien.
+								}else
+								{
+									td.appendChild(html);
+								}								
+							}
+							else{
+								td.innerHTML = html;
+							}
+
+						}
+						else
+						{
+							html = obj[col.field];
+							if (html == null)
+								html = col.nullLabel;
+							
+							td.innerHTML = html;
+						}
+					}
+				
+				}
+				else
+				{
+					var td = document.createElement("td");
+					html = "Erreur: field = null";
+					td.innerHTML = html;
+				}
+
+				if (col.cellClass != null)
+					td.setAttribute("class", col.cellClass);
+
+				tr.appendChild(td);
+			}
+		}
+
+		tr.setAttribute("itemId", this.getPrimaryKeyValue(obj));
+
+		if (this.selectedDataField && this._allowSelection && (obj[this.selectedDataField]))
+		{
+			$(tr).addClass("selected");
+			this._itemsSelected.addItem(obj);
+		}
+	},
+	
+	onTableClick: function(e){
+		var td = $(e.target).closest("td");
+		var tr = td.parent();
+		
+		var itemId = tr.attr("itemId");
+
+		if (itemId != null)
+		{
+			var item = this.getItemByPrimaryKey(itemId);
+
+			if (item != null){
+
+				if ( this._allowSelection ){
+					if (!$(tr).hasClass("selected"))
+					{
+						$(tr).addClass("selected");
+						this._itemsSelected.addItem(item);
+					}else{
+						$(tr).removeClass("selected");
+						this._itemsSelected.removeItem(item);
+					}
+				}
+			
+
+				var evtData = {"evt":e, "td": td, "tr": tr, "item": item};
+				this.dispatchEvent( new Tevent( TsimpleGrid.ON_CELL_CLICK, evtData) );
+				this.dispatchEvent( new Tevent( TsimpleGrid.ON_ROW_CLICK, evtData) );
+				
+			}
+		}	
+	},
+	canAddLine: function(obj){
+		return true;
+	},
+	_addLine:function(obj,docFragment)
+	{		
+		if (!this.canAddLine(obj))
+			return;
+
+		var tr = document.createElement("tr");
+		var temps = 0;
+		this._setTr(tr, obj,true);
+		docFragment.appendChild(tr);
+		this.linesCount ++;
+	},
+	
+	_insertLineAt: function(obj, indx)
+	{
+		if (!this.canAddLine(obj))
+			return;
+		
+		indx ++;
+		var tr = document.createElement("tr");
+		this._setTr(tr, obj, true);
+
+		var trAfter = this.tbody.getElement('tr:nth-child('+indx+')');
+			
+		$(tr).insertAfter(trAfter);
+		this.linesCount ++;
+	},
+
+	/* GESTION DES LIGNES 'DETAIL' */
+	toggleDetailRow: function(item)
+	{
+		var tr = this.getDetailRow(item);
+
+		if ((tr == null)||(tr.hasClass('collapsed')))
+		{
+			this.showDetailRow(item);
+		}else{
+			this.hideDetailRow(item);
+		}		
+	},
+	getDetailRow: function(item){
+		var tr = $(this.getTr(item));
+		var r = tr.next();
+		if (!r.hasClass("detailRow"))
+			r = null;
+		return r;
+	},
+
+	showDetailRow: function(item)
+	{
+		if (this.detailRowRenderer == null)
+			return;
+
+		var detailTr = this.getDetailRow(item);
+
+		if (detailTr == null)
+		{
+				
+
+			var tr = $(this.getTr(item));
+			var detailTr = $('<tr class="detailRow"/>');
+			var detailTd = null;
+			
+			if (typeof this.detailRowRenderer == "function")
+			{
+				//fonction
+				var content = this.detailRowRenderer(item);
+				if (typeof content == "object"){
+					detailTd = $(content);
+				}
+				else{
+					detailTd = $('<td style="display:none" colspan="'+this.visibleColsCount+'">'+content+'</td>');
+				}
+			}else{
+				if (typeof this.detailRowRenderer == "string"){
+					//itemRenderer
+					var compo = panjs.createComponent(this.detailRowRenderer,{}); 	
+					
+
+					if (compo.container[0].nodeName == "TD")
+					{
+						detailTd = compo.container;	
+						detailTd.attr("colspan", this.visibleColsCount);
+						detailTd.css("display","none");
+					}
+					else{
+						detailTd = $('<td style="display:none" colspan="'+this.visibleColsCount+'"></td>');
+						detailTd.append(compo.container);
+					}
+
+					compo.container[0].owner = compo;
+					compo.owner = this;
+					compo.init();	
+					if (typeof compo.setData != "undefined")	
+						compo.setData(item);
+
+				}else{
+					throw "table.detailRowRenderer: type attendu: string ou function";
+				}
+			}
+			
+			detailTr.append(detailTd);
+			detailTr.insertAfter(tr);
+			$.data(tr[0], "detailTr", detailTr[0]);
+			
+		}else{
+			var detailTd = detailTr.getElement('td');
+		}
+		detailTd.css("width", this.table.width()+"px");
+		detailTd.slideDown("fast");
+		detailTr.removeClass("collapsed");
+	},
+
+	hideDetailRow: function(item)
+	{
+		var detailTr = this.getDetailRow(item);
+		if (detailTr != null)
+		{	
+			var detailTd = detailTr.getElement('td');
+			detailTd.slideUp("fast");
+			detailTr.addClass("collapsed");
+		}
+	},
+	
+	detailRowRenderer : function(data){
+
+		return '<div style="word-break: break-all; font-family:Consolas">'+JSON.stringify(data)+'</pre>';
+	},
+	setHeight: function(h){
+		//exemples: h=100% , h=300px
+		this.tableContainer.css("max-height", h);
+		if (h.endsWith("px"))
+			this.tableContainer.css("overflow-y","auto");
+	}
+
+});
+
+
+//]]>
+</script>
+
+</head>
+
+<body>	
+
+<div id="tableContainer" style="height: 100%">
+	 <table class="table-responsive table-striped table-condensed table-bordered" id="table">
+          <tbody id="tbody">
+          
+          </tbody>                 
+     </table>
+ </div>
+    <!--CONTENT-->
+     <h2 id="imgWait" class="imgWait">Chargement en cours...</h2>
+</body>
+</html> 

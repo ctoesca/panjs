@@ -1,0 +1,54 @@
+<html>        
+<head>
+
+<style type="text/less">	
+.Tradiobutton{
+	@offsetY : -16px;
+	.maincontainer{
+		.case.disabled{
+			background-position: -64px @offsetY;
+		}
+		.case.disabled.checked{
+			background-position: -80px @offsetY;
+		}
+		.case.enabled{
+			background-position: -0px @offsetY;
+		}
+		.case.enabled.checked{
+			background-position: -48px @offsetY;
+		}
+	}
+	.maincontainer:hover{
+		.case.enabled{
+			background-position: -16px @offsetY;
+		}
+		.case.enabled.checked{
+			background-position: -32px @offsetY;
+		}		
+	}
+}
+
+
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("Tradiobutton", "ui.fuelUx.Tcheckbox.html", { 
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+	},
+	onClick: function(e)
+	{
+		if (!this.enabled) return;
+		this.setSelected(true);
+		this.dispatchEvent( new Tevent("click"));
+	}
+	
+});
+//]]>
+</script>
+
+</head>
+
+</html> 

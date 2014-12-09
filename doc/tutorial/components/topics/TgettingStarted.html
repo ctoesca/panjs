@@ -1,0 +1,141 @@
+﻿<html>        
+  <head>
+
+    <style type="text/css">
+        
+
+    </style>
+
+<script type="text/x-class-definition">
+
+//<![CDATA[      
+
+defineClass("TgettingStarted", "core.display.Telement", { 
+  
+	baseElement: "div",	
+
+  	constructor: function(args){
+    	this._super.constructor.call(this,args);       
+ 	},
+
+});
+//]]>
+</script>
+
+</head>
+<body>	
+<h1>Getting started</h1>
+
+    <h3>
+    Download
+    </h3>
+    <p>
+        <a href="https://github.com/ctoesca/panjs/archive/master.zip">Donwload source code on gitHub</a>
+    </p>
+
+    <h3>
+    Create your application directory structure
+    </h3>
+    <p>
+  
+    <pre>
+    &lt;root directory&gt;
+        |--panjs
+        |--myApplication
+            |--css
+            |--components
+              |--app.html
+            |--config.html
+            |--index.html</pre>
+    </p>
+    
+
+    <h3>
+   Create <code>index.html</code> and <code>app.html</code>
+    </h3>
+<p>
+<code>index.html</code> is the main page. <code>panjs_core.min.js</code> must be loaded after <code>var panjs = { ... }</code>.
+<br/>
+<code>app.html</code> is the main component: it contains others components.
+<br/>
+For convenience, we use <b><a target_="_blank" href="http://getbootstrap.com/">bootstrap</a></b> style sheet but it's optional.
+</p>
+
+  <div id="tabnav" data-compo="ui.Ttabnav.html"  autoload="true" data-autoload-components="true">  
+
+      <div label="index.html" id="tab1">
+      <div data-compo="ui.TcodeHighlight.html">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+      &lt;head&gt;
+      &lt;script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"&gt;&lt;/script&gt;
+      &lt;!--Bootstrap style (optional) --&gt;
+      &lt;link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/&gt;
+
+      &lt;script&gt;
+      //&lt;![CDATA[  
+        var panjs = {
+          logLevel: "DEBUG",
+          env: "dev", // dev or prod
+          appVersion: "1.0.0", 
+          version: "0.7.0", //panjs version
+                
+          namespaces:[
+            {name: "core", path: "../panjs/core"},
+            {name: "ui", path: "../panjs/ui"},
+            {name: "components", path: "./components"}     
+            ]
+          };  
+      //]]&gt;
+      &lt;/script&gt;
+
+      &lt;script src="../panjs/core/panjs_core.min.js"&gt;&lt;/script&gt;
+
+      &lt;script&gt;
+        $(document).ready(function() 
+        {
+          panjs.load($(document.body)) ;        
+        });
+      &lt;/script&gt;
+      &lt;/head&gt;
+      &lt;body&gt;
+          &lt;div data-compo="components.app.html"/&gt;
+      &lt;/body&gt;
+&lt;/html&gt;
+        </div>
+      </div>
+      <div label="app.html" id="tab2">
+          <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.app1.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp1" autoload="false"/>
+      </div>
+  </div>
+
+
+  <h3>Result</h3>
+  <p>You should see on the web page :</p>
+
+
+  <div data-compo="components.app1.html"/>
+
+<!--
+    <article>
+      <div class="row">  
+          <div class="col-sm-12" >
+              <h3>Simple button component</h3>  
+          </div>
+      </div>
+      <div class="row">    
+          <div class="col-sm-6" >    
+              <div data-compo="ui.TcodeHighlight.html">&lt;div data-compo="app.TtestButton.html"/&gt; </div> 
+          </div>
+          <div class="col-sm-6" >
+              <div data-compo="app.TtestButton.html">  </div> 
+          </div>
+      </div>
+  </article>
+-->
+
+</body>
+
+
+
+</html>	

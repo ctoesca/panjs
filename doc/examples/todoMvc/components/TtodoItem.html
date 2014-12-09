@@ -1,0 +1,85 @@
+<html>        
+<head>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+
+defineClass("TtodoItem", "core.display.Telement", { 
+
+	baseElement: "li",	
+	model: null,
+	todo:null,
+
+	constructor: function(args){ 
+		this._super.constructor.call(this,args);	
+		this.model = args.model;
+		this.setTodo( args.todo );
+		
+		//Events from UI
+		this.label1.on("dblclick", this.onStartEditing.bind(this));
+		this.btn1.on("click", this.onDestroyClick.bind(this));
+		this.checkbox1.on("click", this.onToggleCompletedClick.bind(this));
+		this.edit1.on("change", this.onEndEditing.bind(this));
+		this.edit1.on("keyup", this.onEditKeyUp.bind(this));
+		this.edit1.on("blur", this.onEndEditing.bind(this));
+	},
+
+	setTodo: function( todo){
+		this.todo = todo;
+		this.render();
+	},
+	render: function(){
+		this.label1.text(this.todo.body);
+		this.edit1.val(this.todo.body);
+		this.checkbox1.prop("checked", this.todo.completed);
+		if (this.todo.completed)
+			this.container.addClass("completed");
+		else
+			this.container.removeClass("completed");
+	},
+	
+
+	//Events from UI
+	onDestroyClick: function(e){
+		this.model.removeById(this.todo.id);
+	},
+	onToggleCompletedClick: function(e){
+		this.todo.completed = $(e.target).prop("checked");
+		this.model.save(this.todo);
+	},
+	onStartEditing: function(e){
+		this.container.addClass("editing");
+		this.edit1.focus();
+	},
+	onEndEditing: function(e){
+		this.todo.body = this.edit1.val();
+		this.model.save(this.todo);
+		this.container.removeClass("editing");
+	},
+	onEditKeyUp: function(e){
+
+		if (e.which === 27) {
+			this.container.removeClass('editing');
+			this.edit1.val(this.todo.body);
+		}
+
+		if (e.which === 13) {
+			this.onEndEditing(e);
+		}
+	}
+});
+
+//]]>
+</script>
+
+</head>
+
+<body>	
+		<div class="view">
+			<input id="checkbox1" class="toggle" type="checkbox" checked="checked" />
+			<label id="label1"></label>
+			<button id="btn1" class="destroy"></button>
+		</div>
+		<input class="edit" id="edit1" value=""/>
+</body>
+</html> 

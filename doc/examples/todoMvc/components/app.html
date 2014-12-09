@@ -1,0 +1,26 @@
+<html>        
+<head>
+ <link rel="stylesheet" href="../bower_components/todomvc-common/base.css"/>
+<script type="text/x-class-definition">
+//<![CDATA[
+
+defineClass("app", "core.display.Telement", { 
+
+	baseElement: "div",	
+	
+	constructor: function(args){ 
+		this._super.constructor.call(this,args);
+	}
+});
+
+//]]>
+</script>
+
+</head>
+
+<body>	
+	
+	<div id="todoList" data-compo="components.TtodoList.html" autoload="true">  </div>    
+
+</body>
+</html> 

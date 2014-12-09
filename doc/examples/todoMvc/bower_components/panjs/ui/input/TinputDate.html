@@ -1,0 +1,106 @@
+<html>        
+<head>
+
+ <link href="./css/datepicker.css" rel="stylesheet"/>
+ <script type="text/javascript" src="./js/bootstrap-datepicker.js"></script>
+
+<style>
+
+.TinputDate
+{
+
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("TinputDate", "core.display.Telement", { 
+
+	/* PROPRIETES */
+	value: null,
+	baseElement: "div",
+
+	/* METHODES */
+	
+	constructor: function(args){
+		
+		this._super.constructor.call(this,args);
+		this.value = new Date();
+
+		this.datePicker.attr("data-date", "");
+
+		this.datePicker = this.datePicker.datepicker({viewMode:0, minViewMode:0});	
+		this.val(this.value);
+
+		this.datePicker.on("show", this._onShow.bind());
+		this.datePicker.on("changeDate", this._onChangeDate.bind(this));
+		
+		this.input.val("");
+
+		this._setEvents();
+	},
+	
+	_setEvents: function()
+	{
+
+	},
+	_onChangeDate: function(e)
+	{
+		this.datePicker.datepicker('hide');
+	},
+	_onShow: function(e)
+	{
+	},
+
+	val: function(value)
+	{
+		if (arguments.length == 0)
+		{
+			var r = this.input.val();
+			if (r == "")
+				return null;
+			else
+				return r;
+		}else
+		{
+			if (value == null)
+			{
+				value = "";
+				this.input.val("");
+			}
+			else
+			{
+				this.datePicker.datepicker('setValue', value);	
+			}
+			
+		}
+	},
+	getTimeStamp: function()
+	{
+		var v = this.val();
+		var d = null;
+		if (v != null)
+		{
+			var dd = v.substr(0,2);
+			var mm = v.substr(3,2);
+			var yyyy = v.substr(6,4);
+			d = new Date(yyyy, mm-1, dd);
+			d = d.getTime();
+		}
+		return d;
+	}
+});
+//]]>
+</script>
+
+</head>
+<body>		 
+	
+	<div class="input-group input-append date" id="datePicker" data-date-format="dd/mm/yyyy">
+		<input type="text" class="form-control" size="16"  id="input"/>
+		<span class="input-group-addon" style="cursor:pointer"><i class="glyphicon glyphicon-th" style="font-size:1.1em"></i></span>
+	</div>
+
+</body>
+</html> 

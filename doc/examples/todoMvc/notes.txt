@@ -1,0 +1,23 @@
+IE: the learn element isn't added 
+Reason: base.js doesn't get attribute [data-framework]
+
+Correction:
+
+function Learn(learnJSON, config) {
+		...
+		if (!framework && document.querySelector('[data-framework]')) {
+			framework = document.querySelector('[data-framework]').dataset.framework;
+		}
+		...
+}
+
+replaced by : 
+
+function Learn(learnJSON, config) {
+		...
+		if (!framework && document.querySelector('[data-framework]')) {
+			framework = document.querySelector('[data-framework]').getAttribute("data-framework");
+		}
+		...
+}
+

@@ -1,0 +1,95 @@
+<html>        
+<head>
+
+<script type="text/javascript" src="./fuelux/checkbox.js"></script>
+
+
+<style type="text/less">	
+.Tcheckbox{
+	
+	border-width:1px;
+	display:inline-block;
+	margin-left: 20px;
+
+	.checkboxcontainer{
+
+		cursor: pointer;
+		font-weight: normal;
+		font-size:1.2em;
+		.case.checked{
+				background: url('/libs/panjs/0.4/ui/fuelUx/fuelux/img/form.png') -0px -16px;
+		}
+		.case{
+			
+			background: url('/libs/panjs/0.4/ui/fuelUx/fuelux/img/form.png') -32px -16px;
+			position:absolute;
+			width:16px;
+			height:16px;			
+			background-repeat:no-repeat;		
+		}
+		
+		.libelle{	
+			height:1em;	
+			position:relative;
+			top:-0.25em;
+			padding-left:20px;
+		}
+
+	}
+	
+	/*.checkboxcontainer:hover{
+		.case{
+				background: url('/libs/panjs/0.4/ui/fuelUx/fuelux/img/form.png') -16px 1px;
+		}
+		.libelle{
+			font-weight: bold;
+		}
+	}*/
+}
+
+
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("Tcheckbox", "core.display.Telement", { 
+
+	/* PROPRIETES */
+	baseElement:'div',
+	checked: false,
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+		this.container.addClass("fuelux");
+		this.main.on("click", this.onClick.bind(this));
+		
+	},
+	onClick: function(e)
+	{
+		this.checked = !this.checked;
+		this.refresh();
+	},
+	refresh: function(){
+		if (this.checked == false)
+			this.case.removeClass("checked");
+		else
+			this.case.addClass("checked");
+	}
+
+});
+//]]>
+</script>
+
+</head>
+<body>
+
+
+	<div class="checkboxcontainer" id="main">
+		<div class="case" id="case"/>
+		<div class="libelle" id="libelle">test checkbox kj jkkjjk kj kj</div>
+	</div>
+
+
+</body>
+</html> 
