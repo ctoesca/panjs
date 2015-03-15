@@ -16,13 +16,14 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 	    }
 	    else    
 	    {
-	      logger.error("Event window.hashchanging not supported!")
+	      logger.error("Trouter.constructor: Event window.hashchanging not supported!")
 	    }
   	},
   	refreshkeys: function()
   	{
 		var hash = window.location.hash.droite('#');
 		this.keys = this.decode(hash);
+		//logger.debug("Trouter.refreshkeys: this.keys = "+JSON.stringify(this.keys));
   	},
   	registerComponent: function(c, onhashchange)
   	{
@@ -32,7 +33,6 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 
   	getHash: function(owner)
   	{
-  		this.refreshkeys();
   		var r = this.keys[owner.hashKey] ||null;
   		return r;
   	},
@@ -55,12 +55,12 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 			*/
 
 			var r = this._dispatchOnhashchange(owner.hashKey, value);
-			//logger.debug("RETOUR Onhashchange="+r);
+			//logger.debug("Trouter.setHash: RETOUR Onhashchange="+r);
 			sendEvents = true;	
 		}
 		else
 		{
-			logger.debug("setHash "+value+" => inchangé sur "+owner.id);
+			logger.debug("Trouter.setHash: "+value+" => inchangé sur "+owner.id);
 			//this._dispatchOnhashchange(owner.hashKey, value);
 		}
 
@@ -110,12 +110,12 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 	    		}
 			}catch(err)
 			{
-				logger.error("Echec decodage de "+str+" en objet: "+err);
+				logger.error("Trouter.decode: Echec decodage de "+str+" en objet: "+err);
 			}
 		}
 		/*else
 		{
-			logger.error("Echec decodage  de "+str+" en objet: chaine vide");
+			logger.error("Trouter.decode: Echec decodage  de "+str+" en objet: chaine vide");
 		}*/
 		return r;
   	},
@@ -129,7 +129,8 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 	    		//r = JSON.stringify(object);
 	    		for (k in obj)
 	    		{
-	    			if (obj[k].trim() != "")
+	    			if (typeof obj[k] == 'string')
+	    			//if ((obj[k].trim() != "")&&(obj[k].trim() != ""))
 	    			r = r+k+"="+obj[k]+"&";
 	    		}
 	    		
@@ -138,7 +139,8 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 
 		}catch(err)
 		{
-			logger.error("Echec encodage de "+obj+" en string: "+err);
+			logger.error("Trouter.encode: Echec encodage de "+obj+" en string: "+err);
+			logger.debug("Trouter.encode: obj = "+JSON.encode(obj));
 		}
 		return r;
   	},
@@ -149,51 +151,61 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
   		/* Cette fonction est déclenchée uniquement quand on modifie l'Url manuellement ou que l'on avance ou recule dans l'historique */
   		if (!this.sendEvents)
   			return false;
- 
+
 	    this.hash = window.location.hash.droite('#');
 	    this.keysTmp = this.decode(this.hash);
 
-  		var found = false;
-  		for (k in this.keys){
-  			found = true;
-  			logger.debug("keys."+k+" = "+this.keys[k]+", hash."+k+" = "+this.keysTmp[k]);
-  			if (this.keysTmp[k] != this.keys[k])
-	    	{
-	    		this.keys[k] = this.keysTmp[k] ||null;
-	    		if (typeof this.listeners[k] != "undefined"){
-	    			logger.debug("Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]);
-	    			this._dispatchOnhashchange(k, this.keys[k]);   
+	    /*
+		
+	    */
+		//logger.debug("Trouter.onhashchange: PHASE 1 :");	    
+		//logger.debug("Trouter.onhashchange: this.keysTmp = "+JSON.stringify(this.keysTmp));
+		//logger.debug("Trouter.onhashchange: this.keys = "+JSON.stringify(this.keys));
 
-	    		}
-	    	}
-  		}
-  		if (found == false)
-  		{
-  			for (k in this.keysTmp){
-  				found = true;
-  				if (typeof this.listeners[k] != "undefined")
-  					this._dispatchOnhashchange(k, this.keysTmp[k]);   
-  			}
-  		}
-  		if (found == false){
-  			if (typeof this.listeners[k] != "undefined")
-  					this._dispatchOnhashchange(null, null);   
-  		}
-	   /* for (k in this.keysTmp)
+  		for (k in this.keysTmp)
 	    {
-
-	    	//logger.debug("keys["+k+"] = "+this.keys[k]+" this.keysTmp[k] = "+this.keysTmp[k]);
-	    	if (this.keysTmp[k] != this.keys[k])
+	  		//logger.debug("Trouter.onhashchange: k="+k+" , this.keys[k]="+this.keys[k]+", this.keysTmp[k]="+this.keysTmp[k]);
+	    	if ((typeof this.keys[k] == "undefined")||(this.keys[k] == null))
 	    	{
+	    		//la clef est valorisée alors qu'elle ne l'était pas
 	    		this.keys[k] = this.keysTmp[k];
-	    		if (typeof this.listeners[k] != "undefined"){
-	    			logger.debug("Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]);
-	    			this._dispatchOnhashchange(k, this.keys[k]);   
-
+	    		//logger.debug("Trouter.onhashchange: VALORISATION this.keys["+k+"] = "+this.keysTmp[k]);
+	    		logger.debug("Trouter.onhashchange: [1] Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]);
+	    		this._dispatchOnhashchange(k, this.keys[k]);   
+	    	}else{
+				//la clef est valorisée, elle l'était déjà
+	    		if (this.keysTmp[k] != this.keys[k])
+	    		{
+	    			//logger.debug("Trouter.onhashchange: VALORISATION this.keys["+k+"] = "+this.keysTmp[k]);
+	    			this.keys[k] = this.keysTmp[k];
+	    			logger.debug("Trouter.onhashchange: [2] Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]);
+	    			this._dispatchOnhashchange(k, this.keys[k]);  
 	    		}
 	    	}
-	    	
-	    }*/
+	    	    	
+	    }
+
+	    //logger.debug("Trouter.onhashchange: PHASE 2 :");
+	    //logger.debug("Trouter.onhashchange: this.keysTmp = "+JSON.stringify(this.keysTmp));
+		//logger.debug("Trouter.onhashchange: this.keys = "+JSON.stringify(this.keys));
+	    //Mise à null des clefs qui n'existent plus
+
+  		for (k in this.keys){
+
+  			found = true;
+  			//logger.debug("Trouter.onhashchange: k="+k+" , this.keys[k]="+this.keys[k]+", this.keysTmp[k]="+this.keysTmp[k]);
+
+  			if (typeof this.keysTmp[k] == "undefined")
+	    	{	    			
+	    		this.keys[k] = null;
+	    		//logger.debug("Trouter.onhashchange: VALORISATION this.keys["+k+"] = null");
+	    		logger.debug("Trouter.onhashchange: [3] Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]);
+	    		if (typeof this.listeners[k] != "undefined"){
+	    			
+	    			this._dispatchOnhashchange(k, this.keys[k]);   
+	    		}
+	    	}
+  		} 
 	    
 		var evt = new Tevent(Trouter.HASH_CHANGE,  this.keys);
 	    this.dispatchEvent(evt);

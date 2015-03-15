@@ -1,0 +1,170 @@
+<html>        
+<head>
+
+
+<style>
+.Tcheckbox{
+	margin-right: 10px;
+	display:inline-block;
+	vertical-align: middle;
+}
+.Tcheckbox label{
+	font-weight: normal;
+}
+.Tcheckbox  input[disabled].css-checkbox + label.css-label {
+  box-shadow: none;
+  opacity: .35;
+  cursor: default;
+}
+.Tcheckbox .requiredField
+{
+	color: #CC0000;
+	font-size:9px;
+	position: relative;
+	top: -0.5em;
+}
+.Tcheckbox label{
+	margin-bottom: 0px;
+}
+.Tcheckbox label.checked{
+	/*font-weight: bold;*/
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+   
+   /* A implémenter: 
+
+Property	Description
+autofocus	Sets or returns whether a checkbox should automatically get focus when the page loads
+checked	Sets or returns the checked state of a checkbox
+defaultChecked	Returns the default value of the checked attribute
+defaultValue	Sets or returns the default value of a checkbox
+disabled	Sets or returns whether a checkbox is disabled, or not
+form	Returns a reference to the form that contains the checkbox
+indeterminate	Sets or returns the indeterminate state of the checkbox
+name	Sets or returns the value of the name attribute of a checkbox
+required	Sets or returns whether the checkbox must be checked before submitting a form
+type	Returns which type of form element the checkbox is
+value	Sets or returns the value of the value attribute of a checkbox
+
+   */         
+defineClass("Tcheckbox", "core.display.Telement", { 
+
+	baseElement: "div",	
+	input: null,
+	label: "",
+	labelElement: null,
+	value: null,
+	title: null,
+	required: false,
+	_checked: false,
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+		panjs.loader.loadCssFile(this.dirPath+"/css/checkbox4/style.css");
+	
+		if (defined(args, "title"))
+			this.title = args.title;
+		if (defined(args, "value"))
+			this.value = args.value;
+		if (defined(args, "required"))
+			this.required = args.required;
+		if (defined(args, "checked"))
+			this._checked = args.checked;
+		if (defined(args, "label"))
+			this.label = args.label;
+		if (defined(args, "enabled"))
+			this.enable(args.enabled);
+
+		this.input = this.container.getElement("input");
+		this.labelElement = this.container.getElement("label");
+
+		this.input.attr("id", "input_"+this.id);
+		this.labelElement.attr("for", "input_"+this.id);
+
+		this.input.on("change", this.onChanged.bind(this));
+		
+
+		if (defined(args,"elem"))
+			this.label = args.elem.innerHTML;
+
+		if (this.label == "")
+			this.container.css("margin-right", "0px");
+
+		if (this.value !=  null)
+			this.input.attr("value", this.value);
+		if (this.title !=  null)
+			this.labelElement.attr("title", this.title);
+		if (this.required == true)
+			this.label += '<i class="glyphicon glyphicon-asterisk requiredField"/>';
+		
+		this.val(this._checked);
+
+		this.labelElement.html(this.label);
+	},
+	onChanged: function(e){
+		this.dispatchEvent(new Tevent(Tevent.CHANGE));
+		this.dispatchEvent(new Tevent("change"));
+		this.dispatchEvent(new Tevent("click"));
+
+		this.updateStyle();
+
+	},
+	updateStyle: function(){
+		var v = this.val();
+		if (v == true)
+			this.labelElement.addClass("checked");
+		else
+			this.labelElement.removeClass("checked");
+	},
+	setLabel: function(h){
+		this.label = h;
+		this.labelElement.html(h);
+	},
+	getLabel: function(h){
+		return this.labelElement.html();
+	},
+	val: function(v){
+		if (arguments.length == 0){
+			return this.input.prop("checked");
+		}else{
+			this.input.prop("checked", v);
+			this.updateStyle();
+		}
+	},
+	prop: function(key, value){
+		if (arguments.length > 1){
+			this.input.prop(key,value);
+			this.updateStyle();
+		}else{
+			return this.input.prop(key);
+		}
+	},
+
+	enable: function(v){
+		if (v == true){
+			this.input.removeAttr("disabled");
+		}else{
+			this.input.attr("disabled", "disabled");
+		}
+	}
+
+	
+});
+
+//]]>
+</script>
+
+</head>
+
+<body>	 
+
+	
+<input type="checkbox" id="input" class="css-checkbox"  />
+<label class="css-label"></label>
+
+</body>
+</html>
+

@@ -21,11 +21,10 @@ defineClass("Ttimer", "core.events.TeventDispatcher",
       if (this.delay == null)	
         throw "delay is null";
 
-  		if (this.running)
-        return;
-
-      this.running = true;
-      this._settimeout();
+  		if (!this.running){
+        this.running = true;
+        this._settimeout();
+      }
   	},
 
   	reset: function(){
@@ -34,10 +33,8 @@ defineClass("Ttimer", "core.events.TeventDispatcher",
   	},
 
   	_settimeout: function(){
-      if (this.running == false)
-        return;
-		  this._token = Math.random();
-      delay(this._onTimer.bind(this), this.delay, this._token);
+		    this._token = Math.random();
+        delay(this._onTimer.bind(this), this.delay, this._token);
   	},
 
   	stop: function(){
@@ -46,13 +43,13 @@ defineClass("Ttimer", "core.events.TeventDispatcher",
 
   	_onTimer: function(token)
   	{
-      if ((!this.running)||(this._token != token))
-        return;
-
-      var evt = new Tevent(Ttimer.ON_TIMER, {});
-      this.dispatchEvent(evt);
-     
-      this._settimeout();
+      if ((this.running)&&(this._token == token))
+      {
+        var evt = new Tevent(Ttimer.ON_TIMER, {});
+        this.dispatchEvent(evt);
+        this._settimeout();  
+      }
   	}
 });
+//Ttimer events types:
 Ttimer.ON_TIMER = "ON_TIMER";

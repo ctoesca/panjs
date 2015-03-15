@@ -11,6 +11,7 @@
 {
 	/*width:70px !important;*/
 	float:left!important;
+	margin-bottom: 0px!important;
 }
 .Tselect .btn{
 	/*width:70px ;
@@ -35,22 +36,30 @@ defineClass("Tselect", "core.display.Telement", {
 	opened: false,
 	selectedTextFormat: 'values',
 	width: false,
-	iconImg:null,
+	maxWidth: null,
+	fixedIcon:null,
+	placeholder: 'Aucun sélection',
+	btnStyle: "btn-default",
 	
 	/* var temporaires si setSelectedItems ou setSelectedLabels sont appelés avant initialisation */
 	_labelSelection:null,
 	_selectedItems:null,
 	_valuesSelection:null,
 	_valuesFieldSelection:null,
+	_enabled: true,
+
 	constructor: function(args){
 		
 		this._super.constructor.call(this,args);
 
 		this.injectParam("selectedTextFormat", args["selectedTextFormat"],false);
 		this.injectParam("width", args["width"],false);
-		this.injectParam("iconImg", args["iconImg"],false);
+		this.injectParam("maxWidth", args["maxWidth"],false);
+		this.injectParam("fixedIcon", args["fixedIcon"],false);
 		this.injectParam("selectedField", args["selectedField"],false);
 		this.injectParam("labelField", args["labelField"],false);
+		this.injectParam("placeholder", args.placeholder,false);
+		this.injectParam("btnStyle", args.btnStyle, false);
 		
 
 		this.select = this.container;
@@ -84,7 +93,9 @@ defineClass("Tselect", "core.display.Telement", {
 			this.selectpicker.refresh();
 			return;
 		}
-		
+		/*var opt = $('<option><i>Tout cocher</i></option>');
+		this.container.append(opt);*/
+
 		for (var i=0; i< this._dataProvider._source.length; i++)
 		{
 			var it = this._dataProvider._source[i];
@@ -211,20 +222,15 @@ defineClass("Tselect", "core.display.Telement", {
 		*/
 
 		setTimeout(function(){
-			var fixedIcon = null;
 		
-			if (this.iconImg != null){
-				fixedIcon = '<img src="'+this.iconImg+'" style="margin-top: -1px; margin-left:2px; margin-right:4px"/>'
-			}
-			
 			this.initialized = true;
 			this.selectpickerElem = this.select.selectpicker({
-				fixedIcon: fixedIcon,
-				style: 'btn-default',
+				fixedIcon: this.fixedIcon,
+				style: this.btnStyle,
 		        size: 'auto',
 		        title: null,
 		        selectedTextFormat : this.selectedTextFormat,
-		        noneSelectedText : 'Aucun sélection',
+		        noneSelectedText : this.placeholder,
 		        noneResultsText : 'No results match',
 		        countSelectedText: '{0} / {1} col',
 		        maxOptionsText: ['Limit reached ({n} {var} max)', 'Group limit reached ({n} {var} max)', ['items','item']],
@@ -249,10 +255,12 @@ defineClass("Tselect", "core.display.Telement", {
 			
 			this.refresh();
 			this.selectpickerElem.on("change",this._onChanged.bind(this));
-			this.selectpickerElem.on("open",this._onOpen.bind(this));
+			this.selectpickerElem.on("focusin.modal",this._onOpen.bind(this));
 			this.selectpickerElem.on("close",this._onClose.bind(this));
+			this.enabled(this._enabled);
 
 			this._setStyle();
+	
 
 			if (this._labelSelection != null)
 				this.setSelectedLabels(this._labelSelection);
@@ -262,6 +270,8 @@ defineClass("Tselect", "core.display.Telement", {
 				else
 					if (this._valuesSelection != null)
 					this.setSelectedValues(this._valuesSelection, this._valuesFieldSelection);
+
+			
 
 		}.bind(this), 10);
 	},
@@ -281,7 +291,9 @@ defineClass("Tselect", "core.display.Telement", {
 			if ((v[0] != "")&&(v[1] != ""))
 			this.selectpicker.$newElement.css(v[0],v[1]);		
 		}
-
+		if (this.maxWidth != null)
+			this.selectpicker.$newElement.css("max-width",this.maxWidth);	
+		
 	},
 	toggle: function()
 	{
@@ -289,13 +301,13 @@ defineClass("Tselect", "core.display.Telement", {
 		this.selectpicker.toggle();
 	},
 	_onOpen: function(e)
-	{
+	{alert('open');
 		if (this.opened == false)
 		this.dispatchEvent( new Tevent(Tevent.OPEN));
 		this.opened = true;
 	},
 	_onClose: function(e)
-	{
+	{alert('onclose');
 		if (this.opened == true)
 		this.dispatchEvent( new Tevent(Tevent.CLOSE));
 		this.opened = false;
@@ -317,6 +329,29 @@ defineClass("Tselect", "core.display.Telement", {
 	},
 	_setEvents: function()
 	{
+	},
+	enabled: function(value){
+		
+
+		if (arguments.length == 0)
+		{
+			return this._enabled;
+		}
+		else
+		{
+			if (this.selectpickerElem!=null)
+			{
+				this._enabled = value;
+				var button = this.selectpicker.$newElement.getElement("button");
+				if (value === true){
+					button.removeClass("disabled");
+				}
+				else{
+					button.addClass("disabled");
+				}
+			}
+			
+		}
 	}
 });
 //]]>

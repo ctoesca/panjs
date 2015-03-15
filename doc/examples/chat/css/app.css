@@ -1,0 +1,38 @@
+/* base.css overrides */
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+#chatWindow {
+  background: #eee;
+  border: 1px solid #aaa;
+  width: 70%;
+  height: 300px;
+  overflow: auto;
+  position: relative;
+}
+input {
+  background: #fff;
+  border: 1px solid #aaa;
+  width: 70%;
+  font-size: 1.1em;
+  padding: 5px;
+}
+#chatWindow > div {
+  bottom: 10px;
+  left: 10px;
+}
+p {
+  margin: 0 0 0.4em 0;
+  padding: 0;
+}
+.system {
+  color:#e44;
+}
+.message {
+  color:#222;
+}
+.me {
+  color:#00a;
+}

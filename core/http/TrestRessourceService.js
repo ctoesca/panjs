@@ -281,7 +281,7 @@ defineClass("TrestRessourceService", "core.events.TeventDispatcher", {
 					}
 					
 					this.updateModel(data.item);
-					panjs.model.setUser(data.item);
+					app.getModel().setUser(data.item);
 
 					if (defined(success)){
 						success(data);

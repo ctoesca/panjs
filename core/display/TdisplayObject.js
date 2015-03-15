@@ -41,7 +41,8 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 	baseElement:null,
 	
 	_realVisible: false,
-
+	args: null,
+	
 	/* METHODES */
 	load:function(){
 		/* Si on ne sait pas si l'objet est un proxy ou pas, on appelle load 
@@ -60,6 +61,7 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 	
 	constructor: function(args) { 
 		TdisplayObject._super.constructor.call(this,args);
+		this.args = args;
 
 		if (this.baseElement == null)
 			throw "La propriété \"baseElement\" n'est pas défini sur "+this.className;
@@ -70,10 +72,12 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 		//this.container.css("display", "none");	
 
 		window[this.className].lastId ++;
-		if (!defined(args, "id")) 
+
+		//parfois on a besoin d'un id unique (voir Tcheckbox).				
+		//if (!defined(args, "id")) 
 			this._setId( this.className+window[this.className].lastId );
-		else
-			this._setId(args.id);
+		//else
+		//	this._setId(args.id);
 
 		this.container[0].owner = this;
 		

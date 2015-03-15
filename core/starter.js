@@ -35,7 +35,14 @@
     
     return window[classPath];
 
+  }; 
+  panjs.getInstance  = function(classPath, args) {
+
+    var _class = panjs.getClass(classPath);
+    return new _class(args);
+
   };   
+
   /*
     Remplacement variables panjs dans namespaces
   */
@@ -100,34 +107,9 @@
 
       if (typeof args.elem != "undefined")
       {
-          var el = args.elem;
-
-          for ( var i =0; i< el.attributes.length; i++)
-          {
-                  var attr =  el.attributes.item(i);
-
-                  var name = attr.nodeName.toLowerCase();
-                  var value = attr.value;
-
-                  //if ((name != "id")&&(name != "data-compo"))
-                 // {
-                    if (name.startsWith("data-")){
-                      //name = name.droite("-");
-                      name = panjs.getFormatedArgName(name);
-
-                    }
-                    
-                    if (value == "true")
-                      value = true;
-                    else if (value == "false")
-                      value = false;
-
-                    args[name] = value;
-                    //ATTENTION: attr.nodeName est toujours en lowerCase!
-                    //logger.info("Attribut "+this.id+" , "+name+"="+attr.value);
-                 // }       
-        }
+         panjs.setElementArgs(args.elem, args);
       }
+       
         
       if (typeof panjs.root.components[classPath] != "undefined"){
           if (args.reuse != "undefined") 
@@ -168,6 +150,38 @@
 
     return object;
   }
+  panjs.setElementArgs = function(el, args){
+
+      if (typeof el != "undefined")
+      {
+          for ( var i =0; i< el.attributes.length; i++)
+          {
+                  var attr =  el.attributes.item(i);
+
+                  var name = attr.nodeName.toLowerCase();
+                  var value = attr.value;
+
+                  //if ((name != "id")&&(name != "data-compo"))
+                 // {
+                    if (name.startsWith("data-")){
+                      //name = name.droite("-");
+                      name = panjs.getFormatedArgName(name);
+
+                    }
+                    
+                    if (value == "true")
+                      value = true;
+                    else if (value == "false")
+                      value = false;
+
+                    args[name] = value;
+                    //ATTENTION: attr.nodeName est toujours en lowerCase!
+                    //logger.info("setElementArgs : arg "+name+" = "+value);
+                 // }       
+        }
+      }
+  }
+
   panjs.getFormatedIdName = function(idName)
   {
     //transforme un id="menu-toggle" en "menuToggle"
@@ -238,7 +252,7 @@
   { 
       if (arguments.length == 0)
         var element = $(document.body);
-      
+    
       var compolist = [];
 
       if (element.attr("data-compo") != null)
@@ -321,22 +335,34 @@
     }
     else
     {
-      for (var i=0; i< panjs.namespaces.length; i++)
+      if (!classPath.contains("."))
       {
-        var n = panjs.namespaces[i];
-      
-        if (classPath.startsWith(n.name+"."))
-        {
-          var r = classPath.removeEnd(".html").replace(/\./g, "/");
-          r = r.replace(n.name, n.path);
+        //fichier à la racine
+          r = classPath;
           if (isHtm)
-            r = r +".html";
-          else
-            r = r +".js";
+              r = r +".html";
+            else
+              r = r +".js";
+      }else
+      {
+        for (var i=0; i< panjs.namespaces.length; i++)
+        {
+          var n = panjs.namespaces[i];
+        
+          if (classPath.startsWith(n.name+"."))
+          {
+            var r = classPath.removeEnd(".html").replace(/\./g, "/");
+            r = r.replace(n.name, n.path);
+            if (isHtm)
+              r = r +".html";
+            else
+              r = r +".js";
 
-          break;
-        }
+            break;
+          }
+        }        
       }
+     
     }
 
     if (r == "")
@@ -384,37 +410,40 @@ var Tobject = {
        // if ((panjs.iever != 8)&&(panjs.iever != 9))
        if (panjs.iever != 8)
         {
-            for (k in properties)
+            for (var k in properties)
             { 
-               /* if (k.startsWith("Bindable_"))
+                if (k.startsWith("$"))
                 {
-                  var oldK = properties[k];
-                  k = k.droite("Bindable_");
-                   console.log(k+" => "+typeof oldK);
+                  var defaultValue = properties[k];
+                  k = k.droite("$");
+                    logger.debug("BINDABLE => "+k+", defaultValue="+defaultValue);
 
-                
+                  def["__"+k] =  {
+                    value: defaultValue,
+                    writable: true
+                  };
+
+                  var setF = new Function('var key = "__'+k+'", propName="'+k+'",oldValue=this[key];newValue=arguments[0]; if (this[key] != arguments[0]){this[key] = arguments[0]; this.__OnPropChanged(propName, oldValue, newValue);}');
+                  var getF = new Function('var key = "__'+k+'"; return this[key]');
                   def[k] = { 
-                    configurable: true,
-                    enumerable: true,
-                    get: function(){
-                      return this["__"+k];
-                    },
-                    set: function(v){
-                      this["__"+k] = v;
-                      this["on_var1_changed"]();
-                    }
+
+                    get: getF,
+                    set: setF
                   }
 
-                }else{*/
+                }else{
+
                   def[k] = {
                     value: properties[k],
                     writable: true, 
                     configurable: true,
                     enumerable: true
                   }
-                //}
+
+                }
                 
             }
+           
              //if (typeof superProto.key2 == "undefined"){
           /*  def.key2 = {          
               get: function() 
@@ -1145,7 +1174,9 @@ defineClass("Tloader", "core.Tobject", {
     return r;
   },
   addStyle: function(css, type){
-
+    if (css.trim() == "")
+      return;
+    
     if (typeof type =="undefined")
       var type = "text/css";
 

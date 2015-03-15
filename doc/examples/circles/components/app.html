@@ -1,6 +1,10 @@
 <html>        
 <head>
+<script type="text/javascript" src="../../../../lib/doT.js"></script>
 
+<style>
+
+</style>
 <script type="text/x-class-definition">
 //<![CDATA[
 uses("core.helpers.Ttimer");
@@ -14,36 +18,34 @@ defineClass("app", "core.display.Telement", {
 	counter: 0,
 	lastCounter: 0,
 	delay: 1,
+	$circlesCount: 0,
+	$framerate: 0,
 
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);
-		this.btnStart.on("click", this.onStartClick.bind(this));
-		this.btnStop.on("click", this.onStopClick.bind(this));
-		this.btnAdd.on("click", this.addCircle.bind(this));
+
+		//we dot not affect circles in the properies because it would affect all the prototype chain.
+		this.circles = [];
 
 		this.frameRateTimer = new Ttimer({delay: 2000, onTimer: this.onFrameRateTimer.bind(this)});
 		this.frameRateTimer.start();
 
-		this.circles = [];
-
-		for (var i = 0; i< this.N; i++){
+		for (var i = 0; i< this.N; i++)
 			this.addCircle();
-		}
+
 		this.timer = new Ttimer({delay: this.delay, onTimer: this.onTimer.bind(this)});
+		this.renderBindings();
 
 	},
-	addCircle: function(){
+
+	addCircle: function(e){
+	
 		var circle = new panjs.createComponent("components.Tcircle.html");
-		circle.appendTo(this.container);
+		circle.appendTo(this.circlesContainer);
 		this.circles.push(circle);
-		this.numCircles.text( this.circles.length );
+		this.circlesCount = this.circles.length;
 	},
-	onStartClick: function(){
-		this.timer.start();
-	},
-	onStopClick: function(){
-		this.timer.stop();
-	},
+
 	onTimer: function(e){
 		for (var i = 0; i< this.circles.length; i++){
 			var circle = this.circles[i];
@@ -51,10 +53,10 @@ defineClass("app", "core.display.Telement", {
 		}
 		this.counter ++;
 	},
+
 	onFrameRateTimer: function(e){
-		var f = (this.counter - this.lastCounter) / 2;
+		this.framerate = (this.counter - this.lastCounter) / 2;
 		this.lastCounter = this.counter;
-		this.framerate.text( f +"/sec" );
 	}
 });
 
@@ -65,10 +67,16 @@ defineClass("app", "core.display.Telement", {
 
 <body>	
 	
-	<button id="btnStart">Start</button>
-	<button id="btnStop">Stop</button>
-	<button id="btnAdd">Add circle</button>
+	<!-- in btnStart.onclick and btnStop.onclick, we execute code, so we use {{ }}-->
+	<button id="btnStart" data-onclick="{{this.timer.start()}}">Start</button>
+	<button id="btnStop" data-onclick="{{this.timer.stop()}}">Stop</button>
 
-	<span id="framerate">0/sec</span> - <span id="numCircles"></span> circles
+	<!-- in onclick is just a callback, so dont't use {{ }}-->
+	<button id="btnAdd" data-onclick="this.addCircle">Add circle</button>
+
+	<span>{{=this.framerate}}/sec - {{=this.circles.length}} circles</span> 
+	
+	<div id="circlesContainer"></div>
+	<div style="clear:both"></div>
 </body>
 </html> 

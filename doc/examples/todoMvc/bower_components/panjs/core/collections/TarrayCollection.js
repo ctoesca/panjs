@@ -9,9 +9,14 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
   key: null,
   _byId: null,
  // _length:0,
+  filterFunction: null,
+  _items: null,
 
 	constructor: function(args) { 
 		TarrayCollection._super.constructor.call(this,args);
+    
+    this._items = [];
+
     var data = [];
     if (args){
       if (typeof args.push != "undefined"){
@@ -21,6 +26,8 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
           this.key = args.key;
         if (args.data)
           data = args.data;
+        if (args.filterFunction)
+          this.filterFunction = args.filterFunction;
       }
     }
     
@@ -39,7 +46,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
             }
     });*/
 
-    this.length = this._source.length;
+  
 
   	},
 	
@@ -49,27 +56,33 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
   sort:function( sortFunction)
   {
       if (defined(sortFunction))
-      {
-        this._source.sort(sortFunction);
-      }
+        this._items.sort(sortFunction);
   },
-
+  
 	  getSource: function()
   	{
-  		return this._source;
+  		return this._items;
   	},
   	setSource: function(value)
   	{
   		if (this._source != value)
   		{
   			this._source = value;
+        var start = new Date().getTime();
+        if (this.filterFunction != null)
+          this._items = this._source.filter( this.filterFunction );
+        else
+          this._items = this._source;
+
+        var end = new Date().getTime();
+
         if (this.key != null)
         {
           this._byId = {};
-          for (var i=0; i<this._source.length; i++)
-            this._byId[ this._source[i][this.key]] = this._source[i];
+          for (var i=0; i<this._items.length; i++)
+            this._byId[ this._items[i][this.key]] = this._items[i];
         }
-        
+        this.length = this._items.length;
   			this.refresh();
   		}
   	},
@@ -85,16 +98,26 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
      
       return r;
    },
-    getByProp: function(propname, propvalue, multiple)
+    getByKey: function(key)
+    {
+      return  this._byId[key];
+    },
+    getByProp: function(propname, propvalue, multiple, case_sensitive)
     {
       var r = null;
-     
+      
       if ((this.key!=null) && (propname == this.key))
       {
           if (typeof this._byId[propvalue] != "undefined")
             r = this._byId[propvalue];
       }else
       {
+        if (typeof case_sensitive == "undefined")
+          case_sensitive = false;
+
+        if ((!case_sensitive)&&(typeof propvalue == 'string'))
+          propvalue = propvalue.toLowerCase();
+
           if (arguments.length < 3)
           {
              var multiple = false;
@@ -102,13 +125,17 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
           else{
               r = [];
           }
-          for (var i=0; i<this._source.length; i++)
+          for (var i=0; i<this._items.length; i++)
           {            
-            var item = this._source[i];
+            var item = this._items[i];
             
             if (typeof item[propname] != "undefined")
             {  
-              if (item[propname] == propvalue)
+              var tmp =  item[propname];
+             if ((!case_sensitive)&&(typeof item[propname] == 'string'))
+                  tmp =  item[propname].toLowerCase();
+
+              if (tmp == propvalue)
               {
                 if (multiple == true)
                 {
@@ -127,6 +154,66 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
      
       return r;
     },
+    getFilterFunction: function(){
+      return this.filterFunction;
+    },
+    setFilterFunction: function( f ){
+      if (this.filterFunction != f){
+        this.filterFunction = f;
+      }
+    },
+    dispatchUpdateEvent: function(oldItem, newItem ){
+      this.dispatchEvent( new Tevent(Tevent.UPDATE, newItem));
+      this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"UPDATE", item: oldItem, newItem:newItem}));
+    },
+
+    refresh:function()
+    {
+      
+      if (this.filterFunction != null)
+        this._items = this._source.filter( this.filterFunction );
+      else
+        this._items = this._source;
+
+      this.length = this._items.length;
+     
+      this.dispatchEvent( new Tevent(Tevent.REFRESH, this));
+      this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REFRESH"}));
+    },
+
+    itemUpdated: function(item, property, oldValue, newValue){
+       this.dispatchEvent( new Tevent(Tevent.UPDATE, item));
+    },
+
+    /*
+    ******************** LECTURE DE LA COLLECTION ************************
+    */
+    _getItemIndex: function(item, list)
+    {
+      for (var i=0; i<list.length; i++)
+      {
+        if (list[i] == item)
+          return i;
+      }
+
+      return -1;
+    },
+    getItemIndex: function(item)
+    {
+      return this._getItemIndex(item, this._items);
+    },
+
+    getItemAt: function(indx)
+    {
+      return this._items[indx];
+    },
+  
+    contains: function(item){
+      return (this.getItemIndex(item)>=0);
+    },
+    /*
+    ******************** MODIFICATION DE LA COLLECTION ************************
+    */
     replaceItem:function(item, newItem)
     {
       if (item == newItem)
@@ -134,107 +221,99 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
         var indx = this.getItemIndex(item);
         if (indx > -1)
         {
-          this._source[indx] = newItem;
-          if (this.key != null){
-            this._byId[item[this.key]] = newItem;
-            this.dispatchEvent( new Tevent(Tevent.UPDATE, item));
+          
+          this._source[ this._getItemIndex(item, this._source) ] = newItem;
+
+          if ((this.filterFunction == null) || (this.filterFunction(newItem)))
+          {
+              this._items[indx] = newItem;
+              if (this.key != null){
+                this._byId[item[this.key]] = newItem;
+                this.dispatchEvent( new Tevent(Tevent.UPDATE, item));
+              }
+
+              this.length = this._items.length; 
+             
+              this.dispatchEvent( new Tevent(Tevent.REPLACE, {item:item, newItem: newItem}));
+              this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REPLACE",item:item, newItem: newItem}));
+
+
+          }else{
+             if (this.filterFunction && !this.filterFunction(newItem))
+              this._removeItemAt(indx, newItem);
           }
-          this.length = this._source.length; 
-          this.dispatchEvent( new Tevent(Tevent.REPLACE, {item:item, newItem: newItem}));
-          this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REPLACE",item:item, newItem: newItem}));
+          
         }
     },
-
-    updateItem: function(item)
-    {   
-      var changed = false;
-      var oldItem = item; 
-      if (this.key != null)
-      {
-        oldItem = this.getByProp(this.key, item[this.key]);
-        if (oldItem != null){
-          this._byId[item[this.key]] = item;
-          changed = true;
-        }
-      }else{
-          var indx = getItemIndex(item);
-          if (indx >= 0){
-            oldItem = null;
-            changed = true;
-          }
-      }
-      if (changed)
-        this.dispatchUpdateEvent(oldItem, item );
-    },
-
-    dispatchUpdateEvent: function(oldItem, newItem ){
-      this.dispatchEvent( new Tevent(Tevent.UPDATE, newItem));
-      this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"UPDATE", item: oldItem, newItem:newItem}));
-    },
-  	getItemIndex: function(item)
-  	{
-  		for (var i=0; i<this._source.length; i++)
-      {
-  			if (this._source[i] == item)
-        {
-  				return i;
-        }
-      }
-
-  		return -1;
-  	},
-
-  	getItemAt: function(indx)
-  	{
-  		return this._source[indx];
-  	},
 
   	addItem: function(item)
   	{ 
-  		var indx = this.getItemIndex(item);
+        this._source.push(item);
 
-  		if (indx == -1)
-  		{
-  			this._source.push(item);
-        this.length = this._source.length;    
-        if (this.key != null)
+        if ((this.filterFunction == null) || (this.filterFunction(item)))
+        {
+          var indx = this.getItemIndex(item);
+ 
+          this._items.push(item);
+          this.length = this._items.length;    
+          if (this.key != null)
             this._byId[item[this.key]] = item;
 
-        this.dispatchEvent( new Tevent(Tevent.ADDED, {item:item, index:this.length-1}));
-        this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:item, index:this.length-1}));
-  		}
+          this.dispatchEvent( new Tevent(Tevent.ADDED, {item:item, index:this.length-1}));
+          this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:item, index:this.length-1}));
+        }
   	},
-    addItems: function(items)
+
+    addItemsAt: function(items, indx)
     { 
-      for (var i=0; i<items.length; i++){
-        this._source.push(items[i]); 
-        if (this.key != null)
-          this._byId[items[i][this.key]] = items[i];
+
+      var position = indx;
+      for (var i=0; i<items.length; i++)
+      {
+        this._source.push(items[i]);
+        if ((this.filterFunction == null) || (this.filterFunction(items[i])))
+        {
+          this._items.splice(position, 0, items);
+          position ++;
+          if (this.key != null)
+            this._byId[items[i][this.key]] = items[i];
+          
+          this.length = this._items.length;   
+          this.dispatchEvent( new Tevent(Tevent.ADDED, {item:items[i], index:position}));
+          this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:items[i], index:position}));
+        }
       }
 
-      this.length = this._source.length;   
-
       this.dispatchEvent( new Tevent(Tevent.REFRESH, this));
-      
+    },
+
+    addItems: function(items)
+    { 
+      this.addItemsAt(items, this.length);
     },
     addItemAt: function(item, indx)
     {
-        this._source.splice(indx, 0, item);
-        if (this.key != null)
-          this._byId[item[this.key]] = item;
+        this._source.push(item);
+        if ((this.filterFunction == null) || (this.filterFunction(item)))
+        {
+          this._items.splice(indx, 0, item);
 
-        this.length = this._source.length;    
-        this.dispatchEvent( new Tevent(Tevent.ADDED, {item:item, index:indx}));
-        this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:item, index:indx}));
+          if (this.key != null)
+            this._byId[item[this.key]] = item;
+
+          this.length = this._items.length;    
+          this.dispatchEvent( new Tevent(Tevent.ADDED, {item:item, index:indx}));
+          this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:item, index:indx}));
+        }
+       
     },
 
-  	
   	removeItem: function(item)
   	{
   		var indx = this.getItemIndex(item);
   		if (indx >= 0){
   			this._removeItemAt(indx, item);
-       
+
       }
       return indx;
   	},
@@ -249,23 +328,24 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
   	removeAll: function()
   	{
   		this._source = [];
+      this._items = [];
       this._byId = {};
   		this.refresh();
   	},
-    refresh:function()
-    {
-        this.length = this._source.length;
-        this.dispatchEvent( new Tevent(Tevent.REFRESH, this));
-        this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REFRESH"}));
-    },
+   
     
   	/*
   		PRIVATE
   	*/
   	_removeItemAt: function(indx, item)
   	{
-  		this._source.splice(indx, 1);
-      this.length = this._source.length;
+  		this._items.splice(indx, 1);
+
+      var indxSource = this._getItemIndex(item, this._source);
+      if (indxSource>= 0)
+        this._source.splice(indxSource, 1);
+ 
+      this.length = this._items.length;
       if (this.key != null)
         delete this._byId[item[this.key]];
 

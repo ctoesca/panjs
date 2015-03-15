@@ -48,5 +48,7 @@ function isControlKey(evt)
 {	
 	// flèches, backspace, supp, ctrl+C, ctrl+X , ctrl+V
 	var k = evt.which;	
-	return (k == 8)||(k == 13)||(k == 46)||(k == 37)||(k == 39)||(k == 9) || ( evt.ctrlKey && (k=67))|| ( evt.ctrlKey && (k=86))|| ( evt.ctrlKey && (k=88));
+	var r =  (k == 8)||(k == 13)||(k == 46)||(k == 35)||(k == 36)||(k == 37)||(k == 39)||(k == 9) || ( evt.ctrlKey && (k=67))|| ( evt.ctrlKey && (k=86))|| ( evt.ctrlKey && (k=88));
+	logger.debug(k+ ", r="+r);
+	return r;
 }

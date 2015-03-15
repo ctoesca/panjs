@@ -82,7 +82,7 @@ defineClass("Teditor", "core.display.Telement", {
 
 			this.editor = CKEDITOR.instances[this.editorId];
       }
-     
+     	$(window).resize( this.resize.bind(this));
 	},
 	setBaseHref: function(baseHref){
 		alert(baseHref);
@@ -104,9 +104,9 @@ defineClass("Teditor", "core.display.Telement", {
 			return;
 		var h = this.container.parent().height();//$(window).height();
 		var y = el.offset().top;
-		var height = h;//h - y - 80;
-		if (height < 500)
-			height = 500;
+		var height = h-1;//h - y - 80;
+		//if (height < 500)
+		//	height = 500;
 		
  		this.editor.resize( '100%', height );
  		logger.debug("HEIGHT EDITOR = "+height);

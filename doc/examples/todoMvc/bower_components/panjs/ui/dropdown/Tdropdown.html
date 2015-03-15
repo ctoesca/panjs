@@ -27,17 +27,8 @@
 uses("core.collections.TarrayCollection");
              
 defineClass("Tdropdown", "ui.dropdown.TdropdownBase.html", { 
-
-	/* PROPRIETES */
-	baseElement: "div",	
-	labelField: null,
-	nullLabelItem: '                           ',
-	placeholder: "Sélectionnez une valeur",
-
-	_dataProvider: null,
-	_selectedItem: null,
-	_readonly: false,
-	_itemsCount: 0,
+	
+	errorElement: null,
 
 	/* METHODES */
 	constructor: function(args){
@@ -62,13 +53,24 @@ defineClass("Tdropdown", "ui.dropdown.TdropdownBase.html", {
 			}
 		}
 	},
-
-	showError: function()
+	setErrorText: function(v){
+        this.container.html('<div class="alert alert-danger" role="alert" style="font-size:0.9em">'+v+'</div>');
+    }, 
+	showError: function(message)
 	{
-		this.button.addClass("error");
+		this.button.addClass("error");		
+		if (arguments.length >0){
+			if (this.errorElement!=null)
+				this.errorElement.remove();
+			this.errorElement = $('<p class="text-danger pull-left " style="margin-left:10px;">'+message+'</p>');
+
+			this.container.append(this.errorElement);
+		}
 	},
 	hideError: function()
 	{
+		if (this.errorElement != null)
+		this.errorElement.remove();
 		this.button.removeClass("error");
 	},
 	_setLabel: function(item)
@@ -107,7 +109,8 @@ defineClass("Tdropdown", "ui.dropdown.TdropdownBase.html", {
 
 			if (t != null)
 			{
-				t = t.capitalizeFirstLetter();
+				if (this.capitalizeFirstLetter)
+					t = t.capitalizeFirstLetter();
 				this._itemsCount ++;
 			}else
 			{
@@ -172,7 +175,7 @@ defineClass("Tdropdown", "ui.dropdown.TdropdownBase.html", {
   </button>
   <ul class="dropdown-menu " role="menu" id="ul" >   
   </ul>
-
+<!--CONTENT-->
 </body>
 </html>
 

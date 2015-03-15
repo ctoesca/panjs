@@ -30,12 +30,6 @@
     //]]>
   </script>
 
-  <!-- For debug, load theses 3 files -->   
-  <!--<script src="bower_components/panjs/core/helpers/base.js"></script>
-  <script src="bower_components/panjs/core/helpers/jquery.js"></script>
-  <script src="bower_components/panjs/core/starter.js"></script>-->
-
-
   <!-- For production, load this file -->
   <!--<script src="bower_components/panjs/core/panjs_core.min.js"></script>-->
 
@@ -48,13 +42,9 @@
 
   <script>
     $(document).ready(function() 
-    {
-      uses("model.Tmodel");
-     
-      panjs.model = new Tmodel();
-            
+    {        
       panjs.load($(document.body)) ;  
-      //panjs.root.todoList1.setListe(panjs.model.liste);   
+      //panjs.root.todoList1.setListe(app.getModel().liste);   
     });
   </script>
 </head>

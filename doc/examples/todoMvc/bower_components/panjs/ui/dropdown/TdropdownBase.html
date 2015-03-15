@@ -35,7 +35,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 	nullLabelItem: '                           ',
 	insertNullItem: false,
 	placeholder: "Sélectionnez une valeur",
-	capitalizeFirstLetter: true,
+
 	_dataProvider: null,
 	_selectedItem: null,
 	_readonly: false,
@@ -53,9 +53,12 @@ defineClass("TdropdownBase", "core.display.Telement", {
 			this.injectParam("insertNullItem", args.insertnullitem,false, this.insertNullItem);
 			this.injectParam("nullLabelItem", args.nulllabelitem,false, this.nullLabelItem);
 			this.injectParam("labelFunction", args.labelFunction,false, this.labelFunction);
+			this.injectParam("capitalizeFirstLetter", args.capitalizeFirstLetter,false, this.capitalizeFirstLetter);
 			
 		}
-
+		if (this.placeholder == "")
+			this.placeholder = '<span style="margin-left: 15px;margin-right: 15px;"></span>';
+	
 		this._setEvents();	
 		this._setLabel(null);
 	},
@@ -92,9 +95,9 @@ defineClass("TdropdownBase", "core.display.Telement", {
 			this._addItem(obj);
 		}
 
-		for (var i =0; i< this._dataProvider._source.length; i++)
+		for (var i =0; i< this._dataProvider.length; i++)
 		{
-			var item = this._dataProvider._source[i];
+			var item = this._dataProvider.getItemAt(i);
 
 			if (this._filterFunction == null){
 				this._addItem(item);
@@ -106,10 +109,16 @@ defineClass("TdropdownBase", "core.display.Telement", {
 				}
 		}	
 
-		if (this._itemsCount == 0)
+		if (this._selectedItem != null){
+			var it = this._dataProvider.getItemIndex(this._selectedItem);
+			if (it == -1)
+				 this.setSelectedItem(null);
+		}
+		
+		/*if (this._itemsCount == 0)
 			this.enabled(false)
 		else
-			this.enabled(true);
+			this.enabled(true);*/
 	},
 	setDataProvider: function(dp)
     {
@@ -162,12 +171,12 @@ defineClass("TdropdownBase", "core.display.Telement", {
 	},
 	getItemByLabel:function(label)
 	{
-		if ((this._dataProvider == null)|| (this._dataProvider._source == null))
+		if ((this._dataProvider == null)|| (this._dataProvider.length == 0))
 			return null;
 
-		for (var i =0; i< this._dataProvider._source.length; i++)
+		for (var i =0; i< this._dataProvider.length; i++)
 		{
-			var item = this._dataProvider._source[i];
+			var item = this._dataProvider.getItemAt(i);
 		 	if ((item[this.labelField]!= null) && (item[this.labelField] == label))
 		 		return item;
 		}
@@ -187,9 +196,14 @@ defineClass("TdropdownBase", "core.display.Telement", {
 	{
 		var r = "";
 		if ((item != null)&&(item[this.labelField] != null))
-			r = item[this.labelField].capitalizeFirstLetter();
-		else
+		{	
+			r = item[this.labelField];
+			if (this.capitalizeFirstLetter == true)
+				r = r.capitalizeFirstLetter()	
+		}
+		else{
 			r = this.placeholder;
+		}
 		return r;
 	},
 

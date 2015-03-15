@@ -1,0 +1,105 @@
+<html>        
+<head>
+
+<style>
+.container{
+	padding:20px;
+}
+</style>
+
+
+<script type="text/x-class-definition">
+//<![CDATA[
+uses("core.helpers.Ttimer");
+
+uses("core.collections.TarrayCollection");
+defineClass("app", "core.display.Telement", { 
+
+	baseElement: "div",	
+	data: null,
+	collection: null,
+
+	constructor: function(args){ 
+		this._super.constructor.call(this,args);
+
+		this.data = [];
+
+		for (var i = 0; i < 10; i++) {
+			this.data.push( { key:"var"+i, value:i });
+		};
+		this.collection = new TarrayCollection({data:this.data, filterFunction: this.filterFunction});
+		//this.collection.filterFunction = this.filterFunction;
+		//this.collection.refresh();
+		this.grid.primaryKeyFields = ["key"];
+		this.grid.setDataProvider(this.collection);
+
+	},
+	filterFunction: function(item){
+		return item.value > 5;
+	},
+	onAddItem: function(){
+		var obj = { key: this.inputKey.val(),  value: this.inputValue.val()};
+		this.collection.addItem(obj);
+	},
+	onAddItemAt: function(){
+		var obj = { key: this.inputKey.val(),  value: this.inputValue.val()};
+		this.collection.addItemAt(obj, this.inputPosition.val());
+	},
+	onReplace: function(){
+		var obj = this.collection.getByProp("key", this.inputKey.val());
+		var newobj = { key: this.inputKey.val(),  value: this.inputValue.val()};
+		this.collection.replaceItem(obj, newobj);
+	},
+
+
+	onChangeFilter: function(){
+		this.collection.filterFunction = null;
+	},
+
+	onRefresh: function(){
+		this.collection.refresh();
+	}
+
+
+
+});
+
+//]]>
+</script>
+
+</head>
+
+<body>	
+	<div class="container">
+		
+		<div class="col-md-6">
+			<div class="form-group">
+				<label>key</label> <input class="form-control" id="inputKey"></input> 
+				<label>value</label> <input class="form-control"  id="inputValue"></input>
+				<button data-onclick="this.onAddItem">addItem</button>
+			</div>
+			
+			<div class="form-group">
+				<label>position</label> <input type="number" class="form-control"  id="inputPosition"></input>
+				<button data-onclick="this.onAddItemAt">addItemAt</button>
+				<button data-onclick="this.onReplace">replace</button>
+			</div>
+
+			<div class="form-group">
+				<button data-onclick="this.onChangeFilter">ChangeFilter</button>
+				<button data-onclick="this.onRefresh">refresh</button>
+			</div>
+
+		</div>
+
+		<div class="col-md-6">
+			<div id="grid" data-compo="ui.grids.TsimpleGrid.html">
+				<div field="" itemRenderer="components.TeditItemRenderer.html"></div>
+				<div field="key">key</div>
+				<div field="value">value</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html> 

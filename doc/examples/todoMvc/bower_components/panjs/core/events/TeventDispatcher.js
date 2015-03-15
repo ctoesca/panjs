@@ -15,7 +15,7 @@ defineClass("TeventDispatcher", "core.Tobject", {
 		//logger.debug("TeventDispatcher.init ",this.className,". args=",args);
 	},
 	free: function(){
-	
+		this.removeAllListeners();
 	},
 	/* 	params event:Tevent 
 		return Boolean
@@ -46,10 +46,11 @@ defineClass("TeventDispatcher", "core.Tobject", {
 			{
 				var list = listeners[i];
 
+				if (event.currentTarget == null)
 				event.currentTarget = this;
 
-				event.data = event.data || list.data;
 				event.bind =  list.bind;
+				event.relatedData = list.data;
 				
 				if (event.bind == null)
 					list.listener(event);

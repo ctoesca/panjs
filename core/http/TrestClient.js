@@ -113,11 +113,11 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 	{
 		this._call("DELETE", url, params, data, success||null, failure||null,token);
 	},
-	_call: function(method, url, params, data, success, failure, token)
+	_call: function(method, url, params, data, success, failure, token, dataType)
 	{
-		var dataType = this.dataType;
-		if ((arguments.length >= 8)&&(typeof token.dataType != "undefined"))
-			dataType = token.dataType;
+		
+		if (arguments.length < 8)
+			var dataType = this.dataType;
 		
 		if ((dataType == "json")&&((method=="POST")||(method=="PUT")))
 			data = JSON.stringify(data);
@@ -165,8 +165,11 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 				dataType: dataType,	//json: fonctionne pas en crossdomain sur IE8
 									//nécessité d'utiliser XdomainRequest (CORS pour IE8)
 				success: function(data, textStatus, req) {
-					
-					logger.debug("Requête AJAX terminée avec succès: ",url);
+					logger.debug("Requête AJAX "+token.requestId+" terminée avec succès sur ",url);
+					if (token.aborted){
+						logger.debug("Requête "+token.requestId+" ANNULEE sur ",url);
+						return;
+					}
 					
 					if (this.exitCodeFieldName != null)
 					{
@@ -195,7 +198,12 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 						success(e, token);
 				},
 				error: function( jqXHR, textStatus, errorThrown) {
-					logger.debug("ECHEC requête AJAX "+errorThrown,url);
+					logger.debug("ECHEC Requête AJAX "+token.requestId+" "+errorThrown+" sur ",url);
+					if (token.aborted){
+						logger.debug("Requête "+token.requestId+" ANNULEE sur ",url);
+						return;
+					}
+
 					var readyState = "?";
 					if (jqXHR.readyState == 0) readyState = "request not initialized";
 					if (jqXHR.readyState == 1) readyState = "server connection established";

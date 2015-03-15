@@ -5,7 +5,7 @@
  * Copyright 2013 bootstrap-select
  * Licensed under the MIT license
  */
-
+  
 !function($) {
 
     'use strict';
@@ -383,7 +383,7 @@
         },
 
         setWidth: function() {
-            if (this.options.width == 'auto') {
+            if (this.options.width == 'auto') {alert('auto');
                 this.$menu.css('min-width', '0');
 
                 // Get correct width if element hidden
@@ -432,6 +432,7 @@
                 getPlacement($(this));
                 $drop.appendTo(that.options.container);
                 $drop.toggleClass('open', !$(this).hasClass('open'));
+
                 $drop.append(that.$menu);
             });
             $(window).resize(function() {
@@ -440,7 +441,8 @@
             $(window).on('scroll', function() {
                 getPlacement(that.$newElement);
             });
-            $('html').on('click', function(e) {
+          
+            $('html').on('click', function(e) { 
                 if ($(e.target).closest(that.$newElement).length < 1) {
                     $drop.removeClass('open');
                 }

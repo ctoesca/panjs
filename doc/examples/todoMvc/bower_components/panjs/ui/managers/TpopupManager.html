@@ -32,6 +32,16 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 	        
 		}.bind(this));
 
+		/* la fenetre reste fixe, mais si sa hauteur dépasse la hauteur de l'écran, on ne voit plus ce qui est en bas.
+		La popup doit avoir un contenu scrollable et height ou max-height défini.
+		
+		$(window).scroll(function(e){
+			var top = $(window).scrollTop();
+			for (var i=0; i<this.popups.length; i++){
+				var w = this.popups[i];
+				w.window.css("top", top+"px");
+			}
+		}.bind(this));*/
 	},
 
 	addPopup: function(instance, options)

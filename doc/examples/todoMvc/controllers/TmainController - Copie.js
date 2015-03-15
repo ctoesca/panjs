@@ -55,8 +55,8 @@ defineClass("TmainController", "core.events.TeventDispatcher", {
 					null, 
 					null, 
 					function(evt){
-						panjs.model.ip = evt.data.ip;
-						logger.info("IP: "+panjs.model.ip);
+						app.getModel().ip = evt.data.ip;
+						logger.info("IP: "+app.getModel().ip);
 					},
 					this.defaultErrorHandler ,
 					null

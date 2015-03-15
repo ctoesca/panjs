@@ -72,7 +72,7 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 			this.todos.addItemAt(todo, 0);			
 		}else{
 			var todoModel = this.todos.getByProp("id", todo.id);
-			this.todos.updateItem(todoModel, todo);
+			this.todos.replaceItem(todoModel, todo);
 		}
 		this._save();
 		if (defined(success))

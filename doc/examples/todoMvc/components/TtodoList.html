@@ -3,7 +3,7 @@
 
 <script type="text/x-class-definition">
 //<![CDATA[
-
+uses("model.Tmodel");    
 defineClass("TtodoList", "core.display.Telement", { 
 
 	baseElement: "div",	
@@ -18,12 +18,7 @@ defineClass("TtodoList", "core.display.Telement", {
 		if (!defined(args.model))
 			this.model = new Tmodel();
 
-		this.toggleAll.on("click", this.onToggleAll.bind(this));
-		this.clearCompleted.on("click", this.onClearCompleted.bind(this));
-		this.newTodo.on("keyup", this.onNewTodoKeyUp.bind(this));
-
 		this.onHashChange(  this.getHash() );
-
 		this.model.getAll( this.onGetAll.bind(this));
 	},
 	onHashChange: function(hash){
@@ -153,8 +148,6 @@ defineClass("TtodoList", "core.display.Telement", {
 			compo.render();
 		this.refresh();
 	}
-
-
 });
 
 //]]>
@@ -163,15 +156,14 @@ defineClass("TtodoList", "core.display.Telement", {
 </head>
 
 <body>	
-	
 		<section id="todoapp">
 			<header id="header">
 				<h1>todos</h1>
-				<input id="new-todo" placeholder="What needs to be done?" autofocus="autofocus" />
+				<input id="new-todo" placeholder="What needs to be done?" autofocus="autofocus" data-onkeyup="this.onNewTodoKeyUp"/>
 			</header>
 			<!-- This section should be hidden by default and shown when there are todos -->
 			<section id="main">
-				<input id="toggle-all" type="checkbox"/>
+				<input id="toggle-all" type="checkbox" data-onclick="this.onToggleAll"/>
 				<label for="toggle-all">Mark all as complete</label>
 				<ul id="todo-list">
 					<!-- These are here just to show the structure of the list items -->
@@ -196,9 +188,8 @@ defineClass("TtodoList", "core.display.Telement", {
 					</li>
 				</ul>
 				<!-- Hidden if no completed items are left ↓ -->
-				<button id="clear-completed"></button>
+				<button id="clear-completed" data-onclick="this.onClearCompleted"></button>
 			</footer>
 		</section>
-
 </body>
 </html> 

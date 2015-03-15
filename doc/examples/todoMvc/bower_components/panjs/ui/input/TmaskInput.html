@@ -7,8 +7,10 @@
 {
 
 }
-.error{
-		color:#CC0000;
+.TmaskInput.error{
+		color:#c9302c;
+		border-color:red;
+		border-width: 2px;
 	}
 /*width:100px;*/
 	.red-tooltip + .tooltip > .tooltip-inner {background-color: #aa0000;}
@@ -31,6 +33,7 @@ defineClass("TmaskInput", "core.display.Telement", {
 	placeholder: "",
 	/* METHODES */
 	tooltip: null,
+	mandatory: false,
 
 	constructor: function(args){
 		
@@ -44,6 +47,8 @@ defineClass("TmaskInput", "core.display.Telement", {
 			if (args.style)
 				this.container.attr("style", args.style);
 		}
+		if (defined(args, "mandatory"))
+			this.mandatory = args.mandatory;
 
 		if (defined(args, "size"))
 		{
@@ -92,11 +97,11 @@ defineClass("TmaskInput", "core.display.Telement", {
 	},
 	hideError: function(v)
 	{
-		this.container.css("color", "");
+		this.container.removeClass("error");
 	},
 	showError: function(v)
 	{
-		this.container.css("color", "red");
+		this.container.addClass("error");
 	},
 	/*hideError: function(v)
 	{
@@ -152,13 +157,14 @@ defineClass("TmaskInput", "core.display.Telement", {
 		var isOk = false;
 		var v = this.container.val();
 
-		if (v == "")
-			return true;
-
+		if ((v.trim() == "") && (!this.mandatory))
+			isOk = true;
+		else
 		if (this.mask.test(v)) 
 		{
 			isOk = true;			
 		}
+
 		return isOk;
 	},
 	_onChange:function(e)

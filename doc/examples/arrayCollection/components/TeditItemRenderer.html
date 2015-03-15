@@ -1,0 +1,97 @@
+<html>        
+<head>
+
+<style type="text/css">	
+/*Sur ie8 , a:hover ne passe pas dans less */
+/*.TeditItemRenderer a:hover{
+		text-decoration:none;
+}
+
+.TeditItemRenderer	i:hover{
+		padding:2px;
+		border-style:solid;
+		border-width:1px;
+		border-color:#777777;
+		background-color:#CCCCCC;
+	}
+*/
+.TeditItemRenderer button{
+	border-style:none;
+	padding: 2px;
+	background-color: transparent;
+}
+.TeditItemRenderer i{
+	padding-left:2px;
+	padding-right:2px;
+	cursor:pointer;
+}
+.TeditItemRenderer {
+	white-space:nowrap;
+}
+
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+
+defineClass("TeditItemRenderer", "core.display.Telement", { 
+	baseElement: "td",	
+	_data: null,
+	
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+
+	},
+	
+	setData: function(data)
+	{
+		this._data = data;
+	},
+	
+	getData: function()
+	{
+		return this._data;
+	},
+	
+	init: function(){
+		this.btnSupprimer.on("click", this._onbtnSupprimerClick.bind(this));	
+	},
+	_onbtnModifierClick: function(e)
+	{
+		this.owner.dispatchEvent( new Tevent("ON_MODIFIER_CLICK", this._data));
+		return false;
+	},
+	_onbtnViewClick: function(e)
+	{
+		this.owner.dispatchEvent( new Tevent("ON_VIEW_CLICK", this._data));
+		return false;
+	},
+	_onbtnSupprimerClick: function(e)
+	{
+		this.owner.getDataProvider().removeItem(this._data);
+		return false;
+	},
+	_onbtnDupliquerClick: function(e)
+	{
+		this.owner.dispatchEvent( new Tevent("ON_DUPLIQUER_CLICK", this._data));
+		return false;
+	}
+	
+
+});
+//]]>
+</script>
+
+</head>
+<body>
+
+		
+	<button id="btnModifier" class="btn btn-default btn-xs" style="display:none" title="Modifier"><i  class="glyphicon glyphicon-pencil" ></i></button>
+	<button id="btnSupprimer" class="btn btn-default btn-xs" style="" title="Supprimer"><i class="glyphicon glyphicon-remove"></i></button>
+
+<!--CONTENT-->
+
+
+</body>
+</html> 

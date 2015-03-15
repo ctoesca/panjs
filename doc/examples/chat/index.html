@@ -1,0 +1,52 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>  
+   <title>panjs - Tutorial</title>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+   <link rel="shortcut icon" href="favicon.png"/>
+   <META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="en-EN,en"/>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+   
+   <script>
+    //<![CDATA[  
+    var panjs = {
+      logLevel: "DEBUG", //DEBUG / INFO / WARN / ERROR
+        env: "dev", // dev or prod
+        appVersion: "1.0.0", 
+        version: "0.7.0", 
+
+        namespaces:[
+        {name: "core", path: "../../../core"},
+        {name: "ui", path: "../../../ui"},
+        {name: "app", path: "components"}
+        ]
+      };  
+    //]]>
+  </script>
+
+ 
+  <script src="../../../core/panjs_core_with_less.min.js"></script>
+
+  <script>
+    $(document).ready(function() 
+    {  
+      panjs.load($(document.body)) ;   
+    });    
+  </script>
+</head>
+
+<body>
+
+    <div data-compo="app.app.html" autoload="true">  </div>       
+       
+</body>
+
+</html>
+
+
+
+
+

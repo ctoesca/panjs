@@ -13,15 +13,16 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 	enableHashManager: false,
 	hashKey: null,
 	sourceElementStyle: null,
-
+	
 	/* METHODES */	
 	constructor: function(args) { 
 		
 		Telement._super.constructor.call(this,args);
-
+		
 	
 		if (this.enableHashManager == true){
 			uses("core.managers.Trouter");
+			
 			if (this.hashKey == null)
 				this.hashKey = this.id;
 			panjs.router.registerComponent(this, this._onHashChange, this.hashKey);
@@ -69,9 +70,10 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 				}
 			}	
 		}
-
+	
 		var tmpStyle = args.inlineStyle || null;
 		if (tmpStyle != null){
+			
 				this.sourceElementStyle =  tmpStyle;	
 				this.setStyle(tmpStyle);
 		}
@@ -80,7 +82,9 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 		}*/
 		
   	},
+
   	
+
 	setStyle: function(css)
    	{
 		this.container.attr("style", css);  

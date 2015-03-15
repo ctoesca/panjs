@@ -1,9 +1,6 @@
 <html>        
 <head>
 
- <link href="./css/datepicker.css" rel="stylesheet"/>
- <script type="text/javascript" src="./js/bootstrap-datepicker.js"></script>
-
 <style>
 
 .TinputDate
@@ -15,7 +12,7 @@
 <script type="text/x-class-definition">
 //<![CDATA[
               
-defineClass("TinputDate", "core.display.Telement", { 
+defineClass("TinputDate", "ui.input.TinputDateTime.html", { 
 
 	/* PROPRIETES */
 	value: null,
@@ -24,72 +21,28 @@ defineClass("TinputDate", "core.display.Telement", {
 	/* METHODES */
 	
 	constructor: function(args){
-		
+		this.pickTime = false;
 		this._super.constructor.call(this,args);
-		this.value = new Date();
-
-		this.datePicker.attr("data-date", "");
-
-		this.datePicker = this.datePicker.datepicker({viewMode:0, minViewMode:0});	
-		this.val(this.value);
-
-		this.datePicker.on("show", this._onShow.bind());
-		this.datePicker.on("changeDate", this._onChangeDate.bind(this));
-		
-		this.input.val("");
-
-		this._setEvents();
 	},
 	
-	_setEvents: function()
+	setTimeStamp: function(v)
 	{
-
-	},
-	_onChangeDate: function(e)
-	{
-		this.datePicker.datepicker('hide');
-	},
-	_onShow: function(e)
-	{
-	},
-
-	val: function(value)
-	{
-		if (arguments.length == 0)
-		{
-			var r = this.input.val();
-			if (r == "")
-				return null;
-			else
-				return r;
-		}else
-		{
-			if (value == null)
-			{
-				value = "";
-				this.input.val("");
-			}
-			else
-			{
-				this.datePicker.datepicker('setValue', value);	
-			}
-			
-		}
+		if (v == null)
+			return;
+		this.val( new Date(v.replace(" ","T")));
 	},
 	getTimeStamp: function()
-	{
-		var v = this.val();
-		var d = null;
-		if (v != null)
-		{
-			var dd = v.substr(0,2);
-			var mm = v.substr(3,2);
-			var yyyy = v.substr(6,4);
-			d = new Date(yyyy, mm-1, dd);
-			d = d.getTime();
-		}
-		return d;
-	}
+    {
+    	
+        var r = this.val();
+        if (r !=null)
+        r = moment(r).format("YYYY-MM-DD");
+
+        return r;
+    }
+
+	
+
 });
 //]]>
 </script>

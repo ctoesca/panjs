@@ -23,25 +23,16 @@
       constructor: function(args){
           this._super.constructor.call(this,args);  
 
+          //we dot not affect circles in the properies because it would affect all the prototype chain.
           this.circles = [];
 
           //Create N circles
-          for (var i = 0; i< this.N; i++){
+          for (var i = 0; i< this.N; i++)
             this.addCircle();
-          }
 
           //Create the timer with a delay of 10 ms and listen for "ON_TIMER" event.
-          this.timer = new Ttimer({delay: 10});
-          this.timer.on(Ttimer.ON_TIMER, this.onTimer.bind(this));
-
-          //Listen for click events on buttons
-          this.btnStart.on("click", function(){
-            this.timer.start();
-          }.bind(this));
-
-          this.btnStop.on("click", function(){
-            this.timer.stop();
-          }.bind(this));
+          this.timer = new Ttimer({delay: 10, onTimer: this.onTimer.bind(this)});
+        
         },
 
         addCircle: function(){
@@ -60,8 +51,11 @@
 
 </head>
 <body>  
-  <button id="btnStart">Start</button>
-  <button id="btnStop">Stop</button>
-  <div id="circlesContainer" style="height:40px"/>
+  <!-- in btnStart.onclick and btnStop.onclick, we execute code, so we use {{ }}-->
+  <button id="btnStart" data-onclick="{{this.timer.start()}}">Start</button>
+  <button id="btnStop" data-onclick="{{this.timer.stop()}}">Stop</button>
+
+  <div id="circlesContainer"/>
+  <div style="clear: both"/>
 </body>
 </html> 

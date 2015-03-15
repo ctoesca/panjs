@@ -25,10 +25,12 @@ Exemple:
 -->
 <style type="text/css">
 
-.TsimpleGrid table.allowSelection td {
+.TsimpleGrid table.allowSelection tr {
 	cursor:pointer;
 }
-
+.TsimpleGrid table.td:not(.allowSelection) {
+	cursor:default;
+}
 .TsimpleGrid table.table-hover tbody tr.selected td {
   background-color: #dff0d8 !important;
 }
@@ -89,8 +91,8 @@ Exemple:
 
 }
 .TsimpleGrid tr.detailRow td{
-	background-color: white;
-	cursor: default;
+	/*background-color: white;
+	cursor: default;*/
 }
 </style>
 
@@ -140,8 +142,9 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 
 		this._allowSelection = args["allow-selection"] || args["allowSelection"]|| this._allowSelection;
 		this.selectedDataField = args["selected-data-field"] || this.selectedDataField;
-		
-
+		if (typeof args.maxHeight != "undefined")
+			this.setHeight(args.maxHeight);
+	
 		/*
 		Récup des colonnes définies dans <CONTENT>
 		*/
@@ -168,10 +171,12 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 					"visible": visible,
 					"field": datafield,
 					"title": title,
+					"width": el.attr("width")||null,
 					"nullLabel": "",
 					"headerClass": el.attr("headerClass")||null,
 					"cellClass": el.attr("cellClass")||null,
 					"itemRenderer": itemRenderer,
+					"_itemsRenderersInstances":{},
 					"functionRenderer": el.attr("functionRenderer")||null,
 					"headerFunctionRenderer": el.attr("headerFunctionRenderer")||null,
 
@@ -312,6 +317,13 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 			return null;
 		return this._cols[indx];
 	},
+	getCol : function(indx){
+		return this._cols[indx];
+	},
+	setCol : function(indx, col){
+		this._cols[indx] = col;
+		this.refresh();
+	},
 	addCols : function(cols)
 	{
 		//Col exemple: { field: "warning" , searchable:false, title:"Warning", cellClass:"cellWarning",  headerClass:"cellWarning", itemRenderer:"TdateItemRenderer"}
@@ -330,7 +342,10 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 			if (typeof col.headerClass == u) col.headerClass = null;
 			if (typeof col.itemRenderer == u) col.itemRenderer = null;
 			if (typeof col.titleInfo == u) col.titleInfo = null;	
-			if (typeof col.sortField == u) col.sortField = col.field;		
+			if (typeof col.sortField == u) col.sortField = col.field;	
+			if (typeof col.width == u) col.width = null;	
+			
+			col._itemsRenderersInstances = {};
 			this._cols.push(col);
 		}
 	},
@@ -340,27 +355,30 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 
 	setDataProvider: function(dataProvider)
 	{
-		if (!this.progressiveLoad){
-			this.sectionRecordsCount = 100000;
-		}else{
-			if (!this._progressiveLoadHandledIsSet){
-      			$(window).scroll( this._onBottom.bind(this));
-      			this._progressiveLoadHandledIsSet = true;
-
-      			this.tableContainer.scroll( this._onTableScroll.bind(this));
-      			
-      		}
-		}
-
+		
 		if (this._dataProvider != dataProvider)
 		{
 			this._dataProvider = dataProvider;
+			if (!this.progressiveLoad){
+				this.sectionRecordsCount = 100000;
+			}else{
+				if (!this._progressiveLoadHandledIsSet){
+	      			$(window).scroll( this._onBottom.bind(this));
+	      			this._progressiveLoadHandledIsSet = true;
+
+	      			this.tableContainer.scroll( this._onTableScroll.bind(this));
+	      			
+	      		}
+			}
+
+			
 			this._dataProvider.on(Tevent.UPDATE, this._onItemUpdated.bind(this));
 			this._dataProvider.on(Tevent.DELETE, this._onItemRemoved.bind(this));
 			this._dataProvider.on(Tevent.ADDED, this._onItemAdded.bind(this));
 			this._dataProvider.on(Tevent.REFRESH, this.refresh.bind(this));
 			this._dataProvider.on(Tevent.REPLACE, this._onItemReplaced.bind(this));
 		}
+
 		this._createTable();
 	},
 	_onTableScroll: function(e)
@@ -507,6 +525,8 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 		var th = $('<th colIndx="'+col.index+'"></th>');
 		if (col.headerClass) 
 			th.addClass(col.headerClass);
+		if (col.width)
+			th.css("width",col.width);
 
 		th = this._updateHeader(th, col, this.trHeader);
 		
@@ -683,6 +703,8 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 		if (!trIsEmpty)
 			$(tr).empty();
 
+		var primaryKeyValue = this.getPrimaryKeyValue(obj);
+
 		//!!Redondance. faire fonction _renderDetail(obj)
 		if (typeof detailTr != "undefined")
 		{
@@ -720,16 +742,26 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 		
 			if (col.visible)
 			{	
+				
 				if (col.field != null)
 				{					
 					if (col.itemRenderer)
-					{		
-						var compo = panjs.createComponent(col.itemRenderer,{datafield: col.field}); 	
+					{	
+
+						if (typeof col._itemsRenderersInstances[primaryKeyValue] != "undefined"){
+							var compo = col._itemsRenderersInstances[primaryKeyValue];
+						}
+						else{
+							var compo = panjs.createComponent(col.itemRenderer,{datafield: col.field}); 
+							col._itemsRenderersInstances[primaryKeyValue] = compo;
+							
+							compo.container[0].owner = compo;
+							compo.owner = this;
+							
+						}
+
+						compo.init();	//!! les events sont retirés car on a enlevé l'élement du DOM. et Les items renderers actuels affectent les evenements dans init(), ce qui est normal.	
 						var td = compo.container[0];	
-						compo.container[0].owner = compo;
-						compo.owner = this;
-						compo.init();			
-						
 						if (typeof compo.setData != "undefined")	
 							compo.setData(obj, col.field);									
 					}
@@ -773,14 +805,17 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 					td.innerHTML = html;
 				}
 
-				if (col.cellClass != null)
-					td.setAttribute("class", col.cellClass);
+				if (col.cellClass != null){
+					var c = td.getAttribute("class");
+					td.setAttribute("class", c+" "+col.cellClass);
+				}
+				
 
 				tr.appendChild(td);
 			}
 		}
 
-		tr.setAttribute("itemId", this.getPrimaryKeyValue(obj));
+		tr.setAttribute("itemId", primaryKeyValue);
 
 		if (this.selectedDataField && this._allowSelection && (obj[this.selectedDataField]))
 		{

@@ -29,6 +29,8 @@ defineClass("TsearchCombobox", "core.display.Telement", {
     _combo: null,
     selectingItem: null,
     selectedItem:null,
+    isReady: false,
+  
 
     _sendChangeEvent: true,
 
@@ -38,14 +40,21 @@ defineClass("TsearchCombobox", "core.display.Telement", {
         if (defined(args, "placeholder"))
             this.placeholder = args.placeholder;
 
-        if (defined(args, "valuefield"))
-            this.valueField = args.valuefield;
+        if (defined(args, "labelField"))
+            this.labelField = args.labelField;
+
+        if (defined(args, "valueField"))
+            this.valueField = args.valueField;
+
         
         if (this.valueField == null)
             this.valueField = this.labelField;
 
-        this.waitingIcon = $('<i class="fa fa-spinner fa-2x fa-spin" id="waitingIcon" style="font-size:0.8em;color:#0099CC;"></i>');
-        this.container.append(this.waitingIcon);
+        this.waitingIcon = $('<i class="fa fa-spinner fa-2x fa-spin" id="waitingIcon" style="margin-top: 4px; margin-right: 5px; float:left; font-size:1.2em;color:#0099CC;"></i>');
+        this.container.prepend(this.waitingIcon);
+
+        this._combo = this.select.combobox().data('combobox') ;
+
     },
 
     getDataProvider: function(dp)
@@ -56,6 +65,8 @@ defineClass("TsearchCombobox", "core.display.Telement", {
     {
         var dataProviderWasNull = (this._dataProvider == null);
         this._dataProvider = dp;
+        
+
         this._populate();
         this._combo.clearTarget();
         this._combo.clearElement();
@@ -64,6 +75,8 @@ defineClass("TsearchCombobox", "core.display.Telement", {
         if ((this.selectingItem != null)&& (dataProviderWasNull == true))
             this.val(this.selectingItem);
         this.selectingItem = null;
+        this.isReady = true;
+        this.dispatchEvent(new Tevent(Tevent.READY));
     },
     
     refresh: function(){
@@ -82,7 +95,7 @@ defineClass("TsearchCombobox", "core.display.Telement", {
             }
         }
         this.waitingIcon.hide();
-        this._combo = this.select.combobox().data('combobox') ;
+      
          this.container.getElement('input.combobox').attr('placeholder', this.placeholder);
         this._combo.$source.on("change", this.onChange.bind(this));
         
@@ -91,7 +104,7 @@ defineClass("TsearchCombobox", "core.display.Telement", {
     onChange: function(e)
     {
         var v = $(e.target).val();
-     
+
         if (v != null)
             v = this._dataProvider.getByProp(this.valueField, v);
       
@@ -99,6 +112,7 @@ defineClass("TsearchCombobox", "core.display.Telement", {
         this.selectedItem = v;
 
         if ((oldSelectedItem != v)&&(this._sendChangeEvent)){
+
             this.dispatchEvent( new Tevent(Tevent.CHANGE, v));
         }     
     },
@@ -128,7 +142,9 @@ defineClass("TsearchCombobox", "core.display.Telement", {
     _getInputVal: function(item){
         return item;
     },
-
+    getSelectedItem: function(){
+        return this.selectedItem;
+    },
     val: function(item)
     {
         if (arguments.length == 0)
@@ -148,8 +164,9 @@ defineClass("TsearchCombobox", "core.display.Telement", {
         else
         {
             if (this._dataProvider != null)
-            {    
-                item = this._getInputVal(item);    
+            {   
+                item = this._getInputVal(item);  
+
                 if (item != null){
                     this._combo.select(this.labelFunction(item));
                      this.selectedItem = item;
@@ -164,6 +181,29 @@ defineClass("TsearchCombobox", "core.display.Telement", {
                 this.selectingItem = item;
             }
         }
+    },
+    enabled: function(value)
+    {
+        if (arguments.length == 0)
+        {
+            return (this.select.hasClass("disabled") == false);
+        }
+        else
+        {
+            var el = this.container.getElement("input.combobox");
+            if (el != null){
+                if (value === true){
+                    el.removeAttr("disabled");
+                    this.container.getElement("span.input-group-addon").removeClass("disabled");                    
+                }
+                else
+                {
+                    el.attr("disabled", "disabled");
+                    this.container.getElement("span.input-group-addon").addClass("disabled");
+                }
+            }
+           
+        }       
     }
 });
 

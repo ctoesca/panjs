@@ -12,9 +12,13 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	url: null, // ex: /machines
 	IDField: "id",
 
+	runningRequests: null,
+	lastRequestId : 0,
 
 	constructor: function(args){
 		this._super.constructor.call(this,args);	
+		this.runningRequests = {};
+
 		this.injectParam("apiUrl", args.apiUrl, true);
 		this.injectParam("extraUrlParams", args.extraUrlParams, true);
 
@@ -22,6 +26,13 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 
 		this.restClient = new TrestClient({extraUrlParams: this.extraUrlParams, baseUrl: this.apiUrl, dataType:"json"});
 	},
+	createNewToken: function(success,failure){
+		this.lastRequestId ++;
+		var token = {start: new Date(), requestId: this.lastRequestId, extSuccess:success, extFailure:failure,aborted: false};
+		this.runningRequests[token.requestId] = token;
+		return token;
+	},
+	
 	defaultErrorHandler: function(e, token)
 	{  
 		logger.error(e.data.url+" => "+e.data.responseText);
@@ -41,7 +52,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		
 		if ((arguments.length > 0) && (nom != null) ){
 			if (typeof this.data[nom] != "undefined"){
-				return this.data[nom];
+				r = this.data[nom];
 			}else
 			{
 				if ((arguments.length == 2) && (create == true)){
@@ -94,8 +105,9 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 
 	removeItemFromModels: function(itemId){
 		var items = this.getItemsById(itemId);
-		for (var i=0; i<items.length; i++)
+		for (var i=0; i<items.length; i++){
 			items[i].model.removeItem(items[i].item);
+		}
 	},
 
 	replaceItemInModels: function(item){
@@ -110,6 +122,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	/******************************************************************************/
 	_onupdateDefault: function(evt, token)
 	{
+		
 		//evt.data => objtet Vip
 		if (defined(token.extSuccess))
 			token.extSuccess(evt.data, token);
@@ -117,12 +130,14 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	},
 	_onsearchDefault: function(evt, token)
 	{
+		
 		if (defined(token.extSuccess))
 			token.extSuccess(evt.data, token);
 		
 	},
 	_onremoveDefault: function(evt, token)
 	{
+		
 		if (defined(token.extSuccess))
 			token.extSuccess(evt.data, token);
 		this.onRemove(this, evt.data);
@@ -157,12 +172,13 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	
 	listFiles: function(id, success, failure)
 	{
-		var token = {extSuccess:success, extFailure:failure};		
+		var url = this.url+"/"+id+"/listFiles";
+		var token = this.createNewToken(success, failure);		
 		var data = null;
-		this.restClient.get(this.url+"/"+id+"/listFiles", "" , data, this.onListFilesSuccess.bind(this), failure||this.defaultErrorHandler, token);
+		this.restClient.get(url, "" , data, this.onListFilesSuccess.bind(this), failure||this.defaultErrorHandler, token);
 	},
 	onListFilesSuccess: function(evt, token)
-	{
+	{		
 		if (defined(token.extSuccess))
            token.extSuccess(evt.data, token);  
 	},
@@ -170,11 +186,13 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	
 	deleteFile: function(id,filename, success, failure)
 	{
-		var token = {extSuccess:success, extFailure:failure};
+		var url = this.url+"/"+id+"/files/"+filename;
+		var token = this.createNewToken(success, failure);
 		var data = null;
-		this.restClient.del(this.url+"/"+id+"/files/"+filename, "" , data, this.onDeleteFileSuccess.bind(this), failure||this.defaultErrorHandler, token);
+		this.restClient.del(url, "" , data, this.onDeleteFileSuccess.bind(this), failure||this.defaultErrorHandler, token);
 	},
 	onDeleteFileSuccess: function(evt, token){
+		
 		if (defined(token.extSuccess))
            token.extSuccess(evt.data, token);
 	},
@@ -259,8 +277,9 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 				updateModel = opt.updateModel;
 			data = opt;
 		}
-			
-		var token = {extSuccess:success, extFailure:failure, updateModel: updateModel, searchId: id};
+		var token = this.createNewToken(success, failure);		
+		token.updateModel = updateModel
+		token.searchId = id;
 		
 		//if ((this.cached == false) || (this.listeIsSet == false)|| (this.lastIdSearch!= id))
 		//{
@@ -280,13 +299,13 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	},
 
 	_ongetById: function(evt, token)
-	{
+	{		
 		this._ongetByIdDefault(evt, token);	
 	},
 
 	update: function(obj, success, failure)
 	{
-		var token = { extSuccess:success, extFailure:failure};
+		var token = this.createNewToken(success, failure);		
 		var idType = typeof obj[this.IDField];
 		var hasId = false;
 
@@ -309,6 +328,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 
 	_onupdate: function(evt, token)
 	{
+		
 		if (typeof evt.data.push == "function"){
 			
 			for (var i = 0; i < evt.data.length; i++) {
@@ -320,7 +340,11 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
        	//Pour recharger les grilles attachées au modèle
         this._onupdateDefault(evt, token);
 	},
-
+	updateModels: function(items)
+	{
+		for (var i=0; i< items.length; i++)
+			this.updateModel(items[i]);
+	},
 	updateModel: function(item)
 	{
 		if (item == null)
@@ -374,18 +398,35 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 
 	remove: function(id, success, failure)
 	{
-		var token = {extSuccess:success, extFailure:failure};
+		var token = this.createNewToken(success, failure);		
 		var data = null;
 
 		this.restClient.del(this.url+"/"+id, "" , data, this._onremove.bind(this), failure||this.defaultErrorHandler, token);
 	},
 
 	_onremove: function(evt, token)
-	{
+	{		
 		this.removeItemFromModels(evt.data);
 		this._onremoveDefault(evt, token);
 	},	
-	
+
+
+	getHisto: function(id, success, failure)
+	{
+		var data = null;				
+		var token = this.createNewToken(success, failure);		
+		this.restClient.get(this.url+"/"+id+"/histo", "" , data, this._ongetHistoSuccess.bind(this), failure||this.defaultErrorHandler, token);	
+	},
+	_ongetHistoSuccess: function(evt, token){
+		
+		var l = new TarrayCollection();
+		l.setSource(evt.data.data);
+		l.total = evt.data.total;
+		evt.data.data = l;
+		
+		this._onsearchDefault(evt, token);
+	},
+
 	search: function(searchOptions, success, failure, opt)
 	{
 		var updateModel = true;
@@ -413,11 +454,13 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 
 		var model = this.getModel(nomModel, false);
 
-		var token = {startSearch: new Date(), url: this.url, extSuccess:success, extFailure:failure, searchOptions: searchOptions, updateModel:updateModel, nomModel:nomModel};
+		var token = this.createNewToken(success, failure);		
+		token.updateModel = updateModel;
+		token.nomModel = nomModel;
 		var data = null;
-
+		
 		if ((useCache == false) || (model == null) )
-		{
+		{			
 			this.restClient.get(this.url, searchOptions , data, this._onsearch.bind(this), failure||this.defaultErrorHandler, token);		
 		}
 		else
@@ -426,50 +469,58 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 			var data = {total: model.total, data: model};
 			model.refresh();
 			var randomWait = randomBetween(10, 100);
-			delay(token.extSuccess, randomWait, data);  
+			delay(
+				function(){
+					delete this.runningRequests[token.requestId];
+					token.extSuccess(data, token);
+				}.bind(this), 
+				randomWait, 
+				data
+			);  
 			//token.extSuccess(data);
 		}	
+		return token;
 	},
+	
 
 	_onsearch: function(evt, token)
-	{
-		var debut = new Date();
-		var tempsAppel = (debut - token.startSearch);
-		var tempsCpuServeur =  Math.round(evt.xTime);
-	
-		logger.debug("Temps total ("+tempsAppel +"ms) = Traitement serveur ("+tempsCpuServeur+"ms) + encodage/decodage Json etc ("+ (tempsAppel - tempsCpuServeur)+" ms) token.updateModel="+token.updateModel) ;
+	{		
+			var debut = new Date();
+			var tempsAppel = (debut - token.start);
+			var tempsCpuServeur =  Math.round(evt.xTime);
 		
-		if (evt.data == null){	
-			evt.data = {status: 200, responseText: "Résultat non conforme: La requête a réussi (status="+evt.req.status+") mais a renvoyé null."};
-			if (defined(token.extFailure)){
-				token.extFailure(evt, token);
-			}
-			return;
-		}
-		
-
-		if (token.updateModel)
-		{
-			//On met à jour le model
-			model = this.getModel(token.nomModel, true);			
-			model.total = evt.data.total;
-			model.setSource(evt.data.data);
-			evt.data.data = model;
-		}
-		else
-		{	
-			//On renvoie une nouvelle collection
-			var l = new TarrayCollection();
-			l.setSource(evt.data.data);
-			l.total = evt.data.total;
-			evt.data.data = l;
+			logger.debug("Temps total ("+tempsAppel +"ms) = Traitement serveur ("+tempsCpuServeur+"ms) + encodage/decodage Json etc ("+ (tempsAppel - tempsCpuServeur)+" ms) token.updateModel="+token.updateModel) ;
 			
-		}
-		
-		this._onsearchDefault(evt, token);
+			if (evt.data == null){	
+				evt.data = {status: 200, responseText: "Résultat non conforme: La requête a réussi (status="+evt.req.status+") mais a renvoyé null."};
+				if (defined(token.extFailure)){
+					token.extFailure(evt, token);
+				}
+				return;
+			}
+			
 
-		var fin = new Date();
- 		logger.debug("Temps maj model = "+ (fin - debut)+" ms") ;
- 			
+			if (token.updateModel)
+			{
+				//On met à jour le model
+				model = this.getModel(token.nomModel, true);			
+				model.total = evt.data.total;
+				model.setSource(evt.data.data);
+				evt.data.data = model;
+				
+			}
+			else
+			{	
+				//On renvoie une nouvelle collection
+				var l = new TarrayCollection();
+				l.setSource(evt.data.data);
+				l.total = evt.data.total;
+				evt.data.data = l;
+				
+			}
+			
+			this._onsearchDefault(evt, token);
+			var fin = new Date(); 			
+			logger.debug("Temps maj model (updateModel="+token.updateModel+") = "+ (fin - debut)+" ms") ;
 	}
 });

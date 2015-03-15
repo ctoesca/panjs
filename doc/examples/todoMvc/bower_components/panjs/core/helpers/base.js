@@ -98,6 +98,15 @@ if (!('some' in Array.prototype)) {
     };
 }
 
+var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+var ARGUMENT_NAMES = /([^\s,]+)/g;
+function getParamNames(func) {
+  var fnStr = func.toString().replace(STRIP_COMMENTS, '');
+  var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+  if(result === null)
+     result = [];
+  return result;
+}
 
 function randomBetween(min, max){
   return Math.floor(Math.random() * max) + min;
@@ -112,9 +121,12 @@ function exec(s)
     else
       window.eval(s);
 }
-function getDateFromTimestamp(d){
+function getDateFromTimestamp(d, dateseparator){
     var r = "";
+
     if (d != null){
+      if (arguments.length < 2)
+        var dateseparator = "/";
 
       r = new Date(parseInt(d) * 1000);
       var year = r.getFullYear();
@@ -138,7 +150,7 @@ function getDateFromTimestamp(d){
          if (sec < 10)
         sec = "0"+sec;
 
-      r = year+"/"+month+"/"+day+" "+hour + ':' + min + ':' + sec;
+      r = year+dateseparator+month+dateseparator+day+" "+hour + ':' + min + ':' + sec;
     }
     return r;
 }
@@ -412,7 +424,7 @@ String.prototype.removeEnd = function(s){
   if (this.endsWith(s))
     return this.substring(0, this.length - s.length);
   else
-    return this;   
+    return this.toString();   
 };
 
 String.prototype.removeEndCaseInsensitive = function(end)

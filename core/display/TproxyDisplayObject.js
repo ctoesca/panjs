@@ -5,6 +5,8 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 	loaded: false,
 	sourceElement:null,
 	parent: null,
+	args: null,
+	dataType: null,
 
 	/* METHODES */
 	constructor: function(args) { 
@@ -14,31 +16,44 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 		this.injectParam("sourceElement", args.sourceElement,true);
 		this.sourceElement.style.display = "none";
 		this.sourceElement.setAttribute("loaded", "false");
-  		//logger.debug("init TproxyDisplayObject: ",this.className,", id=",this.id);
+		this.dataType = this.sourceElement.getAttribute("data-compo");	
+
+		this.args = args;
+
+		if (this.args == null)
+				this.args = {};
+		
+  		//logger.debug("init TproxyDisplayObject: ",this.dataType,", id="+this.id+", args="+args);
   	},
   	load: function(args)
   	{
 		var h = this.sourceElement;
 
+		//panjs.setElementArgs(this.sourceElement, this.args);
+
+		
+
 		if ((h != null) && (this.loaded == false))
-		{
-			var dataType = h.getAttribute("data-compo");	
-		
+		{	
 			var origId = h.originalId;
-		
+			logger.debug("LOADING "+this.dataType+"."+origId);
 
-			if (arguments.length == 0)
+			this.args.elem = h;
+			this.args.parent = this.parent;
+
+			if (arguments.length > 0)
 			{
-				var args = {elem:h, parent: this.parent};
-			}
-			else{
-				args.elem = h;
-				args.parent = this.parent;
+				for (var k in args){
+					this.args[k] = args[k];
+
+				}
 			}
 
-			this.dispatchEvent( new Tevent( Tevent.BEFORE_LOAD, {args:args, dataType:dataType}));
-			var compo = panjs.createComponent(dataType,args);	
-		
+			this.dispatchEvent( new Tevent( Tevent.BEFORE_LOAD, {args:this.args, dataType:this.dataType}));
+			var compo = panjs.createComponent(this.dataType,this.args);	
+	
+	
+
 			compo.parent = this.parent;
 			h.owner[origId] = compo;
 		
@@ -52,7 +67,8 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 	
 			h.setAttribute("id", h.owner.id+"_"+origId);
 
-			this.dispatchEvent( new Tevent( Tevent.LOADED, compo));
+			var evt = new Tevent( Tevent.LOADED, compo);
+			this.dispatchEvent( evt);
 			return compo;
 		}
   	},

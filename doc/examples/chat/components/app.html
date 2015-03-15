@@ -1,0 +1,152 @@
+<html>        
+<head>
+ <link rel="stylesheet" href="../css/app.css"/>
+ <script src="/libs/sockjs/0.3.4/sockjs.min.js"></script>
+
+<style>
+
+</style>
+<script type="text/x-class-definition">
+//<![CDATA[
+uses("core.helpers.Ttimer");
+defineClass("app", "core.display.Telement", { 
+
+	baseElement: "div",	
+	sock: null,
+	sockId: null,
+	timer: null,
+	clientId: Math.round(Math.random() * 1000000000),
+	url: 'http://127.0.0.1:8889/echo',
+
+	constructor: function(args){ 
+		this._super.constructor.call(this,args);	
+		this.timer = new Ttimer({delay: 1000, onTimer: this.onTimer.bind(this)});
+		
+  		this.sockId = false;
+  		this.connect();
+	},
+	onTimer: function(e){
+		this.connect();
+	},
+	disconnect: function()
+	{
+	  if (this.sock != null){
+	  	this.sock.close(); 
+	  	this.sock = null;
+	  }
+	},
+
+	connect: function(){
+		this.disconnect();
+		logger.debug('connect');
+
+		this.sock = new SockJS(this.url,null);
+		this.sock.onclose = this.onclose.bind(this);
+		this.sock.onopen = this.onopen.bind(this);
+		this.sock.onmessage = this.onmessage.bind(this);
+	},
+
+	onclose: function(e){
+		this.appendMessage('system', 'Connection closed! code='+e.code+", reason="+e.reason+", wasClean="+e.wasClean);
+		
+		this.sockId = false;
+		this.timer.start();
+	    //setTimeout( connect, 2000);
+	},
+	onopen: function(e){
+		logger.debug("onopen");
+		this.appendMessage('system', 'Connected! Welcome to SockJS chat demo.');
+		this.sock.send(JSON.stringify({
+			type: 'session',
+			clientId: this.clientId
+		}));
+		this.timer.stop();
+	},
+	onmessage: function(e){
+		var data = JSON.parse(e.data);
+
+		logger.debug("sockid = "+data.id+" type="+data.type);
+		switch ( data.type ) {
+
+				case 'newUser':
+				this.appendMessage('system', 'A new user has joined');
+				break;
+
+				case 'message':
+				this.appendMessage('message', data.message, data.id);
+				var audio = new Audio('/libs/sound/chat_message_notify.mp3');
+				audio.play();
+				break;
+
+				case 'history':
+				this.chat.innerHTML = "";
+				this.appendMessage('message', data.message);
+				this.sockId = data.id; 
+				break;
+
+				case 'userLeft':
+				this.appendMessage('system', 'A user has left');
+				break;
+		}
+	},
+
+	appendMessage:function(type, message, id) 
+	{
+	  var p, i, l;
+
+	  if ( typeof message == 'string' ) message = [message];
+	  for ( i = 0, l = message.length; i < l; i++ ) {
+	    p = document.createElement('p');
+	    p.className = type;
+	    if ( id === this.sockId ) {
+	      p.className = 'me';
+	      p.id = id;
+	    }
+	    p.innerHTML = message[i].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+	    this.chat.append($(p));
+	   
+
+	  }
+
+	 // t.animate({"scrollTop": t[0].scrollHeight}, "slow");
+	  this.chatWindow.scrollTop(1E10);
+	},
+
+	sendMessage: function(e) 
+	{
+		if(event.which != 13){
+   return false;
+    }
+
+	  if ( !this.sockId || ! this.message.val().length ) return;
+	  var strData = JSON.stringify({
+	    type: 'text',
+	    message:  this.message.val().substr(0, 128)
+	  });
+
+	  this.sock.send(strData);
+	  this.message.val('');
+	
+	}
+
+});
+
+//]]>
+</script>
+
+</head>
+
+<body>	
+ <div id="chatWindow">
+    <div id="chat" >
+      <p class="system">Connecting...</p>
+    </div>
+  </div>
+
+  <input id="message" type="text" placeholder="Type your message here" data-onkeyup="this.sendMessage" />
+   
+<button id="disconnectBtn" type="text" name="disconnect" data-onclick="this.disconnect">disconnect</button>
+   <button id="connectBtn" type="text" name="connect" data-onclick="this.connect">connect</button>
+
+</body>
+</html> 

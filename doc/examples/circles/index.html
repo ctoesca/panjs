@@ -9,6 +9,7 @@
    <META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="en-EN,en"/>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="../../../lib/defineObject.js"></script>
 
    <script>
     //<![CDATA[  
@@ -34,8 +35,148 @@
   <script>
     $(document).ready(function() 
     {  
-      panjs.load($(document.body)) ;   
+      //Create a base class with some default methods
+      var Base = defineObject({
+        hello: function() {
+          console.log("hello world!");
+        }
+      });
+
+      //Extend from the base class
+      var Animal = Base.extend({
+        //a initialization method with side-effects
+        //that luckily will not get called when the Animal object is extended from
+        __init__: function() {
+          //this.launchRockets();
+        },
+        sound: 'silence',
+        weight: 0,
+        vocalize: function() {
+          console.log(this.sound);
+        }
+      }).properties({
+        
+        testfield : { 
+            configurable: true,
+            enumerable: true,
+            get: function(){
+                alert('get ok');
+                return this["__tesfield"];
+            },
+            set: function(v){
+              alert('set ok');
+                this["__tesfield"] = v;
+                //this["on_var1_changed"]();
+            }
+        }
+
     });
+
+      var Logger = Base.extend({
+        __init__: function() {
+          this.logHistory = [];
+        },
+        classname: "?",
+        log : function(msg) {
+          this.logHistory.push(msg);
+          console.log(this.classname+" - "+ msg)
+        }
+
+      });
+
+      //Define the Dog object extending from Animal while mixing in Logger.
+      var Dog = Animal.extend({
+
+        __init__ : function(weight) {
+          this.weight = weight;
+          this.classname = "DOG";
+          Dog.__super__.__init__.call(this); //-- if you need to have access to the Animal initialization method
+        },
+        sound : 'woof',
+        launchRockets: function(){
+        },
+        vocalize : function() {
+          Dog.__super__.vocalize.call(this); // Calling 'super' methods remains about the same.
+          this.log("dog is vocalizing");
+        },
+        drool: function() {
+          console.log("I want what you're having.");
+          this.log("dog is drooling")
+        }
+      }).mixin(Logger);
+
+      /*var def = {
+      tesfield: { 
+            configurable: true,
+            enumerable: true,
+            get: function(){
+                alert('get ok '+this.testfunc);
+                return this["__tesfield"];
+            },
+            set: function(v){
+              alert('set ok');
+                this["__tesfield"] = v;
+                //this["on_var1_changed"]();
+            }
+        }
+      };*/
+
+      //function Car(){};
+      //var mycar  = Object.create(Car.prototype, def);
+     // mycar.tesfield = "titi";
+      //Tobj.constructor = 
+       // var o = new Tobj();
+
+
+   /*  var O = defineObject()
+    .properties({
+        
+        testfield : { 
+            configurable: true,
+            enumerable: true,
+            get: function(){
+                alert('get ok '+this.testfunc);
+                return this["__tesfield"];
+            },
+            set: function(v){
+              alert('set ok');
+                this["__tesfield"] = v;
+                //this["on_var1_changed"]();
+            }
+        },
+        test: function(){
+          alert('test');
+        },
+        testfunc : {
+          value : function(){
+            alert('testfunc');
+            },
+          writable : false
+        }
+    });
+
+  var o = new O();
+  console.log(o.testfield);
+  o.testfield = 'error'; //error
+  o.testfunc();
+*/
+
+
+      //var dog = new Animal();    
+      //dog.tesfield = "toto";
+      //alert(dog.tesfield);
+      /*dog.hello();
+      dog.vocalize();
+      dog.drool();
+      console.log("History", dog.logHistory);
+
+      console.log( dog instanceof Dog ); //true
+      console.log( dog instanceof Animal); //true
+      console.log( dog.constructor === Dog); //true
+      console.log( dog instanceof Logger); //false */
+
+      panjs.load($(document.body)) ;   
+    });    
   </script>
 </head>
 

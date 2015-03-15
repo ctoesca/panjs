@@ -23,9 +23,15 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 	_statesElements: null,
 	currentState: null,
 	defaultState: null,
+	_bindElements : null,
+	__bindings:null,
+
+
+
 	/* METHODES */	
 	constructor: function(args) { 	
-	
+		this._bindElements = [];
+		this.__bindings = { html: [] };
 		TdisplayObjectContainer._super.constructor.call(this,args);
 		this._statesElements = [];
 		this.currentState = [];
@@ -38,6 +44,63 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 
   		//logger.debug("init TdisplayObjectContainer: "+this.className+". args="+args);
   	},
+
+	bindEvent: function(el, evtName) {
+		var on_evt_attr = el.attr("data-on"+evtName);
+
+		if (on_evt_attr)
+		{
+			if (on_evt_attr.startsWith("{{")){
+				var script = on_evt_attr.droite("{{").gauche("}}");
+				var f = new Function(script).bind(this);
+				el.on(evtName, f);
+			}else{
+				var script = 'arguments[0].on("'+evtName+'", '+on_evt_attr+'.bind(this))';
+		    	var sl = new Function(script).bind(this);
+		    	sl(el, evtName);		
+			}
+		    //this._bindElements.push(el);
+		}	
+    },
+    bindEvents: function(el) {
+    	var events = ["click", "change", "blur", "blur", "keyup", "dblclick"]; 	
+    	for (var i=0; i< events.length; i++){
+    		this.bindEvent(el, events[i]);
+    	}	
+    	this.bind(el);
+    },
+
+   	bind: function(el) {
+   		var html = el.html();
+    	if (html.match(/\{\{.*\}\}/))
+    	{
+			el.tempFn = doT.template(html).bind(this);
+			this.__bindings.html.push({template: html, element: el, tempFn: el.tempFn});
+    	}
+    },
+	renderBindings: function(){
+		for (var i=0; i < this.__bindings.html.length; i++)
+		{
+			var b = this.__bindings.html[i];
+			logger.debug("RENDER "+b.template);
+			try{
+				b.element.html( b.tempFn(this) );	
+			}catch(err){
+				logger.error(err);
+			}
+			
+		}
+	},
+    free: function(){
+
+		TdisplayObjectContainer._super.free.call(this);
+		//inutile de désaffecter les events sur les objets jquery car remove() le fait.
+		//!!par contre, ce n'est pas le cas pour les composants panjs (il faut appeler free() sur tous les compo)
+	},
+	__OnPropChanged: function(propName, oldValue, newValue){
+		logger.debug("__OnPropChanged : propName = "+propName+", oldValue = "+oldValue+", newValue = "+newValue);
+		this.renderBindings();		
+	},
   	processStates:function(element)
   	{
 		var includeIn = element.getAttribute("includeIn");
@@ -87,9 +150,9 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 	},
 
 	_setStateElementVisible: function(visible, state)
-	{
+	{ 
  		if (visible)
-		{	    
+		{	   
 				//on affiche l'élément
 				if (this[state.elem.originalId])
 				{
@@ -174,6 +237,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 							break;
 					}
 				}
+				
 			}
 			
 			flag = true;						
@@ -225,7 +289,8 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 
 
 						if (dataType == null)
-						{			
+						{	
+							var jqobj = $(el);		
 							if ((setObject)&&(id != null))
 							{
 								if (defined(this[id]))
@@ -233,11 +298,11 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 							
 								//logger.debug('Affectation '+id+' sur objet '+this.className);
 								var fId = panjs.getFormatedIdName(id);
-
-								this[fId] = $(el);
+								this[fId] = jqobj;
 								r.push(id);	
 							}
-
+							this.bindEvents( jqobj );
+							
 							this._populateElements(el,setObject, r);
 						}
 						else
@@ -260,7 +325,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 							
 										panjs.stack.push("Unable to create "+dataType+" : "+compo.message);
 									}*/
-
+								
 									compo.parent = this;
 
 									if ((setObject)&&(id != null))
@@ -335,6 +400,8 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 						
 						var c = document.createElement("div");
 						c.setAttribute("data-class", "content");
+						
+
 
 						element.replaceChild(c, el);					
 						this.content = $(c);
@@ -344,6 +411,8 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 					
 				}
 		}
+		
+		
 		return r;
 
 	}  	
