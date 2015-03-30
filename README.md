@@ -55,6 +55,7 @@ You put a component in HTML page (or in another HTML component) like this:
        clickCount:0,
        constructor: function(args){
     	    this._super.constructor.call(this,args);  
+    	    this.btnSubmit.on("click", this.onSubmit.bind(this));
        },
        onSubmit: function(){
           this.clickCount ++;
@@ -66,7 +67,7 @@ You put a component in HTML page (or in another HTML component) like this:
   </head>
   
   <body>
-     <button type="submit" id="btnSubmit" class="btn btn-danger" data-onclick="this.onSubmit">Click here</button>
+     <button type="submit" id="btnSubmit" class="btn btn-danger">Click here</button>
      <span id="result" class="result"></span>
   </body>
 </html>

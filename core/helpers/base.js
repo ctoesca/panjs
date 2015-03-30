@@ -112,15 +112,7 @@ function randomBetween(min, max){
   return Math.floor(Math.random() * max) + min;
 }
 
-function exec(s)
-{           
-  if (s == "") return;  
 
-  if (typeof window.execScript != "undefined")
-      window.execScript(s);  //Porté globale (eval sur IE n'a pas de porté globale)
-    else
-      window.eval(s);
-}
 function getDateFromTimestamp(d, dateseparator){
     var r = "";
 

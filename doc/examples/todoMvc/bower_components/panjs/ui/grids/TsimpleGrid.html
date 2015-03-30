@@ -445,7 +445,7 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 		return r;
 	},
 
-	getItemByPrimaryKey: function(key)
+	getItemByPrimaryKeyValue: function(key)
 	{
 		if (this._dataProvider == null)
 			return null;
@@ -832,7 +832,7 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 
 		if (itemId != null)
 		{
-			var item = this.getItemByPrimaryKey(itemId);
+			var item = this.getItemByPrimaryKeyValue(itemId);
 
 			if (item != null){
 

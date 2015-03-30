@@ -247,6 +247,17 @@
      // }
   
   }
+  
+  panjs.exec = function(s){
+
+    if (s == "") return;  
+
+    if (typeof window.execScript != "undefined")
+        window.execScript(s);  //Porté globale (eval sur IE n'a pas de porté globale)
+      else
+        window.eval(s);
+
+  }
 
   panjs._load = function(element)
   { 
@@ -1063,7 +1074,7 @@ defineClass("Tloader", "core.Tobject", {
       if (r.result)
       {
           r.data = this.processCode(r.data, className);
-          exec(r.data);
+          panjs.exec(r.data);
 
           if (panjs.setSourceInComponents)
           window[className].prototype.source = r.data;
@@ -1239,7 +1250,7 @@ defineClass("Tloader", "core.Tobject", {
       { 
         script = this.processCode(script, className); 
       }
-      exec(script);
+      panjs.exec(script);
     }
     else
     {      
@@ -1252,7 +1263,7 @@ defineClass("Tloader", "core.Tobject", {
           r.data = this.processCode(r.data, className)
         }
 
-        exec(r.data);
+        panjs.exec(r.data);
         this.loadedJs[url.toLowerCase()] = 1;
       
       }else{

@@ -361,6 +361,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 				for (var i=0; i< itemModels.length; i++)
 				{
 					var itemModel = itemModels[i].item;
+
 					if (item.date_modif < itemModel.date_modif)
 					{
 						logger.warn("ATTENTION: l'objet reçu "+this.className+" est obsolète ! Il ne sera pas mis à jour dans le model");
@@ -370,8 +371,9 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 					{
 						//if (item.date_modif != itemModel.date_modif){
 							//L'item existe
-							logger.info("Item Modifiée");
 							itemModels[i].model.replaceItem(itemModel, item);
+							logger.info("Objet "+this.className+" modifié");
+
 						/*}else
 						{
 							logger.debug("La date de modification de l'objet n'a pas changé: item.date_modif ="+item.date_modif+", itemModel.date_modif="+itemModel.date_modif);
@@ -384,8 +386,8 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	       	{
 	       		//création ou pas dans le model
 	       		if (item._isNew == true){
-					logger.info("Création item");
 					this.addItemInModels(item);
+					logger.info("Objet "+this.className+" ajouté");
 	       			
 	       		}
 	       	}	

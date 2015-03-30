@@ -27,7 +27,7 @@ defineClass("app", "core.display.Telement", {
 		for (var i = 0; i < 10; i++) {
 			this.data.push( { key:"var"+i, value:i });
 		};
-		this.collection = new TarrayCollection({data:this.data, filterFunction: this.filterFunction});
+		this.collection = new TarrayCollection({key:"key", data:this.data, filterFunction: this.filterFunction});
 		//this.collection.filterFunction = this.filterFunction;
 		//this.collection.refresh();
 		this.grid.primaryKeyFields = ["key"];

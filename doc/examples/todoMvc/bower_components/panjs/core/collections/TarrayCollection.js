@@ -30,7 +30,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
           this.filterFunction = args.filterFunction;
       }
     }
-    
+
     this._byId = {};
     this.setSource(data);
     
@@ -68,13 +68,13 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
   		if (this._source != value)
   		{
   			this._source = value;
-        var start = new Date().getTime();
-        if (this.filterFunction != null)
+        
+        if (this.filterFunction != null){
           this._items = this._source.filter( this.filterFunction );
-        else
-          this._items = this._source;
-
-        var end = new Date().getTime();
+        }
+        else{
+          this._items = this._source.slice(0);
+        }
 
         if (this.key != null)
         {
@@ -173,7 +173,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
       if (this.filterFunction != null)
         this._items = this._source.filter( this.filterFunction );
       else
-        this._items = this._source;
+         this._items = this._source.slice(0);
 
       this.length = this._items.length;
      
@@ -190,12 +190,11 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
     */
     _getItemIndex: function(item, list)
     {
-      for (var i=0; i<list.length; i++)
+      for (var k=0; k<list.length; k++)
       {
-        if (list[i] == item)
-          return i;
+          if (list[k] == item)
+            return k;
       }
-
       return -1;
     },
     getItemIndex: function(item)
@@ -214,77 +213,106 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
     /*
     ******************** MODIFICATION DE LA COLLECTION ************************
     */
+    _replaceItem: function(indx, item, newItem){
+      
+      this._items[indx] = newItem;
+      if (this.key != null)
+      {
+        this._byId[item[this.key]] = newItem;
+        this.dispatchEvent( new Tevent(Tevent.UPDATE, item));
+      }
+              
+      this.length = this._items.length;      
+      this.dispatchEvent( new Tevent(Tevent.REPLACE, {item:item, newItem: newItem}));
+      this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REPLACE",item:item, newItem: newItem}));
+    },
+
     replaceItem:function(item, newItem)
-    {
+    { 
       if (item == newItem)
         return;
-        var indx = this.getItemIndex(item);
+
+        var indx = this._getItemIndex(item, this._source);
         if (indx > -1)
-        {
-          
-          this._source[ this._getItemIndex(item, this._source) ] = newItem;
-
-          if ((this.filterFunction == null) || (this.filterFunction(newItem)))
+          this._source[ indx] = newItem;
+        
+        indx = this.getItemIndex(item);
+        if (indx > -1)
+        {                 
+          if (this.filterFunction == null)
           {
-              this._items[indx] = newItem;
-              if (this.key != null){
-                this._byId[item[this.key]] = newItem;
-                this.dispatchEvent( new Tevent(Tevent.UPDATE, item));
+            this._replaceItem(indx, item, newItem);
+          }else
+          {          
+              if (this.filterFunction(newItem))
+              {
+                //Filtre OK
+                this._replaceItem(indx, item, newItem);
+
               }
-
-              this.length = this._items.length; 
-             
-              this.dispatchEvent( new Tevent(Tevent.REPLACE, {item:item, newItem: newItem}));
-              this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REPLACE",item:item, newItem: newItem}));
-
-
-          }else{
-             if (this.filterFunction && !this.filterFunction(newItem))
-              this._removeItemAt(indx, newItem);
+              else
+              {
+                //Filtre KO
+                this._removeItemAt(indx, newItem);
+              }
           }
           
+       }
+    },
+    _addItemAt: function(indx, item)
+    {   
+
+        if (this.key != null)
+        {
+          if (typeof this._byId[item[this.key]] != "undefined")
+          {
+            throw "Key already in collection: "+item[this.key];
+          }
+          this._byId[item[this.key]] = item;
         }
+        
+        this._items.splice(indx, 0, item);
+        this.length = this._items.length;    
+
+        this.dispatchEvent( new Tevent(Tevent.ADDED, {item:item, index:indx}));
+        this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:item, index:indx}));
     },
 
   	addItem: function(item)
-  	{ 
+  	{
         this._source.push(item);
 
         if ((this.filterFunction == null) || (this.filterFunction(item)))
         {
-          var indx = this.getItemIndex(item);
- 
-          this._items.push(item);
-          this.length = this._items.length;    
-          if (this.key != null)
-            this._byId[item[this.key]] = item;
-
-          this.dispatchEvent( new Tevent(Tevent.ADDED, {item:item, index:this.length-1}));
-          this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:item, index:this.length-1}));
+          var indx = this.getItemIndex(item);          
+          if (indx == -1)
+          {
+             this._addItemAt(this.length, item);
+          }
         }
   	},
 
     addItemsAt: function(items, indx)
     { 
-
-      var position = indx;
-      for (var i=0; i<items.length; i++)
+      if (indx > this.length)
       {
-        this._source.push(items[i]);
-        if ((this.filterFunction == null) || (this.filterFunction(items[i])))
+        this.addItems(items);
+      }else{
+        var position = indx;
+        for (var i=0; i<items.length; i++)
         {
-          this._items.splice(position, 0, items);
-          position ++;
-          if (this.key != null)
-            this._byId[items[i][this.key]] = items[i];
-          
-          this.length = this._items.length;   
-          this.dispatchEvent( new Tevent(Tevent.ADDED, {item:items[i], index:position}));
-          this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:items[i], index:position}));
-        }
+          this._source.push(items[i]);
+          if ((this.filterFunction == null) || (this.filterFunction(items[i])))
+          {
+            var indx = this.getItemIndex(items[i]);   
+            if (indx > -1){
+              position ++;         
+              this._addItemAt(position, items[i]);  
+            }
+            
+          }
+        }     
       }
-
-      this.dispatchEvent( new Tevent(Tevent.REFRESH, this));
     },
 
     addItems: function(items)
@@ -293,19 +321,15 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
     },
     addItemAt: function(item, indx)
     {
-        this._source.push(item);
-        if ((this.filterFunction == null) || (this.filterFunction(item)))
-        {
-          this._items.splice(indx, 0, item);
-
-          if (this.key != null)
-            this._byId[item[this.key]] = item;
-
-          this.length = this._items.length;    
-          this.dispatchEvent( new Tevent(Tevent.ADDED, {item:item, index:indx}));
-          this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"ADDED", item:item, index:indx}));
+        if (indx > this.length){
+          this.addItem(item)
+        }else{
+            this._source.push(item);
+            if ((this.filterFunction == null) || (this.filterFunction(item)))
+            {
+              this._addItemAt(indx, item );
+            }       
         }
-       
     },
 
   	removeItem: function(item)
@@ -313,13 +337,12 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
   		var indx = this.getItemIndex(item);
   		if (indx >= 0){
   			this._removeItemAt(indx, item);
-
       }
       return indx;
   	},
   	
   	removeItemAt: function(indx)
-  	{
+  	{ 
   		var item = this.getItemAt(indx);
       if (item != null)
   		  this._removeItemAt(indx, item);
@@ -342,6 +365,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
   		this._items.splice(indx, 1);
 
       var indxSource = this._getItemIndex(item, this._source);
+     
       if (indxSource>= 0)
         this._source.splice(indxSource, 1);
  
