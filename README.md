@@ -5,6 +5,9 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 <br/>You can integrate panJS in a existing application (only parts of the application can be managed by panJs).
 </p>
 <p><a href="http://www.nexilearn.fr/libs/panjs/0.6.1/examples/"><b>Demo</b></p>
+
+<p><a href="http://www.nexilearn.com/libs/panjs/trunk/doc/tutorial/index.html#main=getting_started"><b>Tutorial</b></p>
+
 ## Feature Highlights
 
 * A component is a HTML file that contains CSS, JS, HTML, css <link> like any Html file
