@@ -1,50 +1,19 @@
-# Framework Name TodoMVC Example
+# TodoMVC App Template
 
-> Short description of the framework provided by the official website.
+> Template used for creating [TodoMVC](http://todomvc.com) apps
 
-> _[Framework Name - framework.com](link-to-framework)_
-
-
-## Learning Framework Name
-
-The [Framework Name website]() is a great resource for getting started.
-
-Here are some links you may find helpful:
-
-* [Documentation]()
-* [API Reference]()
-* [Applications built with Framework Name]()
-* [Blog]()
-* [FAQ]()
-* [Framework Name on GitHub]()
-
-Articles and guides from the community:
-
-* [Article 1]()
-* [Article 2]()
-
-Get help from other Framework Name users:
-
-* [Framework Name on StackOverflow](http://stackoverflow.com/questions/tagged/____)
-* [Mailing list on Google Groups]()
-* [Framework Name on Twitter](http://twitter.com/____)
-* [Framework Name on Google +]()
-
-_If you have other helpful links to share, or find any of the links above no longer work, please [let us know](https://github.com/tastejs/todomvc/issues)._
+![](https://github.com/tastejs/todomvc-app-css/raw/master/screenshot.png)
 
 
-## Implementation
+## Getting started
 
-How is the app structured? Are there deviations from the spec? If so, why?
+- Read the [Application Specification](https://github.com/tastejs/todomvc/blob/master/app-spec.md) before touching the template.
 
+- Delete this file and rename `app-readme.md` to `readme.md` and fill it out.
 
-## Running
-
-If there is a build step required to get the example working, explain it here.
-
-To run the app, spin up an HTTP server and visit http://localhost/.../myexample/.
+- Clone this repo and install the dependencies with [npm](https://npmjs.com) by running: `npm install`.
 
 
-## Credit
+## License
 
-This TodoMVC application was created by [you]().
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/4.0/80x15.png" /></a><br />This <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" rel="dct:type">work</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://sindresorhus.com" property="cc:attributionName" rel="cc:attributionURL">TasteJS</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/deed.en_US">Creative Commons Attribution 4.0 International License</a>.

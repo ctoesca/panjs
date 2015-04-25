@@ -73,7 +73,7 @@ defineClass("TmaskInput", "core.display.Telement", {
 	},
 	enabled: function(v){
 		if (v)
-			this.container.attr("disabled", "");
+			this.container.removeAttr("disabled");
 		else
 			this.container.attr("disabled","disabled");
 		

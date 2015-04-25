@@ -256,6 +256,7 @@
         window.execScript(s);  //Porté globale (eval sur IE n'a pas de porté globale)
       else
         window.eval(s);
+   
 
   }
 

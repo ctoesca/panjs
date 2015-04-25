@@ -1,10 +1,10 @@
 <html>        
 <head>
 <script>
-	var CKEDITOR_BASEPATH = '/libs/ckeditor/4.0/';
+	var CKEDITOR_BASEPATH = '/libs/ckeditor/4.0_full/';
 </script>
-<script src="/libs/ckeditor/4.0/ckeditor.js"></script>
-<script src="/libs/ckeditor/4.0/adapters/jquery.js"></script>
+<script src="/libs/ckeditor/4.0_full/ckeditor.js"></script>
+<script src="/libs/ckeditor/4.0_full/adapters/jquery.js"></script>
 
 
 <style type="text/less">
@@ -51,23 +51,31 @@ defineClass("Teditor", "core.display.Telement", {
 		]);*/
 
 		this.container.getElement("textarea").ckeditor(
-		{
-			baseHref: this.baseHref,
-			onSave: this._onSave.bind(this),
-			onClose: this._onClose.bind(this),
-			stylesSet: [
-			{ name: 'Well' , element: 'div', attributes: { 'class': 'well' }  },
-			{ name: 'Alert success' , element: 'div', attributes: { 'class': 'alert alert-success' }  },
-			{ name: 'Alert danger' , element: 'div', attributes: { 'class': 'alert alert-danger' }  },
-			{ name: 'label primary' , element: 'span', attributes: { 'class': 'label label-primary' }  },
-			{ name: 'Page header' , element: 'div', attributes: { 'class': 'page-header' }  },
-			{ name: 'small' , element: 'small'  },
-			{ name: 'table' , element: 'table',  attributes: { 'class': 'table table-bordered table-responsive table-striped' }  },
-		
+			function(e){
+				alert('ready');
+			},
+			{
+				baseHref: this.baseHref,
+				removeButtons: 'undo',
+				extraPlugins : 'closebtn,savebtn,colorbutton,preview,colordialog',
+				removePlugins: 'save,forms,language,showblocks,showborders,smiley,wsc,find,bidi,about,a11yhelp,selectall,clipboard,pastetext,flash',
+				language: 'fr',
+				onSave: this._onSave.bind(this),
+				onClose: this._onClose.bind(this)/*,
+				stylesSet: [
+				{ name: 'Well' , element: 'div', attributes: { 'class': 'well' }  },
+				{ name: 'Alert success' , element: 'div', attributes: { 'class': 'alert alert-success' }  },
+				{ name: 'Alert danger' , element: 'div', attributes: { 'class': 'alert alert-danger' }  },
+				{ name: 'label primary' , element: 'span', attributes: { 'class': 'label label-primary' }  },
+				{ name: 'Page header' , element: 'div', attributes: { 'class': 'page-header' }  },
+				{ name: 'small' , element: 'small'  },
+				{ name: 'table' , element: 'table',  attributes: { 'class': 'table table-bordered table-responsive table-striped' }  },
 			
-			],
-			contentsCss : '/libs/twitter-bootstrap/3.0.0/css/bootstrap.css'
-		});
+				
+				],
+				contentsCss : '/libs/twitter-bootstrap/3.0.0/css/bootstrap.css'*/
+			}
+		);
 
       if (this.editor == null)
       {
@@ -85,7 +93,7 @@ defineClass("Teditor", "core.display.Telement", {
      	$(window).resize( this.resize.bind(this));
 	},
 	setBaseHref: function(baseHref){
-		alert(baseHref);
+	
 		this.editor.ckeditorGet().config.baseHref=baseHref;
 	},
 	show: function(args)
@@ -121,11 +129,11 @@ defineClass("Teditor", "core.display.Telement", {
    		this.editor.execCommand('maximize');
 	},
 	_onSave: function(e)
-	{
+	{alert('_onSave');
 		this.dispatchEvent( new Tevent("ON_SAVE", this));
 			
 	},
-	_onClose: function(e){
+	_onClose: function(e){alert('_onClose');
 		var state = CKEDITOR.instances[this.editorId].commands.maximize.state; //1=FullScree, 2=Normal
 		if (state == 1)
 		this.editor.execCommand('maximize');

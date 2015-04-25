@@ -328,15 +328,17 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 
 	_onupdate: function(evt, token)
 	{
-		
-		if (typeof evt.data.push == "function"){
-			
-			for (var i = 0; i < evt.data.length; i++) {
-				this.updateModel(evt.data[i]);
-			};
+		if (evt.data == null){
+			logger.error("TcrudGenericCalls._onupdate: evt.data est null");
 		}else{
-			this.updateModel(evt.data);
-		}
+			if (typeof evt.data.push == "function"){
+				for (var i = 0; i < evt.data.length; i++) {
+					this.updateModel(evt.data[i]);
+				};
+			}else{
+				this.updateModel(evt.data);
+			}
+		}	
        	//Pour recharger les grilles attachées au modèle
         this._onupdateDefault(evt, token);
 	},
