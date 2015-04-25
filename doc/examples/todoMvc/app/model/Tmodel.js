@@ -20,8 +20,11 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 			this.todos = new TarrayCollection( {key: "id", data:data } );
 		}
 	},
-	_save: function(){
-		localStorage.setItem(this.STORAGE_ID, JSON.stringify(this.todos._source));
+	save: function(success, failure){
+
+		localStorage.setItem(this.STORAGE_ID, JSON.stringify(this.todos._items));
+		if (defined(success))
+			success(this.todos);
 	},
 
 	getAll: function (success, failure, opt) 
@@ -53,7 +56,7 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 		}else{
 			for (var k in obj){
 				for (var i=0; i< this.todos.length; i++){
-					var item = this.todos._source[i];
+					var item = this.todos._items[i];
 					if (item[k] == obj[k])
 						r.push(item);
 				}
@@ -62,25 +65,36 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 		
 		this.todos.setSource(r);
 	},
-	save: function(todo, success, failure)
-	{
-		if (this.todos == null) 
-			this._load();
-
-		if (typeof todo.id == "undefined"){
-			todo.id = generateUUID();
-			this.todos.addItemAt(todo, 0);			
-		}else{
-			var todoModel = this.todos.getByProp("id", todo.id);
-			this.todos.replaceItem(todoModel, todo);
-		}
-		this._save();
-		if (defined(success))
-			success(todo);
+	addNewItem: function(item){
+		item.id = generateUUID();
+		item.completed = false;
+		this.todos.addItemAt(item, 0);
+		this.save();
 	},
+	toggleAll: function(completed)
+	{
+		for (var i=0; i< this.todos.length; i++){
+			var item = this.todos._items[i];
+			item.completed = completed;
+			this.todos.sendUpdateEvent(item);
+		}
+		this.save();
+	},
+	toggleItem: function(item, completed)
+	{
+		item.completed = completed;
+		this.todos.sendUpdateEvent(item);
+		this.save();
+	},
+
+	clearCompleted: function(){
+		var completedTodos = this.getTodosCompleted();
+		for (var i=0; i< completedTodos.length; i++)
+			this.todos.removeItem(completedTodos[i]);
+		this.save();
+	},
+
 	getTodosCompleted: function(){
-		if (this.todos == null) 
-			this._load();
 		var r = this.todos.find({
 				filterFunction: function(item){
 					return item.completed;

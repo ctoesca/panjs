@@ -226,7 +226,9 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
       this.dispatchEvent( new Tevent(Tevent.REPLACE, {item:item, newItem: newItem}));
       this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REPLACE",item:item, newItem: newItem}));
     },
-
+    sendUpdateEvent: function(item){
+       this.dispatchEvent( new Tevent(Tevent.UPDATE, item));
+    }, 
     replaceItem:function(item, newItem)
     { 
       if (item == newItem)

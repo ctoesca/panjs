@@ -1,5 +1,14 @@
 <html>        
 <head>
+<style>
+.disable-select {
+  -webkit-user-select: none;  
+  -moz-user-select: none;    
+  -ms-user-select: none;      
+  user-select: none;
+}
+
+</style>
 <script type="text/x-class-definition">
 //<![CDATA[
 
@@ -9,15 +18,17 @@ defineClass("TtodoItem", "core.display.Telement", {
 	model: null,
 	todo:null,
 
+
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);	
 		this.model = args.model;
 		this.setTodo( args.todo );
+		
 	},
 
 	setTodo: function( todo){
 		this.todo = todo;
-		this.render();
+		this.render();		
 	},
 
 	render: function(){
@@ -32,26 +43,38 @@ defineClass("TtodoItem", "core.display.Telement", {
 
 	//Events from UI
 	onDestroyClick: function(e){
-		this.model.removeById(this.todo.id);
+		this.model.todos.removeItem(this.todo);
+		this.model.save();
+		this.free();
 	},
+
 	onToggleCompletedClick: function(e){
-		this.todo.completed = $(e.target).prop("checked");
-		this.model.save(this.todo);
+		this.model.toggleItem( this.todo, $(e.target).prop("checked") );
+		this.model.save();
 	},
+
 	onStartEditing: function(e){
+		
 		this.container.addClass("editing");
 		this.edit1.focus();
+			
+		//cursor at end (FF)
+		this.edit1.val("");
+		this.edit1.val(this.todo.body);
 	},
+	
+
 	onEndEditing: function(e){
 		this.todo.body = this.edit1.val();
-		this.model.save(this.todo);
+		this.model.save();
 		this.container.removeClass("editing");
+		this.render();
 	},
 	onEditKeyUp: function(e){
 
 		if (e.which === 27) {
 			this.container.removeClass('editing');
-			this.edit1.val(this.todo.body);
+			
 		}
 
 		if (e.which === 13) {
@@ -65,8 +88,8 @@ defineClass("TtodoItem", "core.display.Telement", {
 
 </head>
 
-<body>	
-		<div class="view">
+<body>
+		<div class="view disable-select">
 			<input id="checkbox1" data-onclick="this.onToggleCompletedClick" class="toggle" type="checkbox" checked="checked" />
 			<label id="label1" data-ondblclick="this.onStartEditing"></label>
 			<button id="btn1" data-onclick="this.onDestroyClick" class="destroy"></button>

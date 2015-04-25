@@ -74,23 +74,25 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
    		var html = el.html();
     	if (html.match(/\{\{.*\}\}/))
     	{
-			el.tempFn = doT.template(html).bind(this);
-			this.__bindings.html.push({template: html, element: el, tempFn: el.tempFn});
+			var tempFn = doT.template(html).bind(this);
+			this.__bindings.html.push({template: html, element: el, tempFn: tempFn});
     	}
     },
+
 	renderBindings: function(){
 		for (var i=0; i < this.__bindings.html.length; i++)
 		{
 			var b = this.__bindings.html[i];
-			logger.debug("RENDER "+b.template);
+			
 			try{
+				//logger.error("RENDER "+b.template+" => "+b.tempFn(this));
 				b.element.html( b.tempFn(this) );	
 			}catch(err){
 				logger.error(err);
-			}
-			
+			}			
 		}
 	},
+
     free: function(){
 
 		TdisplayObjectContainer._super.free.call(this);
@@ -153,20 +155,20 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 	{ 
  		if (visible)
 		{	   
-				//on affiche l'élément
+				//affichage de l'élément
 				if (this[state.elem.originalId])
 				{
 
 					if (this[state.elem.originalId].className) 
 					{
-						// c'est un composant
+						// composant
 
 						this[state.elem.originalId].load();
 						this[state.elem.originalId].show();
 					}
 					else
 					{
-						// c'est un objet jquery
+						// objet jquery
 						$(state.elem).show(); 
 					}
 				}
@@ -181,12 +183,12 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 				{
 					if (this[state.elem.originalId].className)
 					{
-						// c'est un composant
+						// composant
 						this[state.elem.originalId].hide();
 					}
 					else
 					{
-						// c'est un objet jquery
+						// objet jquery
 						$(state.elem).hide();
 					}
 				}
@@ -244,7 +246,6 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 
 			if ((included != null)||(excluded != null)){
 				//logger.debug("setState "+this.currentState+": affichage "+el.id+", included="+included+", excluded="+excluded);
-				//On  intervient que si included est défini (non null)
 				var show = (((included == true)||(included == null)) && ((excluded == false)||(excluded == null)));
 				this._setStateElementVisible( show, el);
 			}
@@ -296,7 +297,6 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 								if (defined(this[id]))
 									logger.error('1-Duplication du id "'+id+'" sur objet '+this.className);
 							
-								//logger.debug('Affectation '+id+' sur objet '+this.className);
 								var fId = panjs.getFormatedIdName(id);
 								this[fId] = jqobj;
 								r.push(id);	
@@ -318,11 +318,10 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 							
 								if (autoload)
 								{
-									//On crée l'instance du composant
-									
+									//creation instance du composant
 									var compo = panjs.createComponent(dataType,{elem:el, parent:this});	
+
 									/*if (compo.className == "TerrorElement"){
-							
 										panjs.stack.push("Unable to create "+dataType+" : "+compo.message);
 									}*/
 								
@@ -338,30 +337,17 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 									}		
 											
 									if (compo.visible == true)
-									{
-										
-										//alert("AVANT: "+compo.className+" => "+compo.container.css("display"));
-										/*Tdropdown:  Display = block */
-
+									{					
 										$(el).replaceWith(compo.container);										
-
-										//alert("APRES: "+compo.className+" => "+compo.container.css("display"));
-										/*Tdropdown:  Display = inline-block */
-
-										compo.container[0].owner = compo;
-									
-										//compo.show();						
+										compo.container[0].owner = compo;				
 									}
 									else
 									{
 										logger.info("PAS DE replaceWith pour ",compo.id ," visible = ",compo.visible," ",typeof compo.visible);
 									}
-
-									
+							
 									el.loaded = true;
-									compo.loaded = true;
-									
-									
+									compo.loaded = true;							
 								}
 								else
 								{
@@ -370,7 +356,6 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 									uses("core.display.TproxyDisplayObject");
 									var proxyCompo = new TproxyDisplayObject({sourceElement:el});
 									
-
 									proxyCompo.parent = this;
 									el.loaded = false;
 									$(el).hide();

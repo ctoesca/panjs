@@ -59,11 +59,11 @@ defineClass("TtodoList", "core.display.Telement", {
 			return;
 		//Free all items
 		this.clear();
-		for (var i=0; i< this.todos._source.length; i++)
+		for (var i=0; i< this.todos._items.length; i++)
 		{
-			var item = this.todos._source[i];
+			var item = this.todos._items[i];
 			if (this.filter == null){
-				this.addItemCompo( item );
+				this._addItemCompo( item );
 			}else{
 				var filterOk = true;
 				for (var k in this.filter)
@@ -74,22 +74,37 @@ defineClass("TtodoList", "core.display.Telement", {
 					}					
 				}
 				if (filterOk)
-					this.addItemCompo( item );
+					this._addItemCompo( item );
 			}		
 		}
-		this.renderTodosLeftCount();
 		this.refreshFooter();
+		this.refreshHeader();
+	},
+	refreshHeader: function(){
+		if (this.todos.length == 0 ){
+			this.toggleAll.hide();		
+		}
+		else{
+			this.toggleAll.show();
+		}
 	},
 	refreshFooter: function(){
+		this.renderTodosLeftCount();
 		if (this.todos.length == 0)
 			this.footer.hide();
 		else
 			this.footer.show();
 	},
-	addItemCompo: function(todo, indx){
+	_addItemCompo: function(todo, index){
 		var compo = panjs.createComponent("components.TtodoItem.html", { todo: todo, model: this.model});
 		compo.container.attr("todo-id", todo.id);
-		compo.prependTo(this.todoList);
+		if (arguments.length == 1)
+			var index = this.todos.length - 1;
+
+		if (index == 0)
+			compo.prependTo(this.todoList);
+		else
+			compo.appendTo(this.todoList);
 	},
 
 	getTodoItemCompo: function(id){
@@ -113,52 +128,39 @@ defineClass("TtodoList", "core.display.Telement", {
 
 	//Events from UI
 	onToggleAll: function(e){
-		var completed = $(e.target).prop("checked");
-		for (var i=0; i< this.todos.length; i++){
-			this.todos._source[i].completed = completed;
-			this.model.save(this.todos._source[i]);
-		}
-		this.refresh();
+		this.model.toggleAll( $(e.target).prop("checked") );		
 	},
 
 	onNewTodoKeyUp: function(e){
 		
 		if (e.which === 13 && this.newTodo.val().trim()) {
-			this.model.save({body: this.newTodo.val(), completed: false});
+			this.model.addNewItem( {body: this.newTodo.val() } );		
 			this.newTodo.val('');
 		}
 	},
 
 	//Events from model		
-	onItemAdded: function(e){		
-		this.addItemCompo(e.data.item);
-		
+	onItemAdded: function(e){
+		this._addItemCompo(e.data.item, e.data.index);
+		this.refreshHeader();
+		this.refreshFooter();	
 	},
-	onClearCompleted: function(){
-		var completedTodos = this.model.getTodosCompleted();
-		for (var i=0; i< completedTodos.length; i++)
-			this.model.removeById(completedTodos[i].id);
-		this.renderTodosLeftCount();
+
+	onClearCompleted: function(){		
+		this.model.clearCompleted();
 	},
 	onItemRemove: function(e){
-		var todoItem = this.getTodoItemCompo(e.data.id);
-		if (todoItem)
-			todoItem.free();
-		if (this.todos.length == 0 ){
-			this.toggleAll.hide();
-			
-		}
-		else{
-			this.toggleAll.show();
-		}
-		this.renderTodosLeftCount();
+		
+		this.refreshHeader();
 		this.refreshFooter();
 	},
 	onItemUpdate: function(e){
+
 		var compo = this.getTodoItemCompo(e.data.id);
 		if (compo)
 			compo.render();
-		this.refresh();
+		this.refreshHeader();
+		this.refreshFooter();		
 	}
 });
 

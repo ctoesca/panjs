@@ -1,0 +1,41 @@
+<html>        
+  <head>
+    <style type="text/css">
+      .Tpanel
+      {
+          max-width:500px;
+      }
+    </style>
+
+    <script type="text/x-class-definition">
+
+//<![CDATA[      
+
+/* On étend la classe Tformulaire */
+defineClass("Tpanel", "core.display.Telement", { 
+	
+	baseElement:"div",
+
+  	constructor: function(args){
+    	this._super.constructor.call(this,args);  
+    	
+  	}
+});
+//]]>
+</script>
+
+</head>
+<body>	
+
+  	<div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title" id="titre">Panel title</h3>
+        </div>
+        <div class="panel-body">
+            <p>bla bla bla</p>
+            <!--CONTENT-->
+        </div>
+    </div>
+
+</body>
+</html>

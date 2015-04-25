@@ -1,0 +1,49 @@
+<html>        
+  <head>
+    <style type="text/css">
+      .TpanelExt .panel-heading
+      {
+        
+          background-color:#FFFFC2;
+          color:#444444;
+          border-color:#EDE275;
+      }
+
+      .TpanelExt .panel-primary{
+          border-color:#EDE275;
+          background-color:#FFEBCD;
+      }
+      .TpanelExt .internalContent, .TpanelExt .externalContent{
+        padding:10px;
+        border-style:solid;
+        border-width:1px;
+        color:#428bca;
+        margin-top:3px;
+        margin-bottom:3px;
+      }
+     
+    </style>
+
+    <script type="text/x-class-definition">
+//<![CDATA[      
+defineClass("TpanelExt", "app.Tpanel.html", { 
+    constructor: function(args){
+      this._super.constructor.call(this,args);  
+
+      this.titre.html("TpanelExt title");
+    }
+});
+//]]>
+</script>
+
+</head>
+<body>  
+        <div class="externalContent"><strong>External content:</strong><br/>
+        <!--CONTENT-->
+        </div>
+        <div class="internalContent">
+          <strong>This is the internal content of the TpanelExt component</strong><br/>
+        </div>
+
+</body>
+</html>
