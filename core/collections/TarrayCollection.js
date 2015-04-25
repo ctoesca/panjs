@@ -334,6 +334,24 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
         }
     },
 
+    removeItems: function(mixed)
+    {
+      if (typeof mixed == "function")
+      {
+        var itemsToRemove = [];
+        for (var i =0; i< this._items.length; i++)          
+          if (mixed(this._items[i]))
+            itemsToRemove.push(this._items[i]);
+      }else{
+        var itemsToRemove = mixed;
+      }
+      
+      for (var i =0; i< itemsToRemove.length; i++) 
+        this.removeItem( itemsToRemove[i] );
+      
+      return itemsToRemove;
+    },
+
   	removeItem: function(item)
   	{
   		var indx = this.getItemIndex(item);

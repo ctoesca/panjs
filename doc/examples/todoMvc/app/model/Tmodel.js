@@ -10,10 +10,6 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 		this._super.constructor.call(this,args);
 	},
 
-	onFailure: function(e){
-		alert(e.data.responseText);
-	},
-
 	_load: function(){
 		if (this.todos == null){
 			var data = JSON.parse(localStorage.getItem(this.STORAGE_ID) || '[]');
@@ -34,87 +30,68 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 				
 		if (defined(success))
 			success(this.todos);	
-		
 	},
-
-	getById: function(todoId, success, failure){
-		
-		if (this.todos == null) 
-			this._load();
-		var result = this.todos.getByProp("id", todoId);
-		if (defined(success))
-			success(result);
-	},
-	setFilter: function(obj){
-		
-		this._load();
-
-		var r = [];
-		
-		if (obj != null){
-
-		}else{
-			for (var k in obj){
-				for (var i=0; i< this.todos.length; i++){
-					var item = this.todos._items[i];
-					if (item[k] == obj[k])
-						r.push(item);
-				}
-			}			
-		}
-		
-		this.todos.setSource(r);
-	},
+	
 	addNewItem: function(item){
 		item.id = generateUUID();
 		item.completed = false;
 		this.todos.addItemAt(item, 0);
 		this.save();
 	},
+	removeTodo: function(todo){
+		this.todos.removeItem(todo);
+		this.save();
+	},
 	toggleAll: function(completed)
 	{
 		for (var i=0; i< this.todos.length; i++){
 			var item = this.todos._items[i];
-			item.completed = completed;
-			this.todos.sendUpdateEvent(item);
+			this.toggleItem(item, completed);
 		}
-		this.save();
 	},
+
 	toggleItem: function(item, completed)
 	{
-		item.completed = completed;
-		this.todos.sendUpdateEvent(item);
-		this.save();
+		this.updateTodo(item, {completed: completed});
 	},
 
+	updateTodo: function(todo, props){
+		if (this.todos.contains(todo))
+		{
+			var changed = false;
+			for (var k in props)
+			{
+				if (todo[k] != props[k])
+				{
+					todo[k] = props[k];
+					changed = true;
+				}
+			}
+			if (changed){
+				this.save();
+				this.todos.sendUpdateEvent(todo);
+			}
+		}
+	},
 	clearCompleted: function(){
-		var completedTodos = this.getTodosCompleted();
-		for (var i=0; i< completedTodos.length; i++)
-			this.todos.removeItem(completedTodos[i]);
+		this.todos.removeItems(function(item){
+			if (item.completed)
+				return true;
+		});
 		this.save();
 	},
 
-	getTodosCompleted: function(){
+	getTodosCompletedCount: function(){
 		var r = this.todos.find({
 				filterFunction: function(item){
 					return item.completed;
 				}
 		});
-		return r;
+		return r.length;
 	},
-	
-	removeById: function(todoId, success, failure)
-	{
-		if (this.todos == null) 
-			this._load();
-
-		var todoModel = this.todos.getByProp("id", todoId);
-		if (todoModel != null){
-			this.todos.removeItem(todoModel);
-		}
-		this._save();
-		if (defined(success))
-			success(todoId);
+	getTodosNotCompletedCount: function(){
+		var r =  this.todos.length - this.getTodosCompletedCount();
+		return r;
 	}
 
 });

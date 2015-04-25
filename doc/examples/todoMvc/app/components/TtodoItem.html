@@ -20,7 +20,7 @@ defineClass("TtodoItem", "core.display.Telement", {
 
 
 	constructor: function(args){ 
-		this._super.constructor.call(this,args);	
+		this._super.constructor.call(this,args);
 		this.model = args.model;
 		this.setTodo( args.todo );
 		
@@ -43,14 +43,11 @@ defineClass("TtodoItem", "core.display.Telement", {
 
 	//Events from UI
 	onDestroyClick: function(e){
-		this.model.todos.removeItem(this.todo);
-		this.model.save();
-		this.free();
+		this.model.removeTodo(this.todo);
 	},
 
 	onToggleCompletedClick: function(e){
-		this.model.toggleItem( this.todo, $(e.target).prop("checked") );
-		this.model.save();
+		this.model.updateTodo(this.todo, {completed: $(e.target).prop("checked")});
 	},
 
 	onStartEditing: function(e){
@@ -63,23 +60,17 @@ defineClass("TtodoItem", "core.display.Telement", {
 		this.edit1.val(this.todo.body);
 	},
 	
-
-	onEndEditing: function(e){
-		this.todo.body = this.edit1.val();
-		this.model.save();
+	onEndEditing: function(e){		
+		this.model.updateTodo(this.todo, {body: this.edit1.val()});
 		this.container.removeClass("editing");
-		this.render();
 	},
+
 	onEditKeyUp: function(e){
 
-		if (e.which === 27) {
-			this.container.removeClass('editing');
-			
-		}
-
-		if (e.which === 13) {
+		if (e.which === 27)
+			this.container.removeClass('editing');	
+		else if (e.which === 13)
 			this.onEndEditing(e);
-		}
 	}
 });
 

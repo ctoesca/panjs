@@ -37,7 +37,7 @@ defineClass("TtodoList", "core.display.Telement", {
 			else
 				el.removeClass("selected");
 		});
-		this.refresh();
+		this.render();
 	},
 
 	onGetAll: function(data){
@@ -45,7 +45,7 @@ defineClass("TtodoList", "core.display.Telement", {
 		this.todos.on(Tevent.DELETE, this.onItemRemove.bind(this));
 		this.todos.on(Tevent.UPDATE, this.onItemUpdate.bind(this));
 		this.todos.on(Tevent.ADDED, this.onItemAdded.bind(this));
-		this.refresh();
+		this.render();
 	},
 
 	clear: function(){
@@ -54,7 +54,7 @@ defineClass("TtodoList", "core.display.Telement", {
 		});
 	},
 
-	refresh: function(){
+	render: function(){
 		if (this.todos == null)
 			return;
 		//Free all items
@@ -87,13 +87,24 @@ defineClass("TtodoList", "core.display.Telement", {
 		else{
 			this.toggleAll.show();
 		}
+		this.toggleAll.prop("checked", (this.model.getTodosNotCompletedCount() == 0));	
+		
+
 	},
 	refreshFooter: function(){
-		this.renderTodosLeftCount();
+	
+		this.todoCount.html("<strong>"+this.model.getTodosNotCompletedCount()+"</strong> item left");
+		this.clearCompleted.text("Clear completed ("+this.model.getTodosCompletedCount()+")");
+
 		if (this.todos.length == 0)
 			this.footer.hide();
 		else
 			this.footer.show();
+
+		if (this.model.getTodosCompletedCount() == 0)
+			this.clearCompleted.hide();
+		else
+			this.clearCompleted.show();
 	},
 	_addItemCompo: function(todo, index){
 		var compo = panjs.createComponent("components.TtodoItem.html", { todo: todo, model: this.model});
@@ -114,17 +125,6 @@ defineClass("TtodoList", "core.display.Telement", {
 		else
 			return null;
 	},
-	renderTodosLeftCount: function(){
-		var completedTodos = this.model.getTodosCompleted();
-		var notCompletedCount = this.todos.length - completedTodos.length;
-		this.toggleAll.prop("checked", (notCompletedCount == 0));	
-		this.todoCount.html("<strong>"+notCompletedCount+"</strong> item left");
-		this.clearCompleted.text("Clear completed ("+completedTodos.length+")");
-		if (completedTodos.length == 0)
-			this.clearCompleted.hide();
-		else
-			this.clearCompleted.show();
-	},
 
 	//Events from UI
 	onToggleAll: function(e){
@@ -141,7 +141,8 @@ defineClass("TtodoList", "core.display.Telement", {
 
 	//Events from model		
 	onItemAdded: function(e){
-		this._addItemCompo(e.data.item, e.data.index);
+		if ((e.data.item.completed == false) && (this.getHash() != "completed"))
+			this._addItemCompo(e.data.item, e.data.index);
 		this.refreshHeader();
 		this.refreshFooter();	
 	},
@@ -150,7 +151,9 @@ defineClass("TtodoList", "core.display.Telement", {
 		this.model.clearCompleted();
 	},
 	onItemRemove: function(e){
-		
+		var compo = this.getTodoItemCompo(e.data.id);
+		if (compo) compo.free();
+
 		this.refreshHeader();
 		this.refreshFooter();
 	},
