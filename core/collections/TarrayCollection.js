@@ -333,7 +333,9 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
             }       
         }
     },
-
+    forEach: function( f ){
+      this._items.forEach( f );
+    },
     removeItems: function(mixed)
     {
       if (typeof mixed == "function")
@@ -348,7 +350,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
       
       for (var i =0; i< itemsToRemove.length; i++) 
         this.removeItem( itemsToRemove[i] );
-      
+
       return itemsToRemove;
     },
 
