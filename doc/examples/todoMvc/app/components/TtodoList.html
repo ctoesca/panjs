@@ -63,7 +63,7 @@ defineClass("TtodoList", "core.display.Telement", {
 		{
 			var item = this.todos._source[i];
 			if (this.filter == null){
-				this.addItem( item );
+				this.addItemCompo( item );
 			}else{
 				var filterOk = true;
 				for (var k in this.filter)
@@ -74,7 +74,7 @@ defineClass("TtodoList", "core.display.Telement", {
 					}					
 				}
 				if (filterOk)
-					this.addItem( item );
+					this.addItemCompo( item );
 			}		
 		}
 		this.renderTodosLeftCount();
@@ -86,10 +86,10 @@ defineClass("TtodoList", "core.display.Telement", {
 		else
 			this.footer.show();
 	},
-	addItem: function(todo){
+	addItemCompo: function(todo, indx){
 		var compo = panjs.createComponent("components.TtodoItem.html", { todo: todo, model: this.model});
 		compo.container.attr("todo-id", todo.id);
-		compo.appendTo(this.todoList);
+		compo.prependTo(this.todoList);
 	},
 
 	getTodoItemCompo: function(id){
@@ -131,7 +131,8 @@ defineClass("TtodoList", "core.display.Telement", {
 
 	//Events from model		
 	onItemAdded: function(e){		
-		this.refresh();
+		this.addItemCompo(e.data.item);
+		
 	},
 	onClearCompleted: function(){
 		var completedTodos = this.model.getTodosCompleted();

@@ -89,35 +89,14 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
   	removeClass: function(v){
   		this.container.removeClass(v);
   	},
-  	appendTo: function(elem){
-  		
-		if (this._parent != null)
-		{	
-			/* L'objet a déjà un parent*/
 
-			if (this._parent[0] != elem[0])		 
-			{
-				/* Le parent change */
-
-				this._parent[0].removeChild(this.container[0]);				
-				elem[0].appendChild(this.container[0]);			
-				this._parent = $(elem[0]);					
-			}
-			else
-			{
-				/* Le parent reste le même */
-			}
-		}		
-		else
-		{
-			/* Le parent change */
-					
-			elem[0].appendChild(this.container[0]);
-			this._parent = $(elem[0]);
-		}
-		
-		
+  	appendTo: function(elem){		
+  		elem.append(this.container);		
 	},
+	prependTo: function(elem){ 		
+  		this.container.prependTo(elem);		
+	},
+
 	_setId: function(value)
 	{
 		/* attention: ici this.container n'est pas encore un objet jquery*/
