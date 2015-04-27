@@ -33,11 +33,29 @@ defineClass("TeventDispatcher", "core.Tobject", {
 		return -1;
 	},
 	
-	dispatchEvent: function(event)
+	dispatchEvent: function(mixed, eventData, bubbles, cancelable)
 	{	
-		if (!this.hasEventListener(event.type))
-		return;
+		/*mixed = Tevent: {type, eventData, bubbles, cancelable}
+			or 
+		mixed = {type, eventData, bubbles, cancelable}*/
 
+		var type = null;
+		var event = null;
+		if (typeof mixed == "object")
+		{
+			event = mixed;
+			type = mixed.type;
+		}
+		else{
+			type = arguments[0];
+		}
+
+		if (!this.hasEventListener(type))
+				return;
+		//un objet event n'est créé que si il y a des listeners
+		if (event == null)
+			event = new Tevent(type, eventData, bubbles, cancelable);
+		
 		var listeners = this._listeners[event.type];
 
 		for (var i=0; i< listeners.length; i++)

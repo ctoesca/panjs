@@ -18,27 +18,24 @@ defineClass("TtodoItem", "core.display.Telement", {
 	model: null,
 	todo:null,
 
-
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);
 		this.model = args.model;
-		this.setTodo( args.todo );
-		
 	},
 
-	setTodo: function( todo){
+	setData: function( todo){
 		this.todo = todo;
 		this.render();		
+	},
+	getData: function( todo){
+		return this.todo;
 	},
 
 	render: function(){
 		this.label1.text(this.todo.body);
 		this.edit1.val(this.todo.body);
 		this.checkbox1.prop("checked", this.todo.completed);
-		if (this.todo.completed)
-			this.container.addClass("completed");
-		else
-			this.container.removeClass("completed");
+		this.container.toggleClass("completed", this.todo.completed);
 	},
 
 	//Events from UI
@@ -60,15 +57,21 @@ defineClass("TtodoItem", "core.display.Telement", {
 		this.edit1.val(this.todo.body);
 	},
 	
-	onEndEditing: function(e){		
-		this.model.updateTodo(this.todo, {body: this.edit1.val()});
+	onEndEditing: function(e){	logger.error(e.type);
+		var value = this.edit1.val().trim();
+		if (value == "")
+			this.model.removeTodo(this.todo);
+		else
+			this.model.updateTodo(this.todo, {body: this.edit1.val()});	
 		this.container.removeClass("editing");
 	},
 
 	onEditKeyUp: function(e){
 
-		if (e.which === 27)
-			this.container.removeClass('editing');	
+		if (e.which === 27){
+			this.edit1.val(this.todo.body);
+			this.onEndEditing(e);
+		}
 		else if (e.which === 13)
 			this.onEndEditing(e);
 	}
@@ -85,6 +88,6 @@ defineClass("TtodoItem", "core.display.Telement", {
 			<label id="label1" data-ondblclick="this.onStartEditing"></label>
 			<button id="btn1" data-onclick="this.onDestroyClick" class="destroy"></button>
 		</div>
-		<input class="edit" id="edit1" value="" data-onchange="this.onEndEditing" data-onkeyup="this.onEditKeyUp" data-onblur="this.onEndEditing"  />
+		<input class="edit" id="edit1" value="" data-onchange="this.onEndEditing" data-onkeyup="this.onEditKeyUp" data-onblur="this.onEndEditing" />
 </body>
 </html> 

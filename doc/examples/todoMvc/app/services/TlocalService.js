@@ -6,11 +6,13 @@ defineClass("TlocalService", "core.events.TeventDispatcher", {
 	constructor: function(args){
 		this._super.constructor.call(this,args);				
 	},
-	_load: function(){
-		this.todos = new TarrayCollection( JSON.parse(localStorage.getItem(this.STORAGE_ID) || '[]') );
+	_load: function(success, failure){
+		var data = JSON.parse(localStorage.getItem(this.STORAGE_ID) || '[]');
+		return new TarrayCollection( {key: "id", data:data } );
 	},
-	_save: function(){
-		localStorage.setItem(this.STORAGE_ID, JSON.stringify(this.todos._source));
+	_save: function(data, success, failure){
+		localStorage.setItem(this.STORAGE_ID, JSON.stringify(data));
+		return data;
 	}
 
 });

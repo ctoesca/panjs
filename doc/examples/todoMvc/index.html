@@ -21,8 +21,8 @@
         version: "0.7.0", 
 
         namespaces:[
-        {name: "core", path: "node_modules/panjs/core"},
-        {name: "ui", path: "node_modules/panjs/ui"},
+        {name: "core", path: "/libs/panjs/trunk/core"},
+        {name: "ui", path: "/libs/panjs/trunk/ui"},
         {name: "app", path: "app"},
         {name: "components", path: "app/components"},
         {name: "model", path:"app/model"},
@@ -38,10 +38,14 @@
   <!-- panjs + less (not for production) -->
   <!--<script src="bower_components/panjs/core/panjs_core_with_less.min.js"></script>-->
 
-  <script src="node_modules/panjs/core/helpers/base.js"></script>
+  <!--<script src="node_modules/panjs/core/helpers/base.js"></script>
   <script src="node_modules/panjs/core/helpers/jquery.js"></script>
-  <script src="node_modules/panjs/core/starter.js"></script>
-<script type="text/javascript" src="/libs/panjs/trunk/lib/doT.min.js"></script>
+  <script src="node_modules/panjs/core/starter.js"></script>-->
+
+  <script src="/libs/panjs/trunk/core/helpers/base.js"></script>
+  <script src="/libs/panjs/trunk/core/helpers/jquery.js"></script>
+  <script src="/libs/panjs/trunk/core/starter.js"></script>
+
   <script>
     $(document).ready(function() 
     {        

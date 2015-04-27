@@ -4,12 +4,32 @@
 <script type="text/x-class-definition">
 //<![CDATA[
 
+uses("model.Model2");
 defineClass("app", "core.display.Telement", { 
 
 	baseElement: "div",	
-	
+	$model2: null,
+
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);
+		this.model2 = new Model2();
+		this.model2.on(Tevent.CHANGE, this.onModel2Changed.bind(this));
+		this.model2.initData({
+			prop1: Math.random(),
+			prop2: Math.random()
+		});
+		
+	},
+	onModel2Changed: function(e){
+		logger.error(e.data.object.className+".__OnPropChanged: propName="+e.data.propName+" => "+e.data.newValue+", data="+JSON.stringify(e.data.object.getData()));	
+	},
+	
+
+	onClick: function(e){	
+		//this.model2.model3.prop3 = Math.random();
+		this.model2.setData( { prop1: Math.random() , var444: 'jjjjj'} );
+		//this.model2.prop1 = Math.random();
+		//this.model2.model3.setProp4('hhh');
 	}
 });
 
@@ -19,7 +39,7 @@ defineClass("app", "core.display.Telement", {
 </head>
 
 <body>	
-	
+	<a data-onclick="this.onClick" style="display:none">Test</a>
 	<div id="todoList" data-compo="components.TtodoList.html" autoload="true">  </div>    
 
 </body>

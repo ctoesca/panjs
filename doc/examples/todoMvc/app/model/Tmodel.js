@@ -4,21 +4,15 @@ uses("services.TlocalService");
 defineClass("Tmodel", "core.events.TeventDispatcher", { 
 	
 	todos: null,
-	STORAGE_ID: "panjs_todos",
 
 	constructor: function(args){		
 		this._super.constructor.call(this,args);
+		this.service = new TlocalService();
+		this.todos = this.service._load();		
 	},
 
-	_load: function(){
-		if (this.todos == null){
-			var data = JSON.parse(localStorage.getItem(this.STORAGE_ID) || '[]');
-			this.todos = new TarrayCollection( {key: "id", data:data } );
-		}
-	},
 	save: function(success, failure){
-
-		localStorage.setItem(this.STORAGE_ID, JSON.stringify(this.todos._items));
+		this.service._save(this.todos._items)		
 		if (defined(success))
 			success(this.todos);
 	},
@@ -26,7 +20,7 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 	getAll: function (success, failure, opt) 
 	{
 		if (this.todos == null) 
-			this._load();
+			this.todos = this.service._load();		
 				
 		if (defined(success))
 			success(this.todos);	
@@ -44,10 +38,9 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 	},
 	toggleAll: function(completed)
 	{
-		for (var i=0; i< this.todos.length; i++){
-			var item = this.todos._items[i];
+		this.todos.forEach( function(item){
 			this.toggleItem(item, completed);
-		}
+		}.bind(this));
 	},
 
 	toggleItem: function(item, completed)
@@ -81,7 +74,7 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 		this.save();
 	},
 
-	getTodosCompletedCount: function(){
+	getCompletedCount: function(){
 		var r = this.todos.find({
 				filterFunction: function(item){
 					return item.completed;
@@ -89,8 +82,8 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 		});
 		return r.length;
 	},
-	getTodosNotCompletedCount: function(){
-		var r =  this.todos.length - this.getTodosCompletedCount();
+	getNotCompletedCount: function(){
+		var r =  this.todos.length - this.getCompletedCount();
 		return r;
 	}
 

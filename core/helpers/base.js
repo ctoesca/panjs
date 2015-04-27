@@ -276,6 +276,10 @@ function getXmlDocument (text) {
       return xmlDoc;
 }
 
+function isUndefined(obj) {
+      return obj === void 0;
+}
+
 /* 
   defined(object, "prop1", "prop2", "prop3" , ...) 
 */

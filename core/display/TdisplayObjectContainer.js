@@ -56,6 +56,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 				el.on(evtName, f);
 			}else{
 				var script = 'arguments[0].on("'+evtName+'", '+on_evt_attr+'.bind(this))';
+				//logger.error(script);
 		    	var sl = new Function(script).bind(this);
 		    	sl(el, evtName);		
 			}
@@ -63,7 +64,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 		}	
     },
     bindEvents: function(el) {
-    	var events = ["click", "change", "blur", "blur", "keyup", "dblclick"]; 	
+    	var events = ["click", "change", "blur", "keyup", "dblclick"]; 	
     	for (var i=0; i< events.length; i++){
     		this.bindEvent(el, events[i]);
     	}	
@@ -99,7 +100,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 		//inutile de désaffecter les events sur les objets jquery car remove() le fait.
 		//!!par contre, ce n'est pas le cas pour les composants panjs (il faut appeler free() sur tous les compo)
 	},
-	__OnPropChanged: function(propName, oldValue, newValue){
+	__OnPropChanged: function(propName, oldValue, newValue, object){
 		logger.debug("__OnPropChanged : propName = "+propName+", oldValue = "+oldValue+", newValue = "+newValue);
 		this.renderBindings();		
 	},

@@ -418,7 +418,6 @@ var Tobject = {
         var def = {};
         def["classHierarchy"] = {value: superProto.classHierarchy + ' '+className};
  
-
        // if ((panjs.iever != 8)&&(panjs.iever != 9))
        if (panjs.iever != 8)
         {
@@ -432,10 +431,11 @@ var Tobject = {
 
                   def["__"+k] =  {
                     value: defaultValue,
-                    writable: true
+                    writable: true,
+                    enumerable: true
                   };
 
-                  var setF = new Function('var key = "__'+k+'", propName="'+k+'",oldValue=this[key];newValue=arguments[0]; if (this[key] != arguments[0]){this[key] = arguments[0]; this.__OnPropChanged(propName, oldValue, newValue);}');
+                  var setF = new Function('var key = "__'+k+'", propName="'+k+'",oldValue=this[key];newValue=arguments[0]; if (this[key] != arguments[0]){this[key] = arguments[0]; this.__OnPropChanged(propName, oldValue, newValue, this);}');
                   var getF = new Function('var key = "__'+k+'"; return this[key]');
                   def[k] = { 
 
@@ -515,6 +515,9 @@ var Tobject = {
       
         return constr;
     },
+    __OnPropChanged: function(propName, oldValue, newValue, object){
+    },
+
     copyOwnTo: function(source, target) {
         Object.getOwnPropertyNames(source).forEach(function(propName) {
            console.log(propName);
