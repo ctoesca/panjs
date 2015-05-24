@@ -40,7 +40,7 @@ defineClass("app", "core.display.Telement", {
 
 	addCircle: function(e){
 	
-		var circle = new panjs.createComponent("components.Tcircle.html");
+		var circle = this.createComponent("components.Tcircle.html");
 		circle.appendTo(this.circlesContainer);
 		this.circles.push(circle);
 		this.circlesCount = this.circles.length;

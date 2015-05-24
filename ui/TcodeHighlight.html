@@ -26,6 +26,7 @@
       sourceClasspath:null,
       replaceMask: null,
       replaceBy: null,
+      language: 'javascript',
 
       constructor: function(args){  
 
@@ -36,7 +37,10 @@
           this.replaceMask = args.replaceMask;
          if (defined(args, "replaceBy"))
           this.replaceBy = args.replaceBy;
+         if (defined(args, "language"))
+          this.language = args.language;
 
+        this.code1.attr("class", this.language);
 
         if (defined(args, "sourceClasspath"))
         {
@@ -82,6 +86,6 @@
 
 </head>
 <body>  
-      <pre><code class="javascript" id="code1"></code></pre>
+      <pre><code class="html" id="code1"></code></pre>
 </body>
 </html> 

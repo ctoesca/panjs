@@ -26,18 +26,18 @@ defineClass("TerrorElement", "core.display.Telement",
             var path = "?";
             var url = "?";
             
-        
-            if (typeof args.message == "string")
-            {
-                this.message = args.message;   
+            if (typeof args == "object"){
+                if (typeof args.message == "string")
+                    this.message = args.message;   
+                if (typeof args.path == "string")
+                    path = args.path;
+                if (typeof args.url == "string")
+                    url = args.url;
             }
-            else{
-                if (defined( args, "message" ,"message"))
-                    this.message =  args.message.message;
-                else
-                    this.message = args.message;
+            if (typeof args == "string"){
+                this.message = args;  
             }
-
+          
             var messHtml = this.message;
             if (typeof this.message == "string")
             {
@@ -55,7 +55,7 @@ defineClass("TerrorElement", "core.display.Telement",
              if (typeof args.className == "string")
                 this.compoClassName = args.className;
 
-            messHtml += "<br/>Fichier: "+path;
+            messHtml += "<br/>File: "+path;
             messHtml += "<br/>URL: "+url;
 
             messHtml += "<br/>Previous errors:";

@@ -21,10 +21,8 @@ defineClass("Tmain", "core.display.Telement", {
 
   	constructor: function(args){
     	this._super.constructor.call(this,args);  
-     // this.btn4.on("click", this.onBtn4click.bind(this));
-     // this.btn5.on("click", this.onBtn5click.bind(this));
     
-       this.menuToggle.click(function(e) {
+      this.menuToggle.click(function(e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
     });
@@ -142,20 +140,16 @@ defineClass("Tmain", "core.display.Telement", {
                 <li>
                     <a href="#main=create_component_programmatically">Create components programmatically</a>
                 </li>
-
                  <li>
                     <a href="#main=use_arguments">Pass arguments to components</a>
                 </li>
-
-                 
-
-
                  <li>
                     <a href="#main=create_simple_class">Create a simple class</a>
                 </li>
 
-                
-               
+                 <li>
+                    <a href="#main=using_states1">Using states</a>
+                </li>           
             </ul>
         </div>
         <!-- /#sidebar-wrapper -->
@@ -167,19 +161,21 @@ defineClass("Tmain", "core.display.Telement", {
                     <div class="col-lg-12">
                         
 
-<div class="content">
-  <div data-compo="app.topics.TgettingStarted.html" class="topicCompo" id="getting_started" autoload="false"/>
-  <div data-compo="app.topics.Tcreate_first_component.html" class="topicCompo" id="create_first_component"  autoload="false"/>
-  <div data-compo="app.topics.Textend_component.html" class="topicCompo" id="extend_component"  autoload="false"/>
-  <div data-compo="app.topics.Tcontainer_component.html" class="topicCompo" id="container_component"  autoload="false"/>
-  <div data-compo="app.topics.Textend_container_component.html" class="topicCompo" id="extend_container_component"  autoload="false"/>
-  <div data-compo="app.topics.Tuse_events.html" class="topicCompo" id="use_events"  autoload="false"/>
-  <div data-compo="app.topics.Tuse_arguments.html" class="topicCompo" id="use_arguments"  autoload="false"/>
-  <div data-compo="app.topics.Tlazy_loading.html" class="topicCompo" id="lazy_loading"  autoload="false"/>
-  
-  <div data-compo="app.topics.Tcreate_component_programmatically.html" class="topicCompo" id="create_component_programmatically"  autoload="false"/>
-  <div data-compo="app.topics.Tcreate_simple_class.html" class="topicCompo" id="create_simple_class" autoload="false"/>
-</div>
+                        <div class="content">
+                          <div data-compo="app.topics.TgettingStarted.html" class="topicCompo" id="getting_started" autoload="false"/>
+                          <div data-compo="app.topics.Tcreate_first_component.html" class="topicCompo" id="create_first_component"  autoload="false"/>
+                          <div data-compo="app.topics.Textend_component.html" class="topicCompo" id="extend_component"  autoload="false"/>
+                          <div data-compo="app.topics.Tcontainer_component.html" class="topicCompo" id="container_component"  autoload="false"/>
+                          <div data-compo="app.topics.Textend_container_component.html" class="topicCompo" id="extend_container_component"  autoload="false"/>
+                          <div data-compo="app.topics.Tuse_events.html" class="topicCompo" id="use_events"  autoload="false"/>
+                          <div data-compo="app.topics.Tuse_arguments.html" class="topicCompo" id="use_arguments"  autoload="false"/>
+                          <div data-compo="app.topics.Tlazy_loading.html" class="topicCompo" id="lazy_loading"  autoload="false"/>
+                          
+                          <div data-compo="app.topics.Tcreate_component_programmatically.html" class="topicCompo" id="create_component_programmatically"  autoload="false"/>
+                          <div data-compo="app.topics.Tcreate_simple_class.html" class="topicCompo" id="create_simple_class" autoload="false"/>
+
+                          <div data-compo="app.topics.Tusing_states1.html" class="topicCompo" id="using_states1" autoload="false"/>
+                        </div>
   
 
 

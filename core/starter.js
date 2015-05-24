@@ -82,10 +82,17 @@
 
     if (typeof window[className] == "undefined")
     {
-        var r = panjs.loader.usesComponent(classPath);
+      try{
+   
+          var r = panjs.loader.usesComponent(classPath);
+          if (!r.result) 
+            throw r;
+      }
+      catch(r){ 
 
-        if (!r.result) 
-        {        
+            if (typeof r == "string")
+              r = { message: r, className: className};
+
             uses("core.display.TerrorElement.html");
             object = new TerrorElement(r);
 
@@ -97,7 +104,8 @@
               panjs.stackLevel = 0;
             }
             return object;
-        }
+        
+      }
     }
     
     try{
@@ -124,14 +132,14 @@
 
       object = new window[className](args);
 
-    }catch(err){ 
+    }catch(err){  
+
            var m = "Error instantiating "+className+": "+err;
            logger.error(m);
            uses("core.display.TerrorElement.html");  
            var path = panjs.getAbsoluteUrlFromClassPath(classPath);    
            var url = panjs.loader.getUrlWithVersion(path)
-
-           var object = new TerrorElement({message: err, path: path,url:url, className:className});
+           var object = new TerrorElement({message: m, path: path,url:url, className:className});
            panjs.stack.push(m);
     }
     
@@ -674,18 +682,26 @@ defineClass("Tlogger", "core.Tobject", {
       if (console.debug)
         console.debug(this._getMessage("DEBUG", arguments));
       else
-        console.info(this._getMessage("DEBUG", arguments));
+        console.log(this._getMessage("DEBUG", arguments));
     },
     _info: function()
     {
       if (this.active){
-      console.log(this._getMessage("INFO", arguments));
-    }
+      if (console.info)
+          console.info(this._getMessage("INFO", arguments));
+        else
+          console.log(this._getMessage("INFO", arguments));
+      }
     },
     _warn: function()
     {
-      if (this.active)
-      console.warn(this._getMessage("WARN", arguments));
+      if (this.active){
+        if (console.warn)
+          console.warn(this._getMessage("WARN", arguments));
+        else
+         console.log(this._getMessage("INFO", arguments));
+      }
+      
     },
     _error: function()
     {
@@ -714,7 +730,7 @@ defineClass("Tlogger", "core.Tobject", {
 
       this.debug = this._debug;
       this.info = this._info;
-        this.warn = this._warn;
+      this.warn = this._warn;
       this.error = this._error;
     
       if (value >= Tlogger.INFO)
@@ -1087,9 +1103,6 @@ defineClass("Tloader", "core.Tobject", {
           window[className].prototype.className = className;  
           window[className].prototype.classPathDir = this.getClassPathDir(classPath);
           window[className].prototype.dirPath = dirPath;
-
-          window[className].lastId = 0;
-
           window[classPath] = window[className];
       }
       //logger.debug(className+" = "+typeof window[className]+" path = "+path+", result="+r.result);

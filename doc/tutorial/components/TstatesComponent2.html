@@ -1,0 +1,67 @@
+<html>        
+<head>
+  <style>
+    .TstatesComponent2 label.label{
+      font-size: 150%;
+    }
+  </style>
+  <script type="text/x-class-definition">
+    //<![CDATA[      
+
+    defineClass("TstatesComponent2", "core.display.Telement", { 
+
+      baseElement: "div", 
+      
+      constructor: function(args){
+          this._super.constructor.call(this,args);  
+          //by default: no state
+          this.setState([]);
+        },
+        connect: function(){
+          this.addState('connected');
+        },
+        disconnect: function(){
+          this.removeState('connected');
+        },
+        refreshState: function()
+        {
+            //gender: 'male' or 'female'
+            var gender = this.container.getElement("input:radio[name ='gender']:checked").val(); 
+            
+            var states = [gender];
+
+            if (this.hasState("connected"))
+              states.push("connected"); 
+
+            this.setState(states);
+        }
+      });
+    //]]>
+  </script>
+</head>
+
+<body>  
+
+  <div class="well">
+    Gender: 
+    <label class="checkbox-inline">
+        <input type="radio" name="gender" value="male" data-onclick="this.refreshState"/> Male
+    </label>
+    <label class="checkbox-inline">
+        <input type="radio" name="gender" value="female"  data-onclick="this.refreshState"/> Female
+    </label>
+
+    <br/>
+    <button class="btn btn-primary btn-lg" data-onclick="this.connect">Connect</button>
+    <button class="btn btn-primary btn-lg" data-onclick="this.disconnect">Disconnect</button>
+
+  </div>
+      
+  <label class="label label-danger" id="DisconnectedLabel" excludeFrom="connected">Disconnected</label>
+  <label class="label label-success" id="connectedLabel"  includeIn="connected" >connected 
+    <i class="fa fa-male" id="maleIcon" includeIn="male"/> 
+    <i class="fa fa-female" id="femaleIcon" includeIn="female"/> 
+  </label>
+
+</body>
+</html> 

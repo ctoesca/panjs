@@ -752,7 +752,7 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 							var compo = col._itemsRenderersInstances[primaryKeyValue];
 						}
 						else{
-							var compo = panjs.createComponent(col.itemRenderer,{datafield: col.field}); 
+							var compo = this.createComponent(col.itemRenderer,{datafield: col.field}); 
 							col._itemsRenderersInstances[primaryKeyValue] = compo;
 							
 							compo.container[0].owner = compo;
@@ -933,7 +933,7 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 			}else{
 				if (typeof this.detailRowRenderer == "string"){
 					//itemRenderer
-					var compo = panjs.createComponent(this.detailRowRenderer,{}); 	
+					var compo = this.createComponent(this.detailRowRenderer,{}); 	
 					
 
 					if (compo.container[0].nodeName == "TD")

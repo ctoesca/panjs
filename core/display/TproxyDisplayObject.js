@@ -50,10 +50,10 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 			}
 
 			this.dispatchEvent( new Tevent( Tevent.BEFORE_LOAD, {args:this.args, dataType:this.dataType}));
-			var compo = panjs.createComponent(this.dataType,this.args);	
+			var compo = this.parent.createComponent(this.dataType,this.args);	
 	
 	
-
+			this.args.elem.compo = compo;
 			compo.parent = this.parent;
 			h.owner[origId] = compo;
 		

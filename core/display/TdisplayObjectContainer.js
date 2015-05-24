@@ -25,14 +25,19 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 	defaultState: null,
 	_bindElements : null,
 	__bindings:null,
-
+	_children: null,
 
 
 	/* METHODES */	
 	constructor: function(args) { 	
 		this._bindElements = [];
 		this.__bindings = { html: [] };
+		
 		TdisplayObjectContainer._super.constructor.call(this,args);
+		if (this._children == null)
+  			this._children = [];
+
+		this._children = [];
 		this._statesElements = [];
 		this.currentState = [];
 
@@ -72,12 +77,12 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
     },
 
    	bind: function(el) {
-   		var html = el.html();
+   		/*var html = el.html();
     	if (html.match(/\{\{.*\}\}/))
     	{
 			var tempFn = doT.template(html).bind(this);
 			this.__bindings.html.push({template: html, element: el, tempFn: tempFn});
-    	}
+    	}*/
     },
 
 	renderBindings: function(){
@@ -93,10 +98,24 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 			}			
 		}
 	},
-
+	createComponent: function(classPath, args){
+  		var compo = TdisplayObjectContainer._super.createComponent(classPath,args);
+  		if (this._children == null)
+  			this._children = [];
+  		this._children.push(compo);
+  		return compo;
+  	},
+	  		
     free: function(){
 
-		TdisplayObjectContainer._super.free.call(this);
+    	if (this._children != null)
+    	{
+    		TdisplayObjectContainer._super.free.call(this);
+			for (var i=0; i<this._children.length; i++)				
+				this._children[i].free();
+			
+			this._children = null;
+    	}
 		//inutile de désaffecter les events sur les objets jquery car remove() le fait.
 		//!!par contre, ce n'est pas le cas pour les composants panjs (il faut appeler free() sur tous les compo)
 	},
@@ -106,29 +125,29 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 	},
   	processStates:function(element)
   	{
-		var includeIn = element.getAttribute("includeIn");
-		if (includeIn!= null)
-		{
-	  		if (includeIn.indexOf(",")>=0)
-	  			includeIn = includeIn.split(",");
-	  		else
-	  			includeIn = [includeIn];
-	  	}
-
+		var includeIn = element.getAttribute("includeIn");		
+		if (includeIn != null)
+	  		includeIn = includeIn.split(" ");
+	  	var includeLogic = element.getAttribute("includeLogic") ||"OR"; 
+	  		  		  	
 
 	  	var excludeFrom = element.getAttribute("excludeFrom");
 	  	if (excludeFrom != null)
-	  	{
-	  		if (excludeFrom.indexOf(",")>=0)
-	  			excludeFrom = excludeFrom.split(",");
-	  		else
-	  			excludeFrom = [excludeFrom];
-	  	}
+			excludeFrom = excludeFrom.split(" ");
+		var excludeLogic = element.getAttribute("excludeLogic") ||"OR"; 			
+	  	
 
-	  	if ((includeIn != null) || (excludeFrom != null))
-	    	this._statesElements.push({elem: element, id:element.getAttribute("id"), includeIn: includeIn, excludeFrom: excludeFrom});
-	    
+	  	if ((excludeFrom != null) && (includeIn != null))
+	  		throw "'excludeFrom' and 'includeIn' attributes are exclusive";
+		
+	
+	  	if ((includeIn != null) || (excludeFrom != null)){
+	  		//logger.debug("includeIn = "+includeIn+", includeLogic="+includeLogic+", excludeFrom = "+excludeFrom+", excludeLogic="+excludeLogic);
+	  		var obj = {visible: null, excludeLogic: excludeLogic, includeLogic: includeLogic, elem: element, id:element.getAttribute("id"), includeIn: includeIn, excludeFrom: excludeFrom};
+	    	this._statesElements.push( obj );
+	  	}    
   	},
+
   	stateExists: function(state)
 	{
 	    var r = false;
@@ -152,110 +171,203 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 	    return r;
 	},
 
-	_setStateElementVisible: function(visible, state)
+	_setStateElementVisible: function(visible, stateObj)
 	{ 
- 		if (visible)
-		{	   
-				//affichage de l'élément
-				if (this[state.elem.originalId])
-				{
-
-					if (this[state.elem.originalId].className) 
-					{
-						// composant
-
-						this[state.elem.originalId].load();
-						this[state.elem.originalId].show();
-					}
-					else
-					{
-						// objet jquery
-						$(state.elem).show(); 
-					}
-				}
-				else
-				{
-					$(state.elem).show();
-				}
-		}
-		else
+		var isCompo = (stateObj.elem.getAttribute("data-compo") != null);
+		var r = false;
+		if (stateObj.visible != visible)
 		{
-				if (this[state.elem.originalId])
+			r = true;
+			if (visible)
+			{	   
+				//affichage de l'élément
+				if (isCompo) 
 				{
-					if (this[state.elem.originalId].className)
-					{
-						// composant
-						this[state.elem.originalId].hide();
-					}
-					else
-					{
-						// objet jquery
-						$(state.elem).hide();
-					}
+					// composant
+					stateObj.elem.compo.load();
+					stateObj.elem.compo.show();
 				}
 				else
 				{
-					$(state.elem).hide();
+					// objet jquery
+					$(stateObj.elem).show(); 
 				}
-			   
+			}
+			else
+			{
+				if (isCompo) 
+				{
+					// composant
+					stateObj.elem.compo.hide();
+				}
+				else
+				{
+					// objet jquery
+					$(stateObj.elem).hide();
+				}		   
+			}
+			stateObj.visible = visible;
 		}
+ 		return r;
+		
 	},
-	setState: function()
+	hasState: function(state){
+		var r = false;
+		for (var j=0; j< this.currentState.length; j++)
+		{
+			if (this.currentState[j] == state)
+			{
+				r = true;
+				break;
+			}
+		}
+		return r;
+	},
+	addState: function(state){
+		var currentState = [];
+		var found = false;
+		var changed = false;	
+		
+		for (var j=0; j< this.currentState.length; j++)
+		{
+			if (this.currentState[j] == state){
+				found = true;
+			}else{
+				currentState.push(this.currentState[j]);
+			}
+		}
+		
+		if (!found){
+			changed = true;
+			currentState.push(state);
+			this.setState(currentState);
+		}
+		return changed;
+	},
+	removeState: function(state){
+		var currentState = [];
+		var changed = false;
+		for (var j=0; j< this.currentState.length; j++){
+			if (this.currentState[j] != state)
+				currentState.push(this.currentState[j]);
+			else
+				changed = true;
+		}
+		if (changed)
+			this.setState(currentState);
+		return changed;
+
+	},
+	setState: function(mixed)
 	{
 		/*
 			- On affiche les éléments ayant includeIn = un des states passé en argument
 			- On cache les éléments ayant excludeFrom = un des states passé en argument
 		*/
-	
-		var oldStates = this.currentState;
-		this.currentState = [];
-	
-		var flag = false;
+		
+		var newStatesHash = {};
+		var oldStatesHash = {};
 
+		var changed = false;
+		if (typeof mixed != 'object'){
+			
+			var states = [];
+			for (var i=0; i< arguments.length; i++){
+				states.push(arguments[i]);
+				newStatesHash[arguments[i]] = 1;
+			}
+		}else{
+
+			var states = mixed;
+			for (var i=0; i < states.length; i++)
+				newStatesHash[states[i]] = 1;
+		}
+	
+		
+		var oldStates = this.currentState;
+		for (var i=0; i < this.currentState.length; i++){
+			this.container.removeClass(this.currentState[i]);	
+			oldStatesHash[ this.currentState[i] ] = 1;
+		}
+
+		this.currentState = [];
+		
 		for (var j=0; j< this._statesElements.length; j++)
 		{	
 			var el = this._statesElements[j];
 
-			var included = null;
-			var excluded = null;
+			var included = true;
+			var excluded = true;
 
-			for (var i=0; i<arguments.length; i++)
+			if  (el.includeIn != null)
 			{
-				var stateName = arguments[i];
+				excluded = null;
+				included = true;
 
-				if (this.stateExists(stateName))
-				{		
-					if (flag == false)
-			 			this.currentState.push(stateName);
+				for (var i=0; i<el.includeIn.length; i++)
+				{
+					var stateName = el.includeIn[i];
 
-					if ((el.includeIn != null)&&(included != true))
+					var stateIncluded = (typeof newStatesHash[stateName] != "undefined");
+
+					if (el.includeLogic == "OR")
 					{
-						included = (el.includeIn.indexOf(stateName) >= 0);						
-					}
-
-					if ((el.excludeFrom != null)&&(excluded != true))
-					{
-						excluded = (el.excludeFrom.indexOf(stateName) >= 0);	
-						if (excluded)				
-							break;
+						included = stateIncluded;
+						if (included)
+							break;		
+					}else{
+						included = included && stateIncluded;
 					}
 				}
-				
+			}else if  (el.excludeFrom != null)
+			{
+				excluded = false;
+				included = null;
+				for (var i=0; i<el.excludeFrom.length; i++)
+				{
+					var stateName = el.excludeFrom[i];
+					var stateIncluded = (typeof newStatesHash[stateName] != "undefined");
+					
+					if (el.excludeLogic == "OR")
+					{
+						excluded = stateIncluded;
+						if (excluded)
+							break;		
+					}else{
+						excluded = excluded && stateIncluded;
+					}
+				}
 			}
-			
-			flag = true;						
-
-			if ((included != null)||(excluded != null)){
-				//logger.debug("setState "+this.currentState+": affichage "+el.id+", included="+included+", excluded="+excluded);
-				var show = (((included == true)||(included == null)) && ((excluded == false)||(excluded == null)));
-				this._setStateElementVisible( show, el);
+								
+			if ((included != null)||(excluded != null)){				
+				var show = ((included == true) || (excluded == false));
+				var ch = this._setStateElementVisible( show, el);
+				changed = ch || changed ;
 			}
-			
 		}	
-	
-		for (var i=0; i< this.currentState.length; i++){
-			this.dispatchEvent(new Tevent(Tevent.STATE_CHANGED, {oldStates: oldStates, state: this.currentState[i]}));
+		
+		this.currentState = [];
+		for (var k in newStatesHash){
+			this.currentState.push(k);
+			this.container.addClass(k);
 		}
+		if (changed){
+			logger.debug(this.id+".currentState = "+JSON.stringify(this.currentState));
+
+			var statesAdded = [];
+			for (k in newStatesHash)
+				if (typeof oldStatesHash[k] == "undefined")
+					statesAdded.push(k);
+			
+			var statesRemoved = [];
+			for (k in oldStatesHash)
+				if (typeof newStatesHash[k] == "undefined")
+					statesRemoved.push(k);
+
+			this.dispatchEvent(new Tevent(Tevent.STATE_CHANGED, {oldStates: oldStates, newStates: this.currentState, removedStates: statesRemoved, addedStates:statesAdded}));
+		}
+		
+		return changed;
 	},
 
 	_populateElements: function(element, setObject, r)
@@ -320,7 +432,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 								if (autoload)
 								{
 									//creation instance du composant
-									var compo = panjs.createComponent(dataType,{elem:el, parent:this});	
+									var compo = this.createComponent(dataType,{elem:el, parent:this});	
 
 									/*if (compo.className == "TerrorElement"){
 										panjs.stack.push("Unable to create "+dataType+" : "+compo.message);
@@ -337,18 +449,20 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 										r.push(id);										
 									}		
 											
-									if (compo.visible == true)
-									{					
+									//if (compo.visible == true)
+									//{					
 										$(el).replaceWith(compo.container);										
 										compo.container[0].owner = compo;				
-									}
+									/*}
 									else
 									{
 										logger.info("PAS DE replaceWith pour ",compo.id ," visible = ",compo.visible," ",typeof compo.visible);
-									}
+									}*/
 							
 									el.loaded = true;
-									compo.loaded = true;							
+									el.compo = compo;
+									compo.loaded = true;
+
 								}
 								else
 								{
@@ -359,6 +473,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 									
 									proxyCompo.parent = this;
 									el.loaded = false;
+									el.compo = proxyCompo;
 									$(el).hide();
 									if ((setObject)&&(id != null))
 										this[id] = proxyCompo;
@@ -366,7 +481,8 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 
 							}						
 						}
-						el.originalId = id;				
+						el.originalId = id;	
+
 						el.owner = this;
 						this.processStates(el);							
 					

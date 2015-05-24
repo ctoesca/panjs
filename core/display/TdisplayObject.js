@@ -89,7 +89,11 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
   	removeClass: function(v){
   		this.container.removeClass(v);
   	},
-
+  	createComponent: function(classPath, args){
+  		var compo = panjs.createComponent(classPath,args);
+  		return compo;
+  	},
+  	
   	appendTo: function(elem){		
   		elem.append(this.container);		
 	},

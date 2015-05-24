@@ -12,7 +12,7 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 	*/
 	exitCodeFieldName: null, 
 	errorTextFieldName: null, 
-	lastTokenId: 0,
+	
 	extraUrlParams: null,
 	
 	constructor: function(args){	
@@ -93,25 +93,25 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 
 	post: function(url, params, data, success, failure, token)
 	{
-		this._call("POST", url, params, data, success||null, failure||null,token);
+		this._call("POST", url, params, data, success||null, failure||null,token||null);
 	},
 	get: function(url, params, data, success, failure, token)
 	{
 		//data est un objet qui est transformé en URL par jquery
 		//params sont des paramètres de l'url. Exemple: orderBy=nom&search=toto
-		this._call("GET", url, params, data, success||null, failure||null,token);
+		this._call("GET", url, params, data, success||null, failure||null,token||null);
 	},
 	getText: function(url, params, data, success, failure, token)
 	{
-		this._call("GET", url, params, data, success||null, failure||null,token, "text");
+		this._call("GET", url, params, data, success||null, failure||null,token||null, "text");
 	},
 	put: function(url, params, data, success, failure, token)
 	{
-		this._call("PUT", url, params, data, success||null, failure||null,token);
+		this._call("PUT", url, params, data, success||null, failure||null,token||null);
 	},
 	del: function(url, params, data, success, failure, token)
 	{
-		this._call("DELETE", url, params, data, success||null, failure||null,token);
+		this._call("DELETE", url, params, data, success||null, failure||null,token||null);
 	},
 	_call: function(method, url, params, data, success, failure, token, dataType)
 	{
@@ -125,13 +125,19 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 		/*
 			Construction des paramètres de l'url
 		*/
+
+		if (token == null)
+			token = {};
+
 		token.id = this.getNewTokenId();
+		if (!token.requestId)
+			token.requestId = token.id;
+
+
 		if (url.lastIndexOf("?") == -1)
 			url += "?";
 		
 		url += "&";
-			
-
 
 		var urlParams = this.extraUrlParams;
 		if (defined(params))
@@ -147,10 +153,11 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 				urlParams += "&"+params;
 			}
 		}
-		
+		urlParams = urlParams.replace(/#/g, '%23');
+
 		var path = this.baseUrl+url+urlParams;
 	
-		logger.debug("Appel ",method,": ",path,", dataType="+dataType);
+		logger.debug("TrestClient.CALL ",method,": ",path,", dataType="+dataType);
 
 		var req = $.ajax({ 
 				url: path,
@@ -165,10 +172,12 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 				dataType: dataType,	//json: fonctionne pas en crossdomain sur IE8
 									//nécessité d'utiliser XdomainRequest (CORS pour IE8)
 				success: function(data, textStatus, req) {
-					logger.debug("Requête AJAX "+token.requestId+" terminée avec succès sur ",url);
+					
 					if (token.aborted){
-						logger.debug("Requête "+token.requestId+" ANNULEE sur ",url);
+						logger.debug("Requête AJAX "+token.requestId+" ANNULEE sur ",url);
 						return;
+					}else{
+						logger.debug("Requête AJAX "+token.requestId+" terminée avec succès sur ",url);
 					}
 					
 					if (this.exitCodeFieldName != null)
@@ -226,3 +235,5 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 			return req;	
 	}
 });
+
+TrestClient.lastTokenId = 0;

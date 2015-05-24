@@ -51,7 +51,9 @@ defineClass("TsearchCombobox", "core.display.Telement", {
             this.valueField = this.labelField;
 
         this.waitingIcon = $('<i class="fa fa-spinner fa-2x fa-spin" id="waitingIcon" style="margin-top: 4px; margin-right: 5px; float:left; font-size:1.2em;color:#0099CC;"></i>');
+        this.errorElement = $('<div id="errorElement" class="alert alert-danger" role="alert" style="display:none; font-size:0.9em; padding:7px"></div>');
         this.container.prepend(this.waitingIcon);
+         this.container.prepend(this.errorElement);
 
         this._combo = this.select.combobox().data('combobox') ;
 
@@ -95,7 +97,8 @@ defineClass("TsearchCombobox", "core.display.Telement", {
             }
         }
         this.waitingIcon.hide();
-      
+        this.hideErrorText();
+
          this.container.getElement('input.combobox').attr('placeholder', this.placeholder);
         this._combo.$source.on("change", this.onChange.bind(this));
         
@@ -132,9 +135,17 @@ defineClass("TsearchCombobox", "core.display.Telement", {
         }
         this.select.append(s);
     },
-    setErrorText: function(v){
-        this.container.html('<div class="alert alert-danger" role="alert" style="font-size:0.9em">'+v+'</div>');
+    showErrorText: function(v){
+        this.container.getElement(".input-group").hide();
+        this.errorElement.html(v);
+        this.errorElement.show();
+        this.waitingIcon.hide();
     }, 
+    hideErrorText: function(v){
+        this.container.getElement(".input-group").css("display", "table");
+        this.errorElement.hide();
+    },
+
    _getOutputVal: function(item){
         return item;
     },
@@ -204,6 +215,10 @@ defineClass("TsearchCombobox", "core.display.Telement", {
             }
            
         }       
+    },
+    free: function(){
+        this._super.free.call(this);
+        this._combo.$menu.remove();
     }
 });
 
@@ -211,6 +226,9 @@ defineClass("TsearchCombobox", "core.display.Telement", {
 </script>
 </head>
 <body>
+
+
+
 <select class="combobox form-control" id="select"  style="display:none">
 </select>
 </body>

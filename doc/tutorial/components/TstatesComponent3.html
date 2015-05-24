@@ -1,0 +1,66 @@
+<html>        
+<head> 
+  <script type="text/x-class-definition">
+    //<![CDATA[      
+    defineClass("TstatesComponent3", "core.display.Telement", { 
+
+        baseElement: "div", 
+        
+        constructor: function(args){
+            this._super.constructor.call(this,args);  
+            //by default: 'state1'
+            this.setState(['state1']);
+
+            this.menu.getElements("li a").each(function(indx, el){
+                el.on("click", this.onMenuClick.bind(this));
+            }.bind(this));
+        },
+        onMenuClick: function(e){
+          var state = $(e.target).attr("data-target-state").split(" ");
+          if (this.hasState("connected"))
+              state.push("connected");
+
+          this.setState(state);
+        },
+        connect: function(){
+          this.addState("connected");
+        },
+        disconnect: function(){
+          this.removeState("connected");
+        }
+    });
+    //]]>
+  </script>
+</head>
+
+<body>  
+  
+  <div class="container-fluid">
+    
+
+
+    <div class="row">
+      <div class="col-md-3">
+      
+        <button class="btn btn-success" excludeFrom="connected" data-onclick="this.connect">Connect</button>
+        <button class="btn btn-danger" includeIn="connected" data-onclick="this.disconnect">Disconnect</button> 
+
+        <ul id="menu">
+          <li><a data-target-state="state1">item 1</a></li>
+          <li><a data-target-state="state2">item 2</a></li>
+          <li><a data-target-state="state3">item 3</a></li>
+          <li includeIn="connected"><a data-target-state="state4">item 4 (for connected users)</a></li>
+        </ul>
+      </div>
+      <div class="col-md-9">   
+          <div data-compo="components.Tpanel.html" includeIn="state1"><h1>content state1</h1></div>
+          <div data-compo="components.Tpanel.html" includeIn="state2"><h2>content state2</h2></div>
+          <div data-compo="components.Tpanel.html" includeIn="state3"><h3>content state3</h3></div>
+          <div data-compo="components.Tpanel.html" includeIn="state4 connected" includeLogic="AND"><h4>content state4</h4></div>
+          <div data-compo="components.Tpanel.html" id="panelnotconnected" excludeFrom="connected state1 state2 state3"><h2>Not Connected !</h2></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html> 

@@ -3,7 +3,7 @@
 
 <script type="text/x-class-definition">
 //<![CDATA[
-
+uses("model.Tmodel");   
 uses("model.Model2");
 defineClass("app", "core.display.Telement", { 
 
@@ -12,6 +12,11 @@ defineClass("app", "core.display.Telement", {
 
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);
+		var model = new Tmodel();
+		this.todoList.load({model : model});
+		this.todoList2.load({model : model});
+
+
 		this.model2 = new Model2();
 		this.model2.on(Tevent.CHANGE, this.onModel2Changed.bind(this));
 		this.model2.initData({
@@ -40,7 +45,9 @@ defineClass("app", "core.display.Telement", {
 
 <body>	
 	<a data-onclick="this.onClick" style="display:none">Test</a>
-	<div id="todoList" data-compo="components.TtodoList.html" autoload="true">  </div>    
+	<div id="todoList" data-compo="components.TtodoList.html" autoload="false">  </div>    
+	<div id="todoList2" data-compo="components.TtodoList.html" autoload="false">  </div> 
+
 
 </body>
 </html> 

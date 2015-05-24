@@ -1,0 +1,232 @@
+<html>        
+<head>
+
+  <link href="/libs/selectize/0.12.1/dist/css/selectize.bootstrap3.css" rel="stylesheet"/>
+
+  <script type="text/javascript" src="/libs/selectize/0.12.1/dist/js/standalone/selectize.min.js"></script>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("Tselectize", "core.display.Telement", { 
+	/* PROPRIETES */
+	baseElement: "select",
+	
+	/* ARGS */	
+	valueField: "id",
+	labelField: "text",
+	searchField: null,
+	sortField: null,
+	placeholder: "",
+	width: null,
+	renderItem: null,
+	renderOption: null,
+	theme: "default",
+
+	/* PRIVATE */
+	_data: null,
+	_control:null,
+	_dataProvider: null,
+	_data: null,
+	_selectingItems: null,
+	
+
+	constructor: function(args){
+		
+		this._super.constructor.call(this,args);
+
+
+		
+
+		this.injectParam("width", args["width"],false);
+		this.injectParam("placeholder", args["placeholder"],false);
+		this.injectParam("valueField", args["valueField"],false);
+		this.injectParam("labelField", args["labelField"],false);
+		this.injectParam("searchField", args["searchField"],false);
+		this.injectParam("sortField", args["sortField"],false);
+		this.injectParam("theme", args["theme"],false);
+		
+		panjs.loader.loadCssFile("/libs/selectize/0.12.1/dist/css/selectize."+this.theme+".css");
+
+		if (this.searchField == null)
+			this.searchField = this.labelField;
+		if (this.sortField == null)
+			this.sortField = this.labelField;
+		if (this.width != null)
+			this.container.attr("width", this.width);
+
+     	this.container.attr("placeholder",this.placeholder);
+	},
+
+	_transformItem: function(item){
+		return  item;//{id: item[this.valueField], nom: '<img src="/libs/icons/24/iconVmware.png"/>'+item[this.labelField] , isVm: item.isVm};
+	},
+	
+	setDataProvider: function(dp)
+	{
+		
+		this._dataProvider = dp;
+		this._data = [];
+		for (var i=0; i< this._dataProvider._items.length; i++)
+			this._data.push(  this._transformItem( this._dataProvider._items[i] ) );
+
+		this.refresh();
+	},
+
+	_onAfterCreateComponent: function(){
+		if (this._selectingItems != null)
+		{
+			this._selectingItems.callback();
+			this._selectingItems = null;
+		}
+	},
+	_createComponent: function(data){
+		var render ={};
+		if (this.renderOption)
+			render.option = this.renderOption;
+		if (this.renderItem)
+			render.item = this.renderItem;
+
+		var r = this.container.selectize({
+					plugins: ['remove_button'],
+					maxItems: null,
+					maxOptions: 100,
+					valueField: this.valueField,
+					labelField: this.labelField,
+					searchField: this.searchField,
+					sortField: this.sortField,
+					options: this._data,
+					create: false,
+					openOnFocus: true,
+					maxOptions: 1000,
+					hideSelected: true,
+					closeAfterSelect: false,
+					allowEmptyOption:false,
+					scrollDuration: 60,
+					dropdownParent: null,
+					onDropdownOpen: this._onOpen.bind(this),
+					onDropdownClose: this._onClose.bind(this),
+					onChange: this._onChanged.bind(this),
+					render: render
+		})[0].selectize;
+		return r;
+		
+	},
+
+	refresh: function() {	
+		//this._control.refreshOptions();
+		//this._control.refreshItems();
+		if (this._control == null){
+			this._control = this._createComponent(this._data);
+		}else{
+			this._control.destroy();
+			this._control = this._createComponent();
+		}
+		this._onAfterCreateComponent();
+	},
+	
+	getSelectedValues:function(propname){
+		if (arguments.length<1)
+			var propname = this.valueField;
+
+		var items = this.getSelectedItems();
+		var r = [];
+		for (var i=0; i< items.length; i++)
+			r.push(items[i][propname]);
+		return r;
+	},
+
+	setSelectedValues:function(values, propname, silent)
+	{
+		if (this._control != null)
+		{
+			var items = [];
+			if (arguments.length<2)
+				var propname = this.valueField;
+
+			for (var i=0; i<values.length; i++)
+			{
+	 			var item = this._dataProvider.getByProp(propname, values[i]);
+	 			if (item != null)
+					items.push( item[this.valueField] );
+			}
+			this._control.setValue( items, silent);	
+		}
+		else{
+			this._selectingItems = { callback: this.setSelectedValues.bind(this, values, propname, silent)};
+		}
+
+	},
+
+	getSelectedItems: function()
+	{		
+		var selId = this._control.getValue();	
+		var r = [];
+
+		if (selId != null)
+		for (var i=0; i<selId.length; i++){
+			r.push( this._dataProvider.getByProp("id", selId[i]));
+		}
+		return r;
+	},
+
+	setSelectedItems: function(arr, silent)
+	{
+		if (this._control != null)
+		{
+			var items = [];
+			for (var i=0; i<arr.length; i++)
+			{
+				if ( arr[i] != null)
+				items.push( arr[i].id );
+			}
+			this._control.setValue( items, silent);	
+
+		}else{
+			this._selectingItems = { callback: this.setSelectedItems.bind(this, arr, silent)};
+		}
+	},
+	
+	_onOpen: function(e)
+	{
+		if (this.opened == false)
+		this.dispatchEvent( new Tevent(Tevent.OPEN));
+		this.opened = true;
+	},
+	_onClose: function(e)
+	{
+		if (this.opened == true)
+		this.dispatchEvent( new Tevent(Tevent.CLOSE));
+		this.opened = false;
+	},
+	_onChanged: function(e, data)
+	{
+		var data = this.getSelectedItems();
+		this.dispatchEvent( new Tevent(Tevent.CHANGE, data));
+	},
+	
+	enabled: function(value){
+		if (arguments.length >0)
+		{
+			this._enabled = value;
+			if (value)
+				this._control.enable(value);
+			else
+				this._control.disable(value);
+		}
+		else{
+			return this._enabled;
+		}
+	},
+	free: function(){
+		this._super.free.call(this);
+		this._control.destroy();
+	}
+});
+//]]>
+</script>
+
+
+</head>
+</html> 
+

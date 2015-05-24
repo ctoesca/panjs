@@ -10,8 +10,8 @@
 
 
 
-<link href="/libs/bootstrap-datetimepicker/4.0.0/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
-<script type="text/javascript" src="/libs/bootstrap-datetimepicker/4.0.0/build/js/bootstrap-datetimepicker.min.js"></script>
+<link href="/libs/bootstrap-datetimepicker/4.7.14/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+<script type="text/javascript" src="/libs/bootstrap-datetimepicker/4.7.14/build/js/bootstrap-datetimepicker.min.js"></script>
 
 
 <!--<script type="text/javascript" src="/libs/bootstrap-datetimepicker/4.0.0/build/js/bootstrap-datetimepicker.fr.js"></script>-->
@@ -24,6 +24,11 @@
 {
 vertical-align: middle;
 }
+.TinputDateTime input.error{
+	color:red;
+	border-style:solid;
+	border-color:red;
+}
 </style>
 
 <script type="text/x-class-definition">
@@ -35,12 +40,13 @@ defineClass("TinputDateTime", "core.display.Telement", {
 	value: null,
 	baseElement: "div",
 	widget: null,
-	format: "DD/MM/YYYY",
-	pickTime: false,
+	format: "DD/MM/YYYY HH:mm",
+	pickTime: true,
 	useCurrent: false,    
 	minuteStepping: 15,
 	_enabled: true,
-
+	sideBySide: false,
+	placeholder: "",
 	/* METHODES */
 	
 	constructor: function(args){
@@ -59,21 +65,32 @@ defineClass("TinputDateTime", "core.display.Telement", {
 
 			if (typeof args.enabled != "undefined")
 				var toDisable = !args.enabled;
+
+			if (typeof args.sideBySide != "undefined")
+				this.sideBySide = args.sideBySide;
+
+			if (typeof args.placeholder != "undefined")
+				this.placeholder = args.placeholder;
+			else
+				this.placeholder = this.format;
 		}
+
+		if (!this.pickTime)
+			this.format = 'DD/MM/YYYY';
 		
-		if (this.pickTime)
-			this._f = false;
-		else
-			this._f = 'MM/dd/YYYY';
-
 		this.datePicker.attr("data-date-format", this.format);
-
+		this.input.attr("placeholder", this.format);
 
 		var w = this.datePicker.datetimepicker({
 			locale: 'fr',
-			format: this._f,
+			format: this.format,
 			useCurrent: this.useCurrent,
-			stepping: this.minuteStepping
+			stepping: this.minuteStepping,
+			showTodayButton: true,
+			showClear: false,
+			showClose: true,
+			sideBySide: this.sideBySide,
+			keepInvalid: true
 		});
 
 		this.widget = this.datePicker.data("DateTimePicker");
@@ -97,11 +114,14 @@ defineClass("TinputDateTime", "core.display.Telement", {
 		this.datePicker.on("dp.error", this._onErrorDate.bind(this));
 		this.datePicker.on("dp.change", this._onChangeDate.bind(this));
 		this.input.on("change", this._onChangeDate.bind(this));
+		this.input.on("keyup", this._onKeyUp.bind(this));
+		this.input.on("blur", this._onKeyUp.bind(this));
 
 	},
 	free: function(){
 		this._super.free.call(this);
 		this.widget.destroy();
+		this.input.remove();
 	},
 	_onErrorDate: function(e)
 	{
@@ -109,6 +129,10 @@ defineClass("TinputDateTime", "core.display.Telement", {
 	_onHideDate: function(e)
 	{	
 
+	},
+	_onKeyUp: function(e)
+	{
+		this.checkDate();
 	},
 	_onChangeDate: function(e)
 	{
@@ -118,23 +142,19 @@ defineClass("TinputDateTime", "core.display.Telement", {
 	},
 	checkDate : function()
 	{
-		this.input.css("color", "");
-		try{
-			if (this.input.val().trim() == "")
-				return true;
-			var isValide = moment(this.getInputText(), this.format).isValid();
-
-			if (!isValide){
-				this.input.css("color", "red");
-				return false;
+		setTimeout( function(){
+			var isValid;
+			var s = this.input.val().trim();
+			if (s == ""){
+				isValid = true;
 			}
 			else{
-				return true;
+				s = s.replace(/\s+/g, ' ');
+				isValid = moment(s, [this.format],true).isValid();
 			}
-		}catch(err){
-			this.input.css("color", "red");
-			return false;
-		}
+			this.input.toggleClass("error", !isValid);
+			
+		}.bind(this), 300);
 	},
 	_onShowDate: function(e)
 	{
@@ -143,33 +163,14 @@ defineClass("TinputDateTime", "core.display.Telement", {
 
 	val: function(value)
     {
-        //type value: String YYYY-MM-DD HH:mm:ss"
-
+        //type value: Moment object
         if (arguments.length == 0)
         {
-  		
-            var r = this.widget.date();
-            if (this.input.val().trim() == "")
-            r = null;
-
-        	if (this.checkDate() == false)
-				throw "Date incorrecte";
-
-            return r;
-
+            return this.widget.date();
         }else
         {	
-        	
+        	this.widget.date(value);
 
-        	if (value == null){
-        		this.widget.date(null);
-        	}
-        	else{
-
-            	this.widget.date(moment(value).format(this.format));
-				if (this.checkDate() == false)
-				throw "Date incorrecte";
-        	}
         }
     },
     getInputText: function(){
@@ -177,16 +178,19 @@ defineClass("TinputDateTime", "core.display.Telement", {
     },
 	setTimeStamp: function(v)
 	{
-		if (v == null)
-			return;
-		this.val( new Date(v.replace(" ","T")));
+		//AAAA-MM-JJ HH:mm:ss
+		if (v == null){
+			this.widget.date(null);
+		}
+		else{
+			var m = moment(v);
+			this.val( m);
+		}
 	},
 	getTimeStamp: function()
     {
-        var r = this.val();
-        if (r !=null)
-        r = moment(r).format("YYYY-MM-DD HH:mm:00");
-
+        var r = this.val(); if (r != null)
+        r = r.format("YYYY-MM-DD HH:mm:ss");
         return r;
     }
 });
@@ -197,8 +201,8 @@ defineClass("TinputDateTime", "core.display.Telement", {
 <body>		 
 
 
-                <div class="input-group date" id="datePicker" data-date-format="YYYY-MM-DD HH:mm:ss">
-                    <input type='text' class="form-control" id="input"/>
+                <div class="input-group date" id="datePicker" >
+                    <input type="text" class="form-control" id="input" />
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
                     </span>
                 </div>

@@ -166,7 +166,7 @@ defineClass("TlistView", "core.display.Telement", {
 	createLI: function(item){
 		if (this.itemRendererClass)
 		{
-			var LIcompo = panjs.createComponent( this.itemRendererClass, { model: this.model});
+			var LIcompo = this.createComponent( this.itemRendererClass, { model: this.model});
 			LIcompo.container.attr("item_id", this.getPrimaryKeyValue(item));
 			LIcompo.setData(item);
 			var LI = LIcompo.container[0];

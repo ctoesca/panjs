@@ -1,0 +1,32 @@
+<html>        
+<head>
+  <style type="text/css">
+    .app10
+    {
+      border: 1px solid #bce8f1;
+      border-radius: 4px;
+      padding:5px;
+    }
+  </style>
+
+  <script type="text/x-class-definition">
+    //<![CDATA[      
+
+    uses("core.helpers.Ttimer");
+
+    defineClass("app10", "core.display.Telement", { 
+
+      baseElement: "div", 
+
+      constructor: function(args){
+          this._super.constructor.call(this,args);  
+        }
+      });
+    //]]>
+  </script>
+
+</head>
+<body>  
+   <div data-compo="components.TstatesComponent1.html"></div>     
+</body>
+</html> 

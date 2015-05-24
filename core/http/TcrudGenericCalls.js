@@ -357,9 +357,10 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		else
 		{
 			var itemModels= this.getItemsById(item[this.IDField]);
-
+			
 			if (itemModels.length > 0)
 			{
+
 				for (var i=0; i< itemModels.length; i++)
 				{
 					var itemModel = itemModels[i].item;
@@ -374,7 +375,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 						//if (item.date_modif != itemModel.date_modif){
 							//L'item existe
 							itemModels[i].model.replaceItem(itemModel, item);
-							logger.info("Objet "+this.className+" modifié");
+							//logger.debug("updateModel: Objet "+this.className+" modifié");
 
 						/*}else
 						{
@@ -383,15 +384,16 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 							*/	
 					}
 				}
+				logger.info("updateModel: "+itemModels.length+" objet(s) "+this.className+" modifié(s)");
 			}
 	       	else
 	       	{
 	       		//création ou pas dans le model
 	       		if (item._isNew == true){
 					this.addItemInModels(item);
-					logger.info("Objet "+this.className+" ajouté");
-	       			
+					logger.info("updateModel: 1 objet "+this.className+" ajouté");
 	       		}
+	       		
 	       	}	
 		}
 		 	

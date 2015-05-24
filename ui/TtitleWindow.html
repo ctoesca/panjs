@@ -77,6 +77,7 @@ defineClass("TtitleWindow", "core.display.Telement", {
 	},
 	free: function()
 	{
+		this._super.free.call(this);
 		this.buttonClose.off();
 	}
 });

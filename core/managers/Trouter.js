@@ -71,8 +71,10 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 			hash = null;
 		if (hashKey != null)
 		{
-			var l = this.listeners[hashKey];	
-			return l.onhashchange(hash);
+			if (this.listeners[hashKey]){
+				var l = this.listeners[hashKey];	
+				return l.onhashchange(hash);
+			}
 		}else{
 
 			for (var hashkey in this.listeners)

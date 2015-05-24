@@ -1,0 +1,69 @@
+<html>        
+<head>
+
+<style>
+
+.TfontPicker
+{
+	display:inline-block;
+}
+</style>
+
+<script type="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("TfontPicker", "ui.dropdown.Tdropdown.html", { 
+
+
+	localstorageKey: null,
+	fonts: null,
+	labelField: "label",
+
+	placeholder: "Choisir la fonte",
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+		this.fonts = 
+			['Arial,Helvetica,sans-serif',
+	        'Arial Black,Gadget,sans-serif',
+	        'Comic Sans MS,cursive',
+	        'Roboto',
+	        'Courier New,Courier,monospace',
+	        'Georgia,serif',
+	        'Impact,Charcoal,sans-serif',
+	        'Lucida Console,Monaco,monospace',
+	        'Lucida Sans Unicode,Lucida Grande,sans-serif',
+	        'Palatino Linotype,Book Antiqua,Palatino,serif', 
+	        'Tahoma,Geneva,sans-serif',
+	        'Times New Roman,Times,serif', 
+	        'Trebuchet MS,Helvetica,sans-serif', 
+	        'Verdana,Geneva,sans-serif' 
+	    ]
+		var arr = [];
+		for (var i=0; i< this.fonts.length; i++){
+			var label = '<span style="font-family:'+this.fonts[i]+'">'+this.fonts[i].split(',')[0]+'</span>';
+			arr.push( {label: label, id: i , value: this.fonts[i]});
+		}
+         
+		this.setDataProvider( new TarrayCollection(arr));
+    
+	},
+	val: function(v){
+		if (arguments.length == 0){
+			var r = this.getDataProvider().getSelectedItem();
+			if (r != null)
+				r = r.value;
+		}else{
+			var item = this.getDataProvider().getByProp("value", v);
+			this.setSelectedItem(item);
+		}
+	}
+	
+
+});
+//]]>
+</script>
+
+</head>
+	
+</html> 

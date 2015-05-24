@@ -3,7 +3,7 @@ defineClass("Ttimer", "core.events.TeventDispatcher",
 	delay: null,
 	running: false,
 	_token:null,
-
+  count: 0,
 	constructor: function(args) { 
 		Ttimer._super.constructor.call(this,args);	
 
@@ -30,6 +30,7 @@ defineClass("Ttimer", "core.events.TeventDispatcher",
   	reset: function(){
       if (this.running)
         this._settimeout();
+      this.count = 0;
   	},
 
   	_settimeout: function(){
@@ -39,6 +40,7 @@ defineClass("Ttimer", "core.events.TeventDispatcher",
 
   	stop: function(){
       this.running = false;
+      this.count = 0;
   	},
 
   	_onTimer: function(token)
@@ -47,6 +49,7 @@ defineClass("Ttimer", "core.events.TeventDispatcher",
       {
         var evt = new Tevent(Ttimer.ON_TIMER, {});
         this.dispatchEvent(evt);
+        this.count ++;
         this._settimeout();  
       }
   	}
