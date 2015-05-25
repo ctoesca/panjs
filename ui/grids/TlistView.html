@@ -50,10 +50,9 @@ defineClass("TlistView", "core.display.Telement", {
 			this._dataProvider.on(Tevent.UPDATE, this._onItemUpdated.bind(this));
 			this._dataProvider.on(Tevent.DELETE, this._onItemRemoved.bind(this));
 			this._dataProvider.on(Tevent.ADDED, this._onItemAdded.bind(this));
-			this._dataProvider.on(Tevent.REFRESH, this.refresh.bind(this));
+			this._dataProvider.on(Tevent.REFRESH, this.render.bind(this));
 			this._dataProvider.on(Tevent.REPLACE, this._onItemReplaced.bind(this));
 		}
-
 		this.render();
 	},
 	
@@ -107,22 +106,27 @@ defineClass("TlistView", "core.display.Telement", {
 		var item = e.data.item;
 		var newItem = e.data.newItem;	
 	},
-
+	_itemIsVisible: function(item){
+		var r = ((this.filterFunction==null) || this.filterFunction(item));
+		return r;
+	},
 	refreshItem: function( item )
 	{	
 		var el = this.getLIFromItem(item); 	
-		if (el && this.filterFunction && this.filterFunction(item)){
+		if (this._itemIsVisible(item)){
 			el[0].owner.setData(item);
+			el.show();
+		}else{
+			if (el) el.hide();
 		}
 	},
 	_insertLineAt: function(item, indx)
 	{	
-		if (this.filterFunction && this.filterFunction(item))
-		{
-			var el = this.container.getElements('li'); 
-			var LI = this.createLI(item);
-			$(LI).insertBefore(el[indx]);
-		}
+		var el = this.container.getElements('li'); 
+		var LI = $(this.createLI(item));
+		LI.insertBefore(el[indx]);
+		if (!this._itemIsVisible(item))
+			LI.css("display", "none");
 	},
 
 	_onItemUpdated: function(e)
@@ -135,7 +139,7 @@ defineClass("TlistView", "core.display.Telement", {
 	{
 		var item = e.data.item;
 		var indx = e.data.index;
-		this._insertLineAt(item, indx);
+		this._insertLineAt(item, indx);			
 	},
  
 	_onItemRemoved: function(e)
@@ -159,11 +163,7 @@ defineClass("TlistView", "core.display.Telement", {
 		this.filterFunction = f;
 		this.render();
 	},
-	refresh: function()
-	{
-		this.render();
-	},
-	createLI: function(item){
+	createLI: function(item, visible){
 		if (this.itemRendererClass)
 		{
 			var LIcompo = this.createComponent( this.itemRendererClass, { model: this.model});
@@ -172,7 +172,8 @@ defineClass("TlistView", "core.display.Telement", {
 			var LI = LIcompo.container[0];
 		}else{
 			var LI = document.createElement('LI');
-			LI.innerHTML = '<pre>'+JSON.stringify(item)+'</pre>';
+			LI.setAttribute("item_id", this.getPrimaryKeyValue(item));
+			LI.innerHTML = JSON.stringify(item).replace(/",/g, '", ');
 		}
 		return LI;
 	},
@@ -180,18 +181,22 @@ defineClass("TlistView", "core.display.Telement", {
 	{
 		var LI = this.createLI(item);
 		docFragment.appendChild(LI);
+		if (!this._itemIsVisible(item))
+			$(LI).css("display", "none");
 	},
 	render: function()
-	{		
+	{				
 		if (this._dataProvider == null)
 			return;
 
+		logger.debug(this.id+".render()");
 		var docFragment = document.createDocumentFragment();
+
 		for (var i =0; i< this._dataProvider.length; i++)
 		{
-			var d = this._dataProvider.getItemAt(i);	
-			if ((this.filterFunction) && (this.filterFunction(d)))
-				this._addLine(d, docFragment);
+
+			var d = this._dataProvider.getItemAt(i);
+			this._addLine(d, docFragment);
 		}	
 
 		this.container.empty();

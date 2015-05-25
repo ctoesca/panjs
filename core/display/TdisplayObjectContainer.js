@@ -120,7 +120,7 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 		//!!par contre, ce n'est pas le cas pour les composants panjs (il faut appeler free() sur tous les compo)
 	},
 	__OnPropChanged: function(propName, oldValue, newValue, object){
-		logger.debug("__OnPropChanged : propName = "+propName+", oldValue = "+oldValue+", newValue = "+newValue);
+		//logger.debug("__OnPropChanged : propName = "+propName+", oldValue = "+oldValue+", newValue = "+newValue);
 		this.renderBindings();		
 	},
   	processStates:function(element)

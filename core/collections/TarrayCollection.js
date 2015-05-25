@@ -162,27 +162,23 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
         this.filterFunction = f;
       }
     },
-    dispatchUpdateEvent: function(oldItem, newItem ){
-      this.dispatchEvent( new Tevent(Tevent.UPDATE, newItem));
-      this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"UPDATE", item: oldItem, newItem:newItem}));
+    dispatchUpdateEvent: function(item){
+      this.dispatchEvent( new Tevent(Tevent.UPDATE, item));
+      this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"UPDATE", item: item}));
     },
-
+   
     refresh:function()
     {
       
       if (this.filterFunction != null)
         this._items = this._source.filter( this.filterFunction );
-      else
-         this._items = this._source.slice(0);
+      //else
+      //   this._items = this._source.slice(0);
 
       this.length = this._items.length;
      
       this.dispatchEvent( new Tevent(Tevent.REFRESH, this));
       this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REFRESH"}));
-    },
-
-    itemUpdated: function(item, property, oldValue, newValue){
-       this.dispatchEvent( new Tevent(Tevent.UPDATE, item));
     },
 
     /*
@@ -226,9 +222,7 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
       this.dispatchEvent( new Tevent(Tevent.REPLACE, {item:item, newItem: newItem}));
       this.dispatchEvent( new Tevent(Tevent.CHANGE, {action:"REPLACE",item:item, newItem: newItem}));
     },
-    sendUpdateEvent: function(item){
-       this.dispatchEvent( new Tevent(Tevent.UPDATE, item));
-    }, 
+   
     replaceItem:function(item, newItem)
     { 
       if (item == newItem)

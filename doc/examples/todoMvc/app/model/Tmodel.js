@@ -4,7 +4,12 @@ uses("services.TlocalService");
 defineClass("Tmodel", "core.events.TeventDispatcher", { 
 	
 	todos: null,
+	$filter: null,
 
+	__OnPropChanged: function(propName, oldValue, newValue, object){
+		this.todos.refresh();
+	},
+	
 	constructor: function(args){		
 		this._super.constructor.call(this,args);
 		this.service = new TlocalService();
@@ -31,6 +36,7 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 		item.completed = false;
 		this.todos.addItemAt(item, 0);
 		this.save();
+
 	},
 	removeTodo: function(todo){
 		this.todos.removeItem(todo);
@@ -62,7 +68,7 @@ defineClass("Tmodel", "core.events.TeventDispatcher", {
 			}
 			if (changed){
 				this.save();
-				this.todos.sendUpdateEvent(todo);
+				this.todos.dispatchUpdateEvent(todo);
 			}
 		}
 	},

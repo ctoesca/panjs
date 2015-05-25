@@ -25,6 +25,7 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 			
 			if (this.hashKey == null)
 				this.hashKey = this.id;
+			
 			panjs.router.registerComponent(this, this._onHashChange, this.hashKey);
 		}
 

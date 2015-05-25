@@ -19,11 +19,11 @@ defineClass("Model", "core.events.TeventDispatcher",
   },
 
   __OnPropChanged: function(propName, oldValue, newValue, object){
-    if (this.settingData)
+      if (this.settingData)
       return;
 
       if (this[propName] instanceof Model){
-        logger.error("Affectation owner sur objet "+propName);
+        logger.debug("Affectation owner sur objet "+propName);
         this[propName].owner = this;
       }
 

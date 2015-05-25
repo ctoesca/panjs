@@ -28,7 +28,9 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
   	registerComponent: function(c, onhashchange)
   	{
   		this.refreshkeys();
-  		this.listeners[c.hashKey] = {owner: c, onhashchange: onhashchange.bind(c)};
+  		if (typeof this.listeners[c.hashKey] == "undefined")
+  			this.listeners[c.hashKey] = [];
+  		this.listeners[c.hashKey].push( {owner: c, onhashchange: onhashchange.bind(c) });
   	},
 
   	getHash: function(owner)
@@ -69,22 +71,25 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
   	{
   		if (typeof hash == "undefined")
 			hash = null;
+
 		if (hashKey != null)
 		{
-			if (this.listeners[hashKey]){
-				var l = this.listeners[hashKey];	
-				return l.onhashchange(hash);
-			}
-		}else{
-
-			for (var hashkey in this.listeners)
-			{			
-				if (hashkey != null){
-					var l = this.listeners[hashkey];
-					l.onhashchange(hash);	
+			if (this.listeners[hashKey])
+			{
+				for (var i=0; i<this.listeners[hashKey].length; i++){
+					var l = this.listeners[hashKey][i];	
+					l.onhashchange(hash);
 				}
+				
 			}
-		}
+		}/*else{
+
+			for (var k in this.listeners)
+			{			
+				var l = this.listeners[k];
+				l.onhashchange(hash);	
+			}
+		}*/
   	},
   	decode: function(str)
   	{

@@ -12,9 +12,10 @@ defineClass("app", "core.display.Telement", {
 
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);
-		var model = new Tmodel();
-		this.todoList.load({model : model});
-		this.todoList2.load({model : model});
+		var model_1 = new Tmodel();
+		var model_2 = new Tmodel();
+		this.todoList1.load({model : model_1});
+		this.todoList2.load({model : model_1});
 
 
 		this.model2 = new Model2();
@@ -23,10 +24,10 @@ defineClass("app", "core.display.Telement", {
 			prop1: Math.random(),
 			prop2: Math.random()
 		});
-		
+		this.model2.model3.prop3 = "TOTO";
 	},
 	onModel2Changed: function(e){
-		logger.error(e.data.object.className+".__OnPropChanged: propName="+e.data.propName+" => "+e.data.newValue+", data="+JSON.stringify(e.data.object.getData()));	
+		//logger.error(e.data.object.className+".__OnPropChanged: propName="+e.data.propName+" => "+e.data.newValue+", data="+JSON.stringify(e.data.object.getData()));	
 	},
 	
 
@@ -45,8 +46,13 @@ defineClass("app", "core.display.Telement", {
 
 <body>	
 	<a data-onclick="this.onClick" style="display:none">Test</a>
-	<div id="todoList" data-compo="components.TtodoList.html" autoload="false">  </div>    
+
+	<div id="todoList1" data-compo="components.TtodoList.html" autoload="false">  </div>    
+		
 	<div id="todoList2" data-compo="components.TtodoList.html" autoload="false">  </div> 
+		
+	
+	
 
 
 </body>
