@@ -124,7 +124,10 @@ defineClass("TlistView", "core.display.Telement", {
 	{	
 		var el = this.container.getElements('li'); 
 		var LI = $(this.createLI(item));
-		LI.insertBefore(el[indx]);
+		if (el.length >0)
+			LI.insertBefore(el[indx]);
+		else
+			this.container.append(LI);
 		if (!this._itemIsVisible(item))
 			LI.css("display", "none");
 	},
