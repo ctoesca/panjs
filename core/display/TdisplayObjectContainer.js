@@ -213,48 +213,73 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 	},
 	hasState: function(state){
 		var r = false;
-		for (var j=0; j< this.currentState.length; j++)
+
+		if (typeof state == "string")
 		{
-			if (this.currentState[j] == state)
+			for (var j=0; j< this.currentState.length; j++)
 			{
-				r = true;
-				break;
+				if (this.currentState[j] == state)
+				{
+					r = true;
+					break;
+				}
 			}
+		}else{
+			logger.error("hasState error: state is undefined");
 		}
+		
 		return r;
 	},
 	addState: function(state){
-		var currentState = [];
-		var found = false;
-		var changed = false;	
-		
-		for (var j=0; j< this.currentState.length; j++)
+
+		var changed = false;
+
+		if (typeof state == "string")
 		{
-			if (this.currentState[j] == state){
-				found = true;
-			}else{
-				currentState.push(this.currentState[j]);
+			var currentState = [];
+			var found = false;
+				
+			
+			for (var j=0; j< this.currentState.length; j++)
+			{
+				if (this.currentState[j] == state){
+					found = true;
+				}else{
+					currentState.push(this.currentState[j]);
+				}
 			}
+			
+			if (!found){
+				changed = true;
+				currentState.push(state);
+				this.setState(currentState);
+			}
+		}else{
+			logger.error("addState error: state is undefined");
 		}
-		
-		if (!found){
-			changed = true;
-			currentState.push(state);
-			this.setState(currentState);
-		}
+	
 		return changed;
 	},
 	removeState: function(state){
-		var currentState = [];
+
 		var changed = false;
-		for (var j=0; j< this.currentState.length; j++){
-			if (this.currentState[j] != state)
-				currentState.push(this.currentState[j]);
-			else
-				changed = true;
-		}
-		if (changed)
-			this.setState(currentState);
+
+		if (typeof state == "string")
+		{
+			var currentState = [];
+			
+			for (var j=0; j< this.currentState.length; j++){
+				if (this.currentState[j] != state)
+					currentState.push(this.currentState[j]);
+				else
+					changed = true;
+			}
+			if (changed)
+				this.setState(currentState);
+			
+		}else{
+			logger.error("removeState error: state is undefined");
+		}	
 		return changed;
 
 	},
@@ -273,14 +298,21 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 			
 			var states = [];
 			for (var i=0; i< arguments.length; i++){
-				states.push(arguments[i]);
-				newStatesHash[arguments[i]] = 1;
+				if (arguments[i] != undefined){
+					states.push(arguments[i]);
+					newStatesHash[arguments[i]] = 1;
+				}else{
+					logger.error("setState error: state is undefined");
+				}
 			}
 		}else{
 
 			var states = mixed;
 			for (var i=0; i < states.length; i++)
-				newStatesHash[states[i]] = 1;
+				if (states[i] != undefined)
+					newStatesHash[states[i]] = 1;
+				else
+					logger.error("setState error: state is undefined");
 		}
 	
 		

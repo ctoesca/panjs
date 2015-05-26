@@ -20,7 +20,6 @@ defineClass("TlistView", "core.display.Telement", {
 	baseElement: "ul",	
 	_dataProvider: null,
 	primaryKeyFields:null,
-	_isEmpty: true,
 	itemRendererClass: null,
 	filterFunction: null,
 
@@ -113,7 +112,9 @@ defineClass("TlistView", "core.display.Telement", {
 	refreshItem: function( item )
 	{	
 		var el = this.getLIFromItem(item); 	
-		if (this._itemIsVisible(item)){
+		if (el!=null)
+		if (this._itemIsVisible(item))
+		{
 			el[0].owner.setData(item);
 			el.show();
 		}else{
@@ -124,10 +125,13 @@ defineClass("TlistView", "core.display.Telement", {
 	{	
 		var el = this.container.getElements('li'); 
 		var LI = $(this.createLI(item));
-		if (el.length >0)
-			LI.insertBefore(el[indx]);
-		else
+		
+		if (el.length < indx+1){
 			this.container.append(LI);
+		}
+		else{
+			LI.insertBefore(el[indx]);
+		}
 		if (!this._itemIsVisible(item))
 			LI.css("display", "none");
 	},
@@ -149,19 +153,11 @@ defineClass("TlistView", "core.display.Telement", {
 	{
 		var item = e.data;
 		var el = this.getLIFromItem(item); 
+		if (el!=null)
 		if (!isUndefined( el[0].owner.free ))
 			el[0].owner.free();
-		else
-			alert("el[0].owner.free est indéfini");
 	},
 
-	empty: function()
-	{
-		if (this._isEmpty == false)
-		{			
-			this._isEmpty = true;
-		}
-	},
 	setFilterFunction: function(f){
 		this.filterFunction = f;
 		this.render();
@@ -204,8 +200,6 @@ defineClass("TlistView", "core.display.Telement", {
 
 		this.container.empty();
 		this.container[0].appendChild(docFragment);
-
-		this._isEmpty = false;
 
 	}
 

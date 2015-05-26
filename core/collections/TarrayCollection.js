@@ -350,10 +350,16 @@ defineClass("TarrayCollection", "core.events.TeventDispatcher", {
 
   	removeItem: function(item)
   	{
-  		var indx = this.getItemIndex(item);
-  		if (indx >= 0){
-  			this._removeItemAt(indx, item);
+      if (item != null)
+      {
+        var indx = this.getItemIndex(item);
+        if (indx >= 0){
+          this._removeItemAt(indx, item);
+        }
+      }else{
+         var indx = -1;
       }
+  		
       return indx;
   	},
   	
