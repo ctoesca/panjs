@@ -45,11 +45,16 @@
 
   <script>
     $(document).ready(function() 
-    {        
+    {
       panjs.load($(document.body)) ;  
+
       uses("app.model.Tmodel");
       var model = new Tmodel();
+     
       panjs.root.todoList1.load({model : model});  
+      panjs.root.todoList2.load({model : model});         
+
+     
     });
   </script>
 </head>
@@ -57,6 +62,7 @@
 <body data-framework="panjs">
 
     <div id="todoList1" data-compo="app.app.html" autoload="false">  </div>     
+    <div id="todoList2" data-compo="app.app.html" autoload="false">  </div>  
 
     <footer id="info">
       <p>Double-click to edit a todo</p>

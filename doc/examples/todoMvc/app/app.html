@@ -4,16 +4,14 @@
 <script type="text/x-class-definition">
 //<![CDATA[
 
-uses("app.model.Tmodel");
+
 defineClass("app", "core.display.Telement", { 
 
 	baseElement: "div",	
 
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);
-
-		var model = new Tmodel();
-		this.todoList1.load({model : model});
+		this.todoList1.load({model: args.model});
 	}
 });
 

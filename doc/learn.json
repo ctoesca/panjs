@@ -6,7 +6,12 @@
 		"examples": [
 		{
 			"name": "TodoMvc example",
-			"url": "",
+			"url": "http://www.nexilearn.com/libs/panjs/trunk/doc/examples/todoMvc/index.html",
+			"source_url": "https://github.com/ctoesca/panjs/tree/master/doc/examples/todoMvc"
+		},
+		{
+			"name": "TodoMvc x2 example",
+			"url": "http://www.nexilearn.com/libs/panjs/trunk/doc/examples/todoMvc/index2.html",
 			"source_url": "https://github.com/ctoesca/panjs/tree/master/doc/examples/todoMvc"
 		},
 		{
