@@ -5,10 +5,14 @@
 .Ttabnav2{
 	div.tab-content{
 		/*padding-top:10px;*/
-		overflow-y:auto;
-		overflow-x:hidden;
-		padding: 16px 12px;
+		/*overflow-y:auto;
+		overflow-x:hidden;*/
+		/*ACE: padding: 16px 12px; */
+		padding-top: 16px;
 
+	}
+	.tab-pane{
+		height: 100%;
 	}
 }
 
@@ -69,7 +73,7 @@ defineClass("Ttabnav2", "core.display.Telement", {
 	},
 	resize: function(){
 		var h = this.container.height() - this.myTab.height();
-		//logger.debug("container.height="+this.container.height()+" , myTab.height="+this.myTab.height()+" , h="+h);
+		logger.debug("container.height="+this.container.height()+" , myTab.height="+this.myTab.height()+" , h="+h);
 		this.tabContent.css("height", h+"px");
 	},
 	/*_populateElements: function(element, setObject, r)
@@ -101,23 +105,38 @@ defineClass("Ttabnav2", "core.display.Telement", {
 		el.attr("id", this.container.attr("id")+"_tab"+tabIndx);
 
 		var label = el.attr("label");
-		if (label == null)
-			if (typeof opt.label  != "undefined")
+		if (label == null){
+			if (typeof opt.label  != "undefined"){
 				el.attr("label", opt.label);
+			}else{
+
+			}
+		}
 		
 		var autoloadComponents = el.attr("data-autoload-components");
 		if (autoloadComponents == null)
 			if (typeof opt.autoloadComponents != "undefined")
 				el.attr("data-autoload-components", opt.autoloadComponents);
 
-		this._createTab(el);	
+		return this._createTab(el);	
 
 	},
     _createTab: function(el)
 	{
+	
 		var label = el.attr("label");
-		if (label == null)
-			label = el.attr("id");
+		if (label == null){
+			var labelElement = el.getElement("label");
+
+			if (labelElement == null){
+				label = el.attr("id");
+			}
+			else{
+				label = labelElement.html();
+				labelElement.remove();
+			}
+		}
+
 		var autoloadComponents = this.autoloadComponents;
 		if (el.attr("data-autoload-components") != null)
 			autoloadComponents = (el.attr("data-autoload-components") == "true");
@@ -148,16 +167,22 @@ defineClass("Ttabnav2", "core.display.Telement", {
 		this.tabContent.append(el);
 		var tab = {elem:el, link:a, li: li, visible: visible, subComponentsLoaded: false, autoloadComponents: autoloadComponents};
 		this.tabs.push(tab);
-
+		return tab;
 	},
-
+	getTabByIndex: function(indx){
+		return this.tabs[indx];
+	},
+	setLabel: function(tab, value){
+		//!! bind sur objet tab
+		tab.link.html(value);
+	},
 	onTabClick: function(e)
 	{
 		var a = $(e.target);
 		var indx = a.attr("tabIndex");
 		this.selectTab(indx);
 		e.preventDefault();
-		return;
+		return false;
 	},
 
 	_inactivateAll: function()
@@ -178,8 +203,9 @@ defineClass("Ttabnav2", "core.display.Telement", {
 		for (var i = 0; i < composToLoad.length; i++) {
 			var compo = composToLoad[i];
 
-			if (typeof this.parent[compo[0].originalId] != "undefined")
+			if (typeof this.parent[compo[0].originalId] != "undefined"){
 				this.parent[compo[0].originalId].load();
+			}
 		};
 		tab.subComponentsLoaded = true;
 		/* on ne charge que les composants de 1er niveau */
@@ -248,12 +274,3 @@ defineClass("Ttabnav2", "core.display.Telement", {
 
 </body>
 </html> 
-
-
-
-
-
-
-
-
-

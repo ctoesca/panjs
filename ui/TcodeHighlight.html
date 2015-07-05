@@ -46,8 +46,10 @@
         {
             this.sourceClasspath = args.sourceClasspath;
 
-            var classe = uses(this.sourceClasspath);
-            var source = classe.Class.prototype.source;
+            var url = panjs.getAbsoluteUrlFromClassPath(this.sourceClasspath);
+            var result = panjs.loader.loadFile(url, this.onFileLoadSuccess.bind(this), this.onFileLoadFailure.bind(this));
+         
+            var source = result.data;
 
             source = source.replace(/&/g, "&amp;");
             source = source.replace(/</g, "&lt;");
@@ -77,6 +79,12 @@
       },
       processCode: function(code){
         return code;
+      },
+      onFileLoadSuccess: function(e){
+
+      },
+      onFileLoadFailure: function(e){
+        
       }
 
     });
