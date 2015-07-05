@@ -42,7 +42,7 @@ defineClass("Ttimer", "core.events.TeventDispatcher",
       this.running = false;
       this.count = 0;
   	},
-
+    
   	_onTimer: function(token)
   	{
       if ((this.running)&&(this._token == token))

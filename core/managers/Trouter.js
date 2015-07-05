@@ -38,36 +38,39 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
   		var r = this.keys[owner.hashKey] ||null;
   		return r;
   	},
-	setHash: function(owner, value)
+	setHash: function(owner, value, silent)
   	{
   		//if (typeof value == "undefined")
   		//	value = null;
-
+  		//logger.debug("START Trouter.setHash: "+value+" silent="+silent);
   		if (this.keys[owner.hashKey] != value)
   		{
   			var oldValue = this.keys[owner.hashKey];
 
   			this.keys[owner.hashKey] = value||null;
   			var encoded = this.encode(this.keys);
-  			sendEvents = false;
+  			this.sendEvents = false;
 			window.location.hash = encoded;
 			/*Le fait d'avoir déjà modifié this.keys fait que onhashchange ne détectera pas qeul objet a modifié son hash (pas de différence)
 			et n'enverra pas d'evenement donc on envoie l'évènement ici.
 			De plus, c'est plus optimisé.
+			!!edit: en fait onhashchange est déclenché quand même après cette fonction.
 			*/
 
-			var r = this._dispatchOnhashchange(owner.hashKey, value);
+			if (!silent)
+				this._dispatchOnhashchange(owner.hashKey, value, oldValue);
+
 			//logger.debug("Trouter.setHash: RETOUR Onhashchange="+r);
-			sendEvents = true;	
+			this.sendEvents = true;	
 		}
 		else
 		{
 			logger.debug("Trouter.setHash: "+value+" => inchangé sur "+owner.id);
 			//this._dispatchOnhashchange(owner.hashKey, value);
 		}
-
+		//logger.debug("END Trouter.setHash: "+value+" silent="+silent);
   	},
-  	_dispatchOnhashchange: function( hashKey, hash)
+  	_dispatchOnhashchange: function( hashKey, hash, oldValue)
   	{
   		if (typeof hash == "undefined")
 			hash = null;
@@ -78,7 +81,7 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 			{
 				for (var i=0; i<this.listeners[hashKey].length; i++){
 					var l = this.listeners[hashKey][i];	
-					l.onhashchange(hash);
+					l.onhashchange(hash, oldValue);
 				}
 				
 			}
@@ -175,18 +178,20 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 	    	if ((typeof this.keys[k] == "undefined")||(this.keys[k] == null))
 	    	{
 	    		//la clef est valorisée alors qu'elle ne l'était pas
+	    		var oldhash =  null;
 	    		this.keys[k] = this.keysTmp[k];
 	    		//logger.debug("Trouter.onhashchange: VALORISATION this.keys["+k+"] = "+this.keysTmp[k]);
-	    		logger.debug("Trouter.onhashchange: [1] Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]);
-	    		this._dispatchOnhashchange(k, this.keys[k]);   
+	    		logger.debug("Trouter.onhashchange: [1] Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]+", oldhash="+oldhash);
+	    		this._dispatchOnhashchange(k, this.keys[k], oldhash);   
 	    	}else{
 				//la clef est valorisée, elle l'était déjà
 	    		if (this.keysTmp[k] != this.keys[k])
 	    		{
+	    			var oldhash =  this.keys[k];
 	    			//logger.debug("Trouter.onhashchange: VALORISATION this.keys["+k+"] = "+this.keysTmp[k]);
 	    			this.keys[k] = this.keysTmp[k];
-	    			logger.debug("Trouter.onhashchange: [2] Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]);
-	    			this._dispatchOnhashchange(k, this.keys[k]);  
+	    			logger.debug("Trouter.onhashchange: [2] Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]+", oldhash="+oldhash);
+	    			this._dispatchOnhashchange(k, this.keys[k], oldhash);  
 	    		}
 	    	}
 	    	    	
@@ -198,21 +203,17 @@ defineClass("Trouter", "core.events.TeventDispatcher", {
 	    //Mise à null des clefs qui n'existent plus
 
   		for (k in this.keys){
-
-  			found = true;
-  			//logger.debug("Trouter.onhashchange: k="+k+" , this.keys[k]="+this.keys[k]+", this.keysTmp[k]="+this.keysTmp[k]);
-
+  			found = true;		
   			if (typeof this.keysTmp[k] == "undefined")
 	    	{	    			
 	    		this.keys[k] = null;
-	    		//logger.debug("Trouter.onhashchange: VALORISATION this.keys["+k+"] = null");
 	    		logger.debug("Trouter.onhashchange: [3] Le composant "+k+" va être notifié que son hash a changé: hash="+this.keys[k]);
 	    		if (typeof this.listeners[k] != "undefined"){
 	    			
-	    			this._dispatchOnhashchange(k, this.keys[k]);   
+	    			this._dispatchOnhashchange(k, this.keys[k], null);   
 	    		}
 	    	}
-  		} 
+  		}
 	    
 		var evt = new Tevent(Trouter.HASH_CHANGE,  this.keys);
 	    this.dispatchEvent(evt);

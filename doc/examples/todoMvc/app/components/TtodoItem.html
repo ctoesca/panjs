@@ -1,14 +1,6 @@
 <html>        
 <head>
-<style>
-.disable-select {
-  -webkit-user-select: none;  
-  -moz-user-select: none;    
-  -ms-user-select: none;      
-  user-select: none;
-}
 
-</style>
 <script type="text/x-class-definition">
 //<![CDATA[
 
@@ -47,7 +39,7 @@ defineClass("TtodoItem", "core.display.Telement", {
 		this.model.updateTodo(this.todo, {completed: $(e.target).prop("checked")});
 	},
 
-	onStartEditing: function(e){
+	onStartEditingClick: function(e){
 		
 		this.container.addClass("editing");
 		this.edit1.focus();
@@ -57,7 +49,7 @@ defineClass("TtodoItem", "core.display.Telement", {
 		this.edit1.val(this.todo.body);
 	},
 	
-	onEndEditing: function(e){	logger.error(e.type);
+	onEndEditing: function(e){	
 		var value = this.edit1.val().trim();
 		if (value == "")
 			this.model.removeTodo(this.todo);
@@ -83,9 +75,9 @@ defineClass("TtodoItem", "core.display.Telement", {
 </head>
 
 <body>
-		<div class="view disable-select">
+		<div class="view">
 			<input id="checkbox1" data-onclick="this.onToggleCompletedClick" class="toggle" type="checkbox" checked="checked" />
-			<label id="label1" data-ondblclick="this.onStartEditing"></label>
+			<label id="label1" data-ondblclick="this.onStartEditingClick"></label>
 			<button id="btn1" data-onclick="this.onDestroyClick" class="destroy"></button>
 		</div>
 		<input class="edit" id="edit1" value="" data-onchange="this.onEndEditing" data-onkeyup="this.onEditKeyUp" data-onblur="this.onEndEditing" />

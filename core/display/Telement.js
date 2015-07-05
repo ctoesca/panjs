@@ -91,14 +91,14 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 		this.container.attr("style", css);  
   	},
 
-  	_onHashChange: function(hash)
+  	_onHashChange: function(hash, oldValue)
   	{
 		var r = false;
 		
   		if (this.enableHashManager) 
   		if (typeof this.onHashChange === "function"){
-  			logger.debug("Telement."+this.id+"._onHashChange => "+hash);
-  			r = this.onHashChange(hash);
+  			logger.debug("Telement."+this.id+"._onHashChange: "+oldValue+" --> "+hash);
+  			r = this.onHashChange(hash, oldValue);
   		}
   		return r;
   	},
@@ -110,10 +110,13 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 
   	},
 
-  	setHash:function(hash)
+  	setHash:function(hash, silent)
   	{
-  		if (this.enableHashManager) 
-  		 panjs.router.setHash(this, hash);
+  		if (this.enableHashManager){
+  			if (arguments.length < 2)
+  				var silent = false;
+  		 	panjs.router.setHash(this, hash, silent);
+  		}
   	},
 	getHash:function()
   	{

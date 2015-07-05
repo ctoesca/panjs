@@ -140,7 +140,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 
 		return r;
 	},
-	setSelectedItem:function(value)
+	setSelectedItem:function(value, silent)
 	{
 	
 		if (value != this._selectedItem)
@@ -156,15 +156,15 @@ defineClass("TdropdownBase", "core.display.Telement", {
 			{
 				this._setLabel(this._selectedItem);
 			}
-		
+			if ((arguments.length < 2) || (silent == false))
 			this.dispatchEvent( new Tevent(Tevent.CHANGE, this._selectedItem));
 		}
 	},
 			
-	setSelectedItemByLabel:function(label)
+	setSelectedItemByLabel:function(label, silent)
 	{
 		var item = this.getItemByLabel(label);
-		this.setSelectedItem(item);
+		this.setSelectedItem(item, silent);
 	},
 	getItemByLabel:function(label)
 	{

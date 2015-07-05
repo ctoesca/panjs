@@ -22,7 +22,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		this.injectParam("apiUrl", args.apiUrl, true);
 		this.injectParam("extraUrlParams", args.extraUrlParams, true);
 
-		this.data = {Default: new TarrayCollection()};
+		this.data = {};
 
 		this.restClient = new TrestClient({extraUrlParams: this.extraUrlParams, baseUrl: this.apiUrl, dataType:"json"});
 	},
@@ -97,10 +97,13 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	},	
 
 	addItemInModels: function(item){
+		var r = 0;
 		for (var nomModel in this.data){
 			var model = this.data[nomModel];
 			model.addItemAt(item,0);
+			r++;
 		}
+		return r;
 	},
 
 	removeItemFromModels: function(itemId){
@@ -357,10 +360,10 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		else
 		{
 			var itemModels= this.getItemsById(item[this.IDField]);
-			
+		
 			if (itemModels.length > 0)
 			{
-
+	
 				for (var i=0; i< itemModels.length; i++)
 				{
 					var itemModel = itemModels[i].item;
@@ -374,6 +377,8 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 					{
 						//if (item.date_modif != itemModel.date_modif){
 							//L'item existe
+							
+							
 							itemModels[i].model.replaceItem(itemModel, item);
 							//logger.debug("updateModel: Objet "+this.className+" modifié");
 
@@ -390,8 +395,8 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 	       	{
 	       		//création ou pas dans le model
 	       		if (item._isNew == true){
-					this.addItemInModels(item);
-					logger.info("updateModel: 1 objet "+this.className+" ajouté");
+					var count = this.addItemInModels(item);
+					logger.info("updateModel: "+count+" objet(s) "+this.className+" ajouté(s)");
 	       		}
 	       		
 	       	}	
@@ -451,11 +456,17 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		if (searchOptions == null)
 			searchOptions = "";
 		
-		if (searchOptions.startsWith("&"))
-			searchOptions = searchOptions.substring(1);
-	
+		var q = "";
+		if (typeof searchOptions == "object"){
+			for (var k in searchOptions)
+				q += k+"="+searchOptions[k]+"&";
+			q = q.removeEnd("&");
+		}else{
+			q = searchOptions;
+		}
+			
 		if (nomModel == null){
-			nomModel = searchOptions;
+			nomModel = q;
 		}
 
 		var model = this.getModel(nomModel, false);
@@ -467,7 +478,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 		
 		if ((useCache == false) || (model == null) )
 		{			
-			this.restClient.get(this.url, searchOptions , data, this._onsearch.bind(this), failure||this.defaultErrorHandler, token);		
+			this.restClient.get(this.url, q , data, this._onsearch.bind(this), failure||this.defaultErrorHandler, token);		
 		}
 		else
 		{

@@ -173,7 +173,12 @@ defineClass("TcrudService", "core.events.TeventDispatcher", {
 
 		return result;
 	},
-
+	removeItem: function (name, value, success, failure) {
+		var key = this.localStorageId+"."+name;
+		localStorage.removeItem(key);
+		if (defined(success))
+			success(value);
+	},
 	setValue: function (name, value, success, failure) {
 
 

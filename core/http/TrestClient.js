@@ -157,7 +157,7 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 
 		var path = this.baseUrl+url+urlParams;
 	
-		logger.debug("TrestClient.CALL ",method,": ",path,", dataType="+dataType);
+		logger.debug("TrestClient._call requestId:"+token.requestId,", method:", method,", path: ",path,", dataType="+dataType);
 
 		var req = $.ajax({ 
 				url: path,
@@ -178,6 +178,8 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 						return;
 					}else{
 						logger.debug("Requête AJAX "+token.requestId+" terminée avec succès sur ",url);
+						if (logger.debug)
+							logger.debug("data size = "+req.responseText.length+" bytes");
 					}
 					
 					if (this.exitCodeFieldName != null)
@@ -207,11 +209,13 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 						success(e, token);
 				},
 				error: function( jqXHR, textStatus, errorThrown) {
-					logger.debug("ECHEC Requête AJAX "+token.requestId+" "+errorThrown+" sur ",url);
+					
 					if (token.aborted){
 						logger.debug("Requête "+token.requestId+" ANNULEE sur ",url);
 						return;
 					}
+					
+					logger.error("TrestClient._call.error: Echec requête "+token.requestId+": "+errorThrown+" sur ",url);
 
 					var readyState = "?";
 					if (jqXHR.readyState == 0) readyState = "request not initialized";
@@ -220,9 +224,23 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 					if (jqXHR.readyState == 3) readyState = "processing request";
 					if (jqXHR.readyState == 4) readyState = "request finished and response is ready";
 
-					var headers = JSON.stringify(jqXHR.getAllResponseHeaders());
+					var headers = (jqXHR.getAllResponseHeaders());
 
-					logger.error("responseHeaders="+headers+", readyState="+readyState+", jqXHR.responseText = "+jqXHR.responseText +", jqXHR.responseXml = "+jqXHR.responseXML +", textStatus="+textStatus+", errorThrown = "+errorThrown);
+					var responseText = jqXHR.responseText;
+					if ((typeof jqXHR.responseText == "string")&&(jqXHR.responseText.length > 1000))
+						responseText = responseText.substring(0, 1000)+" ...";
+					
+					var responseXml = jqXHR.responseXml;
+					if ((typeof jqXHR.responseXml == "string")&&(jqXHR.responseXml.length > 1000))
+						responseXml = responseXml.substring(0, 1000)+" ...";
+
+					logger.debug("responseHeaders="+headers);
+					logger.debug("readyState="+readyState);
+					logger.debug("responseText = "+responseText);
+					logger.debug("responseXml = "+responseXml);
+					logger.debug("textStatus="+textStatus);
+					logger.debug("errorThrown = "+errorThrown);
+
 					var e = this._getErrorEvent(jqXHR, method, errorThrown,path, token);
 
 					this.dispatchEvent(e);

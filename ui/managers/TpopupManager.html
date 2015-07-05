@@ -43,12 +43,19 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 			}
 		}.bind(this));*/
 	},
-
+	_getNewPopupZindex: function(){
+		var r = 9000;
+		var lastModal = this._getLastModal();
+		if (lastModal != null)
+			r = lastModal.zindex;
+		r += 2;
+		return r;
+	},
 	addPopup: function(instance, options)
 	{		
+		var _zindex = this._getNewPopupZindex();
 		
-		
-		var ctn = $('<div class="window TpopupManager" ></div>');
+		var ctn = $('<div class="window TpopupManager" style="z-index:'+_zindex+'"></div>');
 		ctn.on("click", function(e){
 			if ( $(e.target).hasClass("window"))
 				this._onMaskClick(e);
@@ -60,7 +67,9 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 			window: ctn, 
 			compo: instance, 
 			closeOnMaskClick: false,
-			freeOnClose: true
+			freeOnClose: true,
+			zindex: _zindex
+
 		};
 
 		if (defined(options, "closeOnMaskClick"))
@@ -74,8 +83,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		instance.on(Tevent.CLOSE, this._onCompoClose, this);
 	
 		this.popups.push( obj );
-
-		
+			
 
 		$(document.body).append(ctn);
 		this._positionnerModal(ctn);
@@ -87,6 +95,9 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		}
         //ctn.fadeIn(500); 
         this._showMask();
+
+		this.mask.css("z-index", _zindex-1); 
+		
 		this.dispatchEvent(new Tevent(Tevent.SHOW, instance));	
 		//$(document.body).css("overflow-y", "hidden");
 		
@@ -131,10 +142,14 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 				compo.off(Tevent.CLOSE, this._onCompoClose);
 			
 				this.popups.splice(i,1);	
-					
-				if (this._getLastModal() == null)
+				
+				var lastModal = this._getLastModal();
+				if (lastModal == null){
 					this._hideMask();
-								
+				}
+				else{
+					this.mask.css("z-index", lastModal.zindex-1); 
+				}
 				this.dispatchEvent(new Tevent(Tevent.CLOSE, compo));
 				if ((typeof compo.free == "function")&&( freeOnClose == true))
 					compo.free();
@@ -157,6 +172,7 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 		{*/
 			this.mask.hide();
 			this.mask.css("opacity", "0"); 
+
 		//}
         
         this.maskIsVisible = false;
@@ -168,6 +184,9 @@ defineClass("TpopupManager", "core.events.TeventDispatcher", {
 			$(document.body).append( this.mask);
 			this.mask.on("click", this._onMaskClick.bind(this)); 
 		}
+
+
+		
 
 		this._refreshMaskSize();  
 		/*if ((panjs.iever == -1) ||(panjs.iever >= 10)){

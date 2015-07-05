@@ -17,7 +17,7 @@
       <script src="../lib/Respond/respond.min.js"></script>
     <![endif]-->
 
-    <script src="lib/jquery/dist/jquery.js"></script>
+   <script src="../../../lib/jquery/2.1.1/jquery.min.js"></script>
     <script src="lib/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
     <script>
@@ -27,13 +27,13 @@
         env: "prod", // dev or prod
         appVersion: "0.1", //utilisé dans l'url des commposants htm, js et css (pas de cache si nouvelle version)
         version: "0.7.1", //version de panjs
-              
-        namespaces:[
-          {name: "core", path: "../../../core"},
-          {name: "ui", path: "../../../ui"},
-          {name: "app", path: "components"}     
-          ]
-        };  
+                    
+        namespaces: {
+          "core"    : {path:  "../../../core"},
+          "ui"    : {path:  "../../../ui"},
+          "app"  : {path: "components"}
+        }
+      };  
     //]]>
     </script>
 

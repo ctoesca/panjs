@@ -1,10 +1,9 @@
 <html>        
 <head>
-<script type="text/javascript" src="../../../../lib/doT.js"></script>
 
 <style>
-
 </style>
+
 <script type="text/x-class-definition">
 //<![CDATA[
 uses("core.helpers.Ttimer");
@@ -57,6 +56,7 @@ defineClass("app", "core.display.Telement", {
 	onFrameRateTimer: function(e){
 		this.framerate = (this.counter - this.lastCounter) / 2;
 		this.lastCounter = this.counter;
+		this.statElem.text('Framerate='+this.framerate+'/sec - '+this.circles.length+' circles');
 	}
 });
 
@@ -74,7 +74,7 @@ defineClass("app", "core.display.Telement", {
 	<!-- in onclick is just a callback, so dont't use {{ }}-->
 	<button id="btnAdd" data-onclick="this.addCircle">Add circle</button>
 
-	<span>{{=this.framerate}}/sec - {{=this.circles.length}} circles</span> 
+	<span id="statElem"></span> 
 	
 	<div id="circlesContainer"></div>
 	<div style="clear:both"></div>

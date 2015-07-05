@@ -105,9 +105,21 @@ defineClass("TeventDispatcher", "core.Tobject", {
 		this._listeners[type].push(l);
 	},
 
-	/* 	params: (type:String, listener:Function, useCapture:Boolean = false 
-		return void
-	*/
+	
+	offByCtx: function(ctx){
+		for (type in this._listeners)
+		{
+			var listeners = this._listeners[type];
+			for (var i=0; i< listeners.length; i++)
+			{
+				if ((listeners[i] != null)&&(listeners[i].bind == ctx))
+				{
+					listeners[i] = null;
+				}	
+			}
+		}
+	},
+	
 	off: function(type, listener)
 	{
 		var indx = this._getListenerIndex(type, listener);

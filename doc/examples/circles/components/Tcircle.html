@@ -10,10 +10,10 @@
     }
 
     .Tcircle .box {
-      border-radius: 100px;
+      border-radius: 50%;  
       width: 20px; 
       height: 20px;
-      padding: 5px 0;
+      padding: 5px 2px 0 2px;
       color: #fff;
       font: 10px/10px Arial;
       text-align: center;
@@ -44,7 +44,7 @@ defineClass("Tcircle", "core.display.Telement", {
     this.count ++;
     this.top = (Math.sin(this.count / 10) * 10) + 'px';
     this.left = this.direction * (Math.cos(this.count / 10) * 10) + 'px';
-    this.color = 'rgb(0,0,' + (this.count) % 255 + ')'; 
+    this.color = 'rgb(0,'+(this.count) % 255+',0)'; 
     this.content = this.count % 100;
     this.render();
   },

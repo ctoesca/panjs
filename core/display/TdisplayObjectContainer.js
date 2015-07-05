@@ -19,7 +19,7 @@
 
 defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 { 	
-	/* PROPRIETES */
+
 	_statesElements: null,
 	currentState: null,
 	defaultState: null,
@@ -27,8 +27,6 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 	__bindings:null,
 	_children: null,
 
-
-	/* METHODES */	
 	constructor: function(args) { 	
 		this._bindElements = [];
 		this.__bindings = { html: [] };
@@ -175,6 +173,10 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 	{ 
 		var isCompo = (stateObj.elem.getAttribute("data-compo") != null);
 		var r = false;
+
+		//if (logger.isLevelEnabled(Tlogger.TRACE))
+		//	logger.trace("_setStateElementVisible show="+visible+", isCompo="+isCompo+", id="+stateObj.id);
+
 		if (stateObj.visible != visible)
 		{
 			r = true;
@@ -373,6 +375,8 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 								
 			if ((included != null)||(excluded != null)){				
 				var show = ((included == true) || (excluded == false));
+			
+
 				var ch = this._setStateElementVisible( show, el);
 				changed = ch || changed ;
 			}
@@ -383,8 +387,10 @@ defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
 			this.currentState.push(k);
 			this.container.addClass(k);
 		}
+
 		if (changed){
-			logger.debug(this.id+".currentState = "+JSON.stringify(this.currentState));
+			if (logger.isLevelEnabled(Tlogger.TRACE))
+				logger.trace(this.id+".currentState = "+JSON.stringify(this.currentState));
 
 			var statesAdded = [];
 			for (k in newStatesHash)

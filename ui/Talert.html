@@ -131,6 +131,17 @@ Talert.show = function(message, buttons, closeHandler, data, iconhtml, title, fa
 	});
 	return p;
 }
+Talert.confirm = function(message,closeHandler, data)
+{
+	if (!defined(iconhtml))
+		var iconhtml = '<i class="glyphicon glyphicon-exclamation-sign" style="font-size:200%; color:#f0ad4e"/>';
+
+	var _title = "Demande de confirmation";
+	if ((typeof title != "undefined") && (title != null))
+		_title = title;
+
+	Talert.show(message, [Talert.YES, Talert.CANCEL], closeHandler, data, iconhtml, _title, false);	
+}
 Talert.warn = function(message, buttons, closeHandler, data, iconhtml, title, fade)
 {
 	if (!defined(iconhtml))

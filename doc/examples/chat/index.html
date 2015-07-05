@@ -8,7 +8,7 @@
    <link rel="shortcut icon" href="favicon.png"/>
    <META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="en-EN,en"/>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="../../../lib/jquery/2.1.1/jquery.min.js"></script>
    
    <script>
     //<![CDATA[  
@@ -18,11 +18,11 @@
         appVersion: "1.0.0", 
         version: "0.7.0", 
 
-        namespaces:[
-        {name: "core", path: "../../../core"},
-        {name: "ui", path: "../../../ui"},
-        {name: "app", path: "components"}
-        ]
+        namespaces: {
+          "core"    : {path:  "../../../core"},
+          "ui"    : {path:  "../../../ui"},
+          "app"  : {path: "components"}
+        }
       };  
     //]]>
   </script>

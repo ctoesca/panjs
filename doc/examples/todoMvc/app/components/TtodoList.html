@@ -23,16 +23,7 @@ defineClass("TtodoList", "core.display.Telement", {
 		this.model.filter = this.getHash();
 		this.todoList.model = this.model;
 
-		//set click events on footer links
-		this.filters.getElements("a").each(function(indx, el){
-			var hash = el.attr("href").rightOf("=") || null;
-			el.on("click", function(){
-				this.setHash(hash);
-				return false;
-			}.bind(this));
-		}.bind(this));
-
-		//We change the id because the todoMvc css applies style on elements with id="todo-list" and not 'todoList'
+		//We change the id because the todoMvc css applies style on elements with id="todo-list" and not 'ctnTlistView1'
 		this.todoList.container.attr('id', 'todo-list');
 
 		this.model.getAll( this.onGetAll.bind(this));
@@ -53,10 +44,8 @@ defineClass("TtodoList", "core.display.Telement", {
 
 		this.todoList.setFilterFunction( this.filterFunction.bind(this) );
 		this.todoList.setDataProvider(this.todos);
-
 		this.todos.on(Tevent.CHANGE, this.refreshFooter.bind(this));
-		//this.todos.on(Tevent.UPDATE, this.refreshFooter.bind(this));
-		//this.todos.on(Tevent.ADDED, this.refreshFooter.bind(this));
+
 		this.refreshFooter();
 	},
 	
@@ -87,10 +76,15 @@ defineClass("TtodoList", "core.display.Telement", {
 	},
 	
 	//Events from UI => update model
-	onClearCompleted: function(){		
+	onFilterLinkClick: function(e){
+		var hash = $(e.target).attr("href").rightOf("=") || null;
+		this.setHash(hash);
+		return false;
+	},
+	onClearCompletedClick: function(){		
 		this.model.clearCompleted();
 	},
-	onToggleAll: function(e){
+	onToggleAllClick: function(e){
 		this.model.toggleAll( $(e.target).prop("checked") );		
 	},
 
@@ -117,26 +111,26 @@ defineClass("TtodoList", "core.display.Telement", {
 				<input id="new-todo" placeholder="What needs to be done?" autofocus="autofocus" data-onkeyup="this.onNewTodoKeyUp"/>
 			</header>
 			<section id="main">
-				<input id="toggle-all" type="checkbox" data-onclick="this.onToggleAll"/>
+				<input id="toggle-all" type="checkbox" data-onclick="this.onToggleAllClick"/>
 				<label for="toggle-all">Mark all as complete</label>
 
-				<div id="todoList" data-compo="ui.grids.TlistView.html" data-item-renderer-class="components.TtodoItem.html" />
+				<div id="todoList" data-compo="ui.grids.TlistView.html" data-primary-key-fields="id" data-item-renderer-class="components.TtodoItem.html" />
 			
 			</section>
 			<footer id="footer">
 				<span id="todo-count"></span>
 				<ul id="filters">
 					<li>
-						<a class="selected" href="#">All</a>
+						<a class="selected" href="#" data-onclick="this.onFilterLinkClick">All</a>
 					</li>
 					<li>
-						<a href="#todolist=active">Active</a>
+						<a href="#todolist=active"  data-onclick="this.onFilterLinkClick">Active</a>
 					</li>
 					<li>
-						<a href="#todolist=completed">Completed</a>
+						<a href="#todolist=completed"  data-onclick="this.onFilterLinkClick">Completed</a>
 					</li>
 				</ul>
-				<button id="clear-completed" data-onclick="this.onClearCompleted"></button>
+				<button id="clear-completed" data-onclick="this.onClearCompletedClick"></button>
 			</footer>
 		</section>
 </body>

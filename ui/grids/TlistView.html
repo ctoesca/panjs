@@ -26,9 +26,11 @@ defineClass("TlistView", "core.display.Telement", {
 	/* METHODES */	
 	constructor: function(args){
 
-		this.primaryKeyFields = ["id"];
+		this.primaryKeyFields = ["idhj"];
 		this._super.constructor.call(this,args);	
 		this.injectParam("itemRendererClass", args.itemRendererClass );
+		if (defined(args, "primaryKeyFields" ))
+			this.primaryKeyFields = args.primaryKeyFields.split(',');
 	},
 	
 	_onHide: function()
@@ -39,18 +41,25 @@ defineClass("TlistView", "core.display.Telement", {
 	_onShow: function()
 	{
 	},
-
+	free: function(){
+		this._super.free.call(this);
+		if (this._dataProvider != null)
+			this._dataProvider.offByCtx(this);
+		this._dataProvider = null;
+	},
 	setDataProvider: function(dataProvider)
-	{
-		
+	{		
 		if (this._dataProvider != dataProvider)
 		{
+			if (this._dataProvider != null)
+				this._dataProvider.offByCtx(this);
+
 			this._dataProvider = dataProvider;			
-			this._dataProvider.on(Tevent.UPDATE, this._onItemUpdated.bind(this));
-			this._dataProvider.on(Tevent.DELETE, this._onItemRemoved.bind(this));
-			this._dataProvider.on(Tevent.ADDED, this._onItemAdded.bind(this));
-			this._dataProvider.on(Tevent.REFRESH, this.render.bind(this));
-			this._dataProvider.on(Tevent.REPLACE, this._onItemReplaced.bind(this));
+			this._dataProvider.on(Tevent.UPDATE, this._onItemUpdated,this);
+			this._dataProvider.on(Tevent.DELETE, this._onItemRemoved,this);
+			this._dataProvider.on(Tevent.ADDED, this._onItemAdded, this);
+			this._dataProvider.on(Tevent.REFRESH, this.render, this);
+			this._dataProvider.on(Tevent.REPLACE, this._onItemReplaced, this);
 		}
 		this.render();
 	},
@@ -187,8 +196,7 @@ defineClass("TlistView", "core.display.Telement", {
 	{				
 		if (this._dataProvider == null)
 			return;
-
-		logger.debug(this.id+".render()");
+		
 		var docFragment = document.createDocumentFragment();
 
 		for (var i =0; i< this._dataProvider.length; i++)

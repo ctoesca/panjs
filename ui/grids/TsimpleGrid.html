@@ -278,8 +278,8 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 		{
 			if (added < count){
 				var d = this._dataProvider.getItemAt(i);	
-				this._addLine(d, docFragment);
-				added ++;
+				if (this._addLine(d, docFragment))
+					added ++;
 			}
 		}
 
@@ -468,28 +468,38 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 	{
 		var item = e.data.item;
 		var newItem = e.data.newItem;	
-		this._itemsSelected.replaceItem(item, newItem);
-		this._setTr(this.getTr(item), newItem, false);
+		if (this._filterFunction(newItem)){
+			this._itemsSelected.replaceItem(item, newItem);
+			this._setTr(this.getTr(item), newItem, false);	
+		}else{
+			this._removeItem(item);
+		}
 	},
 
 	refreshItem: function( item )
 	{
 		var tr = this.getTr(item);		
-		this._setTr(tr, item, false);
+		if (this._filterFunction(item)){
+			this._setTr(tr, item, false);
+		}
+		else{
+			this._removeItem(item);
+		}
 	},
 	_removeItem:function(item)
 	{
-
 		var tr = this.getTr(item);
-		var detailTr = $.data(tr, "detailTr");
-		tr = $(tr);
-		tr.remove();
-		
-		if (typeof detailTr != "undefined")
-			$(detailTr).remove();
+		if (tr){
+			var detailTr = $.data(tr, "detailTr");
+			tr = $(tr);
+			tr.remove();
+			
+			if (typeof detailTr != "undefined")
+				$(detailTr).remove();
 
-		this._itemsSelected.removeItem(item);
-		this.linesCount --;
+			this._itemsSelected.removeItem(item);
+			this.linesCount --;
+		}		
 	},
 
 	_onItemUpdated: function(e)
@@ -666,11 +676,12 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 			this._createHeaders();		
 		
 		var docFragment = document.createDocumentFragment();
+
 		for (var i =0; i< this._dataProvider.length; i++)
 		{
 			var d = this._dataProvider.getItemAt(i);	
-			if (i<this.sectionRecordsCount)
-			this._addLine(d, docFragment);
+			if (this.linesCount<this.sectionRecordsCount)
+				this._addLine(d, docFragment);
 		}	
 
 		this.tbody[0].appendChild(docFragment);
@@ -855,25 +866,35 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 			}
 		}	
 	},
-	canAddLine: function(obj){
+	_filterFunction: function(obj){
 		return true;
 	},
+	getFilterFunction: function(f){
+		return this._filterFunction;
+	},
+	setFilterFunction: function(f){
+		this._filterFunction = f;
+		if (f == null)
+			this._filterFunction = function(data){return true};
+	},
+
 	_addLine:function(obj,docFragment)
 	{		
-		if (!this.canAddLine(obj))
-			return;
+		if (!this._filterFunction(obj))
+			return false;
 
 		var tr = document.createElement("tr");
 		var temps = 0;
 		this._setTr(tr, obj,true);
 		docFragment.appendChild(tr);
 		this.linesCount ++;
+		return true;
 	},
 	
 	_insertLineAt: function(obj, indx)
 	{
-		if (!this.canAddLine(obj))
-			return;
+		if (!this._filterFunction(obj))
+			return false;
 		
 		indx ++;
 		var tr = document.createElement("tr");
@@ -883,6 +904,7 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 			
 		$(tr).insertAfter(trAfter);
 		this.linesCount ++;
+		return true;
 	},
 
 	/* GESTION DES LIGNES 'DETAIL' */

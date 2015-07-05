@@ -1,8 +1,9 @@
 <html>        
 <head>
 
-<link href="./bootstrap-combobox-master/css/bootstrap-combobox.css" rel="stylesheet"/>
-<script type="text/javascript" src="./bootstrap-combobox-master/js/bootstrap-combobox.js"></script>
+<!--!! Version 1.1.6 est buggué -->
+<link href="./bootstrap-combobox/1.1.5/css/bootstrap-combobox.css" rel="stylesheet"/>
+<script type="text/javascript" src="./bootstrap-combobox/1.1.5/js/bootstrap-combobox.js"></script>
 
 <style type="text/less">
 .TsearchCombobox
@@ -63,7 +64,7 @@ defineClass("TsearchCombobox", "core.display.Telement", {
     {
         return this._dataProvider;
     },
-    setDataProvider: function(dp)
+    setDataProvider: function(dp, silent)
     {
         var dataProviderWasNull = (this._dataProvider == null);
         this._dataProvider = dp;
@@ -78,6 +79,7 @@ defineClass("TsearchCombobox", "core.display.Telement", {
             this.val(this.selectingItem);
         this.selectingItem = null;
         this.isReady = true;
+        if (((arguments.length>1)&&(silent == false)) || (arguments.length==1))
         this.dispatchEvent(new Tevent(Tevent.READY));
     },
     

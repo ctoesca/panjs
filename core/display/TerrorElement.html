@@ -71,6 +71,9 @@ defineClass("TerrorElement", "core.display.Telement",
       },
       init: function(){
         
+      },
+      onClose: function(){
+        this.dispatchEvent( new Tevent(Tevent.CLOSE));
       }
 });
 
@@ -83,7 +86,7 @@ defineClass("TerrorElement", "core.display.Telement",
 <body>   
     
     <div class="alert alert-danger fade in">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true" data-onclick="this.onClose">×</button>
         <h4 id="titre">Unable to load the component <em>{compoClassName}</em> !</h4>
         <pre id="messageContent" class="message">
         </pre>

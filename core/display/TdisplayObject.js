@@ -117,6 +117,7 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
   		this._onHide();
   	},
   	show: function(args){
+
   		if (this._realVisible)
   			return;
 
