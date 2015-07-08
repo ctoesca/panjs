@@ -80,35 +80,45 @@ You put a component in HTML page (or in another HTML component) like this:
 ##Getting started
 
 ```
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<html>
+  <head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+ 
+    <script>
+    //<![CDATA[  
 
-<script>
-//<![CDATA[  
+          var panjs = {
+            logLevel: "DEBUG",
+            env: "dev", // dev or prod
+            appVersion: "0.1", 
+            version: "0.7.4", //panjs version
+            
+            namespaces:{
+              "core": {path: "../core"},    //panjs "core" directory
+              "ui":   {path: "../ui"},        //panjs "ui" directory (optionnal)
+              "app":  {path: "components"}   //path on your app components (example)
+            }
+          };
+         
+          $(document).ready(function() 
+          {
+            logger.debug("READY");
+            panjs.load($(document.body));           
+          });
 
-      var panjs = {
-        logLevel: "DEBUG",
-        env: "dev", // dev or prod
-        appVersion: "0.1", 
-        version: "0.7.4", //panjs version
-        
-        namespaces:{
-          "core": {path: "../core"},    //panjs "core" directory
-          "ui":   {path: "../ui"},        //panjs "ui" directory (optionnal)
-          "app":  {path: "components"}   //path on your app components (example)
-        }
-      };
-     
-      $(document).ready(function() 
-      {
-        logger.debug("READY");
-        panjs.load($(document.body));           
-      });
+    //]]>
+    </script>
+    
+    <script src="../core/panjs_core.min.js"></script>
+    <!-- Use panjs_core_with_less.min.js if you want to enable LESS-->
 
-//]]>
-</script>
+  </head>
+  <body>
+      <!-- panjs component in './components' directory-->
+      <div data-compo="app.myComponent.html"/>
 
-<script src="../core/panjs_core.min.js"></script>
-<!-- Use panjs_core_with_less.min.js if you want to enable LESS-->
+  </body>
+</html>
 ```
 
 
