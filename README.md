@@ -1,4 +1,4 @@
-#panJS v0.7.3
+#panJS v0.7.4
 > A 38 ko javascript framework 
 
 panJs is a javascript framework that uses Jquery and allows you to create application easily, by making resusable components.
@@ -87,7 +87,7 @@ You put a component in HTML page (or in another HTML component) like this:
         logLevel: "DEBUG",
         env: "dev", // dev or prod
         appVersion: "0.1", 
-        version: "0.7.3", //panjs version
+        version: "0.7.4", //panjs version
         
         namespaces:{
           "core": {path: "../core"},    //panjs "core" directory

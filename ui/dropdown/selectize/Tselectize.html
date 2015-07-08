@@ -137,17 +137,9 @@ defineClass("Tselectize", "core.display.Telement", {
 
 	_getOptions: function(){
 		var render ={};
-		if (this.renderOption)
-			render.option = this.renderOption;
-		if (this.renderItem)
-			render.item = this.renderItem;
-
-		var plugins = ['remove_button'];
-		if (this.maxItems == 1)
-			var plugins = [];
 
 		return 	{
-					plugins: plugins,
+					plugins: ['remove_button'],
 					maxItems: this.maxItems,
 					valueField: this.valueField,
 					labelField: this.labelField,
@@ -164,7 +156,9 @@ defineClass("Tselectize", "core.display.Telement", {
 					onDropdownOpen: this._onOpen.bind(this),
 					onDropdownClose: this._onClose.bind(this),
 					onChange: this._onChanged.bind(this),
-					render: render
+					render: {
+						
+					}
 		};
 	},
 

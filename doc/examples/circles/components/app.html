@@ -16,9 +16,7 @@ defineClass("app", "core.display.Telement", {
 	frameRateTimer: null,
 	counter: 0,
 	lastCounter: 0,
-	delay: 1,
-	$circlesCount: 0,
-	$framerate: 0,
+	delay: 1, //ms
 
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);
@@ -33,8 +31,6 @@ defineClass("app", "core.display.Telement", {
 			this.addCircle();
 
 		this.timer = new Ttimer({delay: this.delay, onTimer: this.onTimer.bind(this)});
-		this.renderBindings();
-
 	},
 
 	addCircle: function(e){
@@ -42,7 +38,6 @@ defineClass("app", "core.display.Telement", {
 		var circle = this.createComponent("components.Tcircle.html");
 		circle.appendTo(this.circlesContainer);
 		this.circles.push(circle);
-		this.circlesCount = this.circles.length;
 	},
 
 	onTimer: function(e){

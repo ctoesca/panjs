@@ -1,0 +1,138 @@
+<html>        
+<head>
+  
+  <link href="selectize/0.12.1/dist/css/selectize.bootstrap3.css" rel="stylesheet"/>
+  <script type="text/javascript" src="selectize/0.12.1/dist/js/standalone/selectize.min.js"></script>
+
+
+  <style type="text/css">
+    .TselectPays ::-webkit-input-placeholder { color:#999999; }
+    .TselectPays ::-moz-placeholder { color:#999999; } /* firefox 19+ */
+    .TselectPays :-ms-input-placeholder { color:#999999; } /* ie */
+    .TselectPays input:-moz-placeholder { color:#999999; }
+  </style>
+
+  <script type="text/x-class-definition">
+//<![CDATA[
+defineClass("TselectPays", "core.display.Telement", { 
+
+	baseElement: "select",	
+  placeholder: "Pays",
+  valueField: null,
+  labelField: null,
+  searchField: null,
+  sortField: null,
+  maxItems: null,
+  data: null,
+
+  _control:null,
+
+  constructor: function(args){
+    this._super.constructor.call(this,args);  
+    this.loadData();
+  },
+
+  loadData: function()
+  {
+    this.restClient = new TrestClient({ baseUrl:"http://localhost/apis/cmdb/index.php"});
+
+    this.labelField = "name";
+    this.valueField = "name";
+    this.searchField = this.labelField;
+    this.sortField = this.labelField;
+
+    /* Affichage icone loading */
+    setTimeout( function(){
+      this._createComponent();
+      this._control.$control.empty().append( $('<i><i class="fa fa-spin fa-cog"></i> Chargement en cours</i>') );
+    }.bind(this), 10);
+   
+
+    this.restClient.get("/pays", "", null, function(e){
+      /* Succès */
+      this.data = e.data;
+      this._createComponent();
+    }.bind(this),
+    function(e){
+      /* Echec */
+      this._createComponent();
+      this._control.$control.empty().append( $('<span class="text-danger"><i class="fa fa-warning"></i> Erreur de chargement</span>') );
+    }.bind(this));
+
+  },
+
+  _createComponent: function()
+  {
+    var opt =   {
+          options: this.data,
+          plugins: ['remove_button'],
+          maxItems: this.maxItems,
+          valueField: this.valueField,
+          labelField: this.labelField,
+          searchField: this.searchField,
+          sortField: this.sortField,
+          create: false,
+          openOnFocus: true,
+          maxOptions: 1000,
+          hideSelected: true,
+          closeAfterSelect: false,
+          allowEmptyOption:false,
+          scrollDuration: 60,
+          dropdownParent: null,
+          onChange: this._onChanged.bind(this)
+    };
+   
+    if (this._control != null)
+      this._control.destroy();
+
+    this.container.attr("placeholder", this.placeholder);
+    this._control = this.container.selectize(opt)[0].selectize;
+ 
+    return this._control; 
+  },
+
+  _onChanged: function(e){
+    var data = this._control.getValue();
+    this.dispatchEvent( new Tevent(Tevent.CHANGE, data));
+  },
+
+  show: function(){
+    if (this._control != null)
+    this._control.$control.show();
+  },
+
+  hide: function(){
+    if (this._control != null)
+    this._control.$control.hide();
+  },
+
+  enabled: function(value){
+    if (arguments.length >0)
+    {
+      this._enabled = value;
+      if (value)
+        this._control.enable(value);
+      else
+        this._control.disable(value);
+    }
+    else{
+      return this._enabled;
+    }
+  },
+
+  free: function(){
+    this._super.free.call(this);
+    this._control.destroy();
+  },
+
+  val: function(){
+    return this._control.getValue();
+  }
+
+});
+
+//]]>
+</script>
+</head>
+
+</html> 
