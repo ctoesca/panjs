@@ -41,15 +41,13 @@ defineClass("app", "core.display.Telement", {
 	},
 
 	onTimer: function(e){
-		for (var i = 0; i< this.circles.length; i++){
-			var circle = this.circles[i];
-			circle.tick();
-		}
+		for (var i = 0; i< this.circles.length; i++)
+			var circle = this.circles[i].tick();
 		this.counter ++;
 	},
 
 	onFrameRateTimer: function(e){
-		this.framerate = (this.counter - this.lastCounter) / 2;
+		var framerate = (this.counter - this.lastCounter) / 2;
 		this.lastCounter = this.counter;
 		this.statElem.text('Framerate='+this.framerate+'/sec - '+this.circles.length+' circles');
 	}
@@ -66,13 +64,12 @@ defineClass("app", "core.display.Telement", {
 	<button id="btnStart" data-onclick="{{this.timer.start()}}">Start</button>
 	<button id="btnStop" data-onclick="{{this.timer.stop()}}">Stop</button>
 
-	<!-- in onclick is just a callback, so dont't use {{ }}-->
+	<!-- onclick is just a callback, so dont't use {{ }}-->
 	<button id="btnAdd" data-onclick="this.addCircle">Add circle</button>
 
 	<span id="statElem"></span> 
 	
 	<div id="circlesContainer"></div>
-	<div style="clear:both"></div>
 
 </body>
 </html> 
