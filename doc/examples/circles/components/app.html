@@ -42,14 +42,14 @@ defineClass("app", "core.display.Telement", {
 
 	onTimer: function(e){
 		for (var i = 0; i< this.circles.length; i++)
-			var circle = this.circles[i].tick();
+			this.circles[i].tick();
 		this.counter ++;
 	},
 
 	onFrameRateTimer: function(e){
 		var framerate = (this.counter - this.lastCounter) / 2;
 		this.lastCounter = this.counter;
-		this.statElem.text('Framerate='+this.framerate+'/sec - '+this.circles.length+' circles');
+		this.statElem.text('Framerate='+framerate+'/sec - '+this.circles.length+' circles');
 	}
 });
 
@@ -70,6 +70,7 @@ defineClass("app", "core.display.Telement", {
 	<span id="statElem"></span> 
 	
 	<div id="circlesContainer"></div>
+	<div style="clear:both"></div>
 
 </body>
 </html> 
