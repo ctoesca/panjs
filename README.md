@@ -6,6 +6,8 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 </p>
 <p><a href="http://www.nexilearn.fr/libs/panjs/trunk/doc/examples/demo"><b>Basic demo</b></p>
 <p><a href="http://www.nexilearn.fr/libs/panjs/trunk/doc/examples/todoMvc"><b>TodoMVC example</b></p>
+<p><a href="http://www.nexilearn.fr/libs/panjs/trunk/doc/examples/todoMvc/index2.html"><b>TodoMVC X2 example</b></p>
+<p><a href="http://www.nexilearn.fr/libs/panjs/trunk/doc/examples/circles"><b>Circles example</b></p>
 <p><a href="http://www.nexilearn.fr/libs/panjs/trunk/doc/tutorial"><b>Tutorial</b></p>
 ## Feature Highlights
 
