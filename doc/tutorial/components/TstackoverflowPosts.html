@@ -87,13 +87,47 @@
         this.errorElem.show();
         this.timer.start();
       },
+      getDateFromTimestamp: function(d, dateseparator){
 
+        var r = "";
+
+        if (d != null){
+          if (arguments.length < 2)
+            var dateseparator = "/";
+
+          r = new Date(parseInt(d) * 1000);
+          var year = r.getFullYear();
+          var month = r.getMonth()+1;
+          if (month < 10)
+            month = "0"+month;
+
+          var day = r.getDate();
+          if (day < 10)
+            day = "0"+day;
+
+          var hour = r.getHours();
+             if (hour < 10)
+            hour = "0"+hour;
+
+          var min = r.getMinutes();
+             if (min < 10)
+            min = "0"+min;
+
+          var sec = r.getSeconds();
+             if (sec < 10)
+            sec = "0"+sec;
+
+          r = year+dateseparator+month+dateseparator+day+" "+hour + ':' + min + ':' + sec;
+        }
+        return r;
+      },
+      
       addItem: function(item){
           var html = '<div class="panel panel-default">';
           html +=         '<div class="panel-heading" role="tab" id="post_'+item.post_id+'">';
           html +=           '<h4 class="panel-title">';
           html +=             '<a data-toggle="collapse" data-parent="#accordion" href="#collapse'+item.post_id+'" aria-expanded="true" aria-controls="collapse'+item.post_id+'">';
-          html +=               getDateFromTimestamp(item.creation_date)+ ' - ' + item.title;
+          html +=               this.getDateFromTimestamp(item.creation_date)+ ' - ' + item.title;
           html +=             '</a>';
           html +=           '</h4>';
           html +=         '</div>';

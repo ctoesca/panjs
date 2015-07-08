@@ -1,58 +1,12 @@
 ﻿
 window["MsxmlObject"] = null;
 
-String.prototype.capitalizeFirstLetter = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1);
-}
-
-var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-var ARGUMENT_NAMES = /([^\s,]+)/g;
-function getParamNames(func) {
-  var fnStr = func.toString().replace(STRIP_COMMENTS, '');
-  var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-  if(result === null)
-     result = [];
-  return result;
-}
 
 function randomBetween(min, max){
   return Math.floor(Math.random() * max) + min;
 }
 
 
-function getDateFromTimestamp(d, dateseparator){
-    var r = "";
-
-    if (d != null){
-      if (arguments.length < 2)
-        var dateseparator = "/";
-
-      r = new Date(parseInt(d) * 1000);
-      var year = r.getFullYear();
-      var month = r.getMonth()+1;
-      if (month < 10)
-        month = "0"+month;
-
-      var day = r.getDate();
-      if (day < 10)
-        day = "0"+day;
-
-      var hour = r.getHours();
-         if (hour < 10)
-        hour = "0"+hour;
-
-      var min = r.getMinutes();
-         if (min < 10)
-        min = "0"+min;
-
-      var sec = r.getSeconds();
-         if (sec < 10)
-        sec = "0"+sec;
-
-      r = year+dateseparator+month+dateseparator+day+" "+hour + ':' + min + ':' + sec;
-    }
-    return r;
-}
 function generateUUID(){
     var d = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -183,9 +137,9 @@ function getXmlDocument (text) {
       return xmlDoc;
 }
 
-function isUndefined(obj) {
+/*function isUndefined(obj) {
       return obj === void 0;
-}
+}*/
 
 /* 
   defined(object, "prop1", "prop2", "prop3" , ...) 
@@ -255,11 +209,7 @@ String.prototype.capitalizeFirstLetter = function()
 {
   if (this.length == 0)
     return this;
-
-  var r = this.charAt(0).toUpperCase();
-  if (this.length >1)
-    r = r+this.substr(1);
-  return r;
+  return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
 String.prototype.htmlEntities = function()
@@ -278,7 +228,7 @@ String.prototype.rightOf = function(search)
 }
 String.prototype.droite = String.prototype.rightOf;
 
-String.prototype.droitedroite = function(souschaine)
+String.prototype.rightRightOf = function(souschaine)
 { 
   var index = this.lastIndexOf(souschaine);
   if (index >0)
@@ -286,6 +236,7 @@ String.prototype.droitedroite = function(souschaine)
   else 
     return "";
 }
+String.prototype.droitedroite = String.prototype.rightRightOf;
 
 String.prototype.isEmpty = function(){
    var s = this.trim();

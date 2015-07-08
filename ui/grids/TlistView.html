@@ -163,7 +163,7 @@ defineClass("TlistView", "core.display.Telement", {
 		var item = e.data;
 		var el = this.getLIFromItem(item); 
 		if (el!=null)
-		if (!isUndefined( el[0].owner.free ))
+		if (defined( el[0].owner,"free" ))
 			el[0].owner.free();
 	},
 
