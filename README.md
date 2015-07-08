@@ -86,7 +86,7 @@ You put a component in HTML page (or in another HTML component) like this:
  
     <script>
     //<![CDATA[  
-
+          //panjs settings:
           var panjs = {
             logLevel: "DEBUG",
             env: "dev", // dev or prod
@@ -105,7 +105,6 @@ You put a component in HTML page (or in another HTML component) like this:
             logger.debug("READY");
             panjs.load($(document.body));           
           });
-
     //]]>
     </script>
     
