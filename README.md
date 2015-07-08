@@ -14,14 +14,14 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 * A component is a HTML file that contains CSS, JS, HTML, css <link> like any Html file
 * Components can be integrated in a page or in other components with html markup
 * Components (and their dependencies) are loaded dynamically and you don't have to add js/css in the `<head>` of the page.
-* Cache management (Js/css/html)
+* Cache management (Js/css/html): the framework add '?v=x.x.x' in all loaded files.
 * Inheritance on classes and components (HTML / CSS / JS)
-* Encapsulation</li>
+* Encapsulation
 * Lazy loading of components and classes
 * You can use LESS in components. panJs converts LESS to CSS.
 * Includes Ajax facilities (Class TrestClient.js)
 * Easy to make a one page application (but not mandatory)
-* States, hash routing (work in progress)
+* States, hash routing
 * ...
 
 
