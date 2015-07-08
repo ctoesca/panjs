@@ -113,7 +113,7 @@ You put a component in HTML page (or in another HTML component) like this:
 
   </head>
   <body>
-      <!-- panjs component in './components' directory-->
+      <!-- panjs component: path : './components/myComponent.html' -->
       <div data-compo="app.myComponent.html"/>
 
   </body>
