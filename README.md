@@ -22,6 +22,7 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 * Includes Ajax facilities (Class TrestClient.js)
 * Easy to make a one page application (but not mandatory)
 * States, hash routing
+* Errors management: in production, a component with a runtime error/syntax error/XML error will be replaced by a special error component showing the error: the application is not interrupted (showing a white page etc).
 * ...
 
 
