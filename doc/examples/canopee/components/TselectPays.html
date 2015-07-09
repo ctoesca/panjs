@@ -35,10 +35,10 @@ defineClass("TselectPays", "core.display.Telement", {
 
   loadData: function()
   {
-    this.restClient = new TrestClient({ baseUrl:"http://localhost/apis/cmdb/index.php"});
+    this.restClient = new TrestClient({ baseUrl:"https://cid.douane/apis/cmdb/index.php"});
 
-    this.labelField = "name";
-    this.valueField = "name";
+    this.labelField = "pay_lib";
+    this.valueField = "pay_cd";
     this.searchField = this.labelField;
     this.sortField = this.labelField;
 
