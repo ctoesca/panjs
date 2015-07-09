@@ -1224,18 +1224,20 @@ usesComponent: function(classPath)
 	{
 		/*
 			Remplace this._super par className._super
-			*/  
-			return code.replace(/this._super/g, className+"._super");   
-		},
+		*/  
+		return code.replace(/this._super/g, className+"._super");   
+	},
 
-		addScriptNode: function(node, dirPath, className)
-		{ 
+	addScriptNode: function(node, dirPath, className)
+	{ 
+		var type = node.getAttribute("type");
+		var src = node.getAttribute("src");
 
-			if (node.getAttribute("src") == null)
-			{
+		if (src == null)
+		{
 			var script = getText(node); //Attention si <!DOCTYPE html> est mis en haut du fichier, PB IE8
-
-			if ((className != null) && (node.getAttribute("type") == "text/x-class-definition"))
+			
+			if ((className != null) && ( type == "text/x-class-definition"))
 			{ 
 				script = this.processCode(script, className); 
 			}
@@ -1243,12 +1245,12 @@ usesComponent: function(classPath)
 		}
 		else
 		{      
-			var url = panjs.transformUrl(node.getAttribute("src"),dirPath);
+			var url = panjs.transformUrl( src , dirPath);
 
 			if (!this.loadedJs[url.toLowerCase()])
 			{         
 				var r = this.loadFile(this.getUrlWithVersion(url));
-				if ((className != null) && (node.getAttribute("type") == "text/x-class-definition")){
+				if ((className != null) && ( type == "text/x-class-definition")){
 					r.data = this.processCode(r.data, className)
 				}
 
