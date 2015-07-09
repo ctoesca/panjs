@@ -108,8 +108,13 @@ You put a component in HTML page (or in another HTML component) like this:
     //]]>
     </script>
     
-    <script src="../core/panjs_core.min.js"></script>
-    <!-- Use panjs_core_with_less.min.js if you want to enable LESS-->
+    <script src="../core/panjs_core.dev.min.js"></script>
+    <!-- If you want to enable LESS-->
+    <!-- <script src="../core/panjs_core_with_less.dev.min.js"></script>-->
+
+    <!-- Production (error management enabled) -->
+    <!-- <script src="../core/panjs_core.prod.min.js"></script>-->
+    <!-- <script src="../core/panjs_core_with_less.prod.min.js"></script>-->
 
   </head>
   <body>

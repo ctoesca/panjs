@@ -71,6 +71,23 @@
 	/* 
 		CreateCompoennt 
 		*/
+		panjs.getErrorComponent = function(classPath, className, r)
+		{
+			if (typeof r == "string")
+			r = { message: r, className: className};
+
+			uses("core.display.TerrorElement.html");
+			object = new TerrorElement(r);
+
+			panjs.stack.push(r.message);
+			panjs.stackLevel --;
+
+			if (panjs.stackLevel <= 0){
+				panjs.stack = [];
+				panjs.stackLevel = 0;
+			}
+			return object;
+		};
 
 		panjs.createComponent = function(classPath, args)
 		{ 
@@ -80,33 +97,14 @@
 
 			if (typeof window[className] == "undefined")
 			{
-				try{
 
 					var r = panjs.loader.usesComponent(classPath);
-					if (!r.result) 
-						throw r;
-				}
-				catch(r){ 
-
-					if (typeof r == "string")
-						r = { message: r, className: className};
-
-					uses("core.display.TerrorElement.html");
-					object = new TerrorElement(r);
-
-					panjs.stack.push(r.message);
-					panjs.stackLevel --;
-
-					if (panjs.stackLevel <= 0){
-						panjs.stack = [];
-						panjs.stackLevel = 0;
+					if (!r.result){
+						return panjs.getErrorComponent(classPath, className, r);
 					}
-					return object;
 
-				}
 			}
 
-			try{
 
 				if (typeof args == "undefined")
 					var args = {};
@@ -130,16 +128,6 @@
 
 				object = new window[className](args);
 
-			}catch(err){  
-
-				var m = "Error instantiating "+className+": "+err;
-				logger.error(m);
-				uses("core.display.TerrorElement.html");  
-				var path = panjs.getAbsoluteUrlFromClassPath(classPath);    
-				var url = panjs.loader.getUrlWithVersion(path)
-				var object = new TerrorElement({message: m, path: path,url:url, className:className});
-				panjs.stack.push(m);
-			}
 
 			panjs.stackLevel --;
 			if (panjs.stackLevel <= 0){
@@ -548,12 +536,9 @@
 			}
 		}
 
-		try{
+			
 			window[className] = window[classe].extend(def,className,classe);
-		}catch(err)
-		{
-			alert(classe+" "+err);
-		}
+
 
 		panjs.lastDefinedClassName = className;
 	}
@@ -907,8 +892,8 @@ usesComponent: function(classPath)
 
 					 var dom = getXmlDocument(r.data);
 				 }catch(err){
-					logger.error(err);         
-					return {result:false, message:err, className: className, classPath:classPath, url: url, path:path};
+					logger.error("XML error in class "+className+": "+err);         
+					return {result:false, isXmlError: true, message:err, className: className, classPath:classPath, url: url, path:path};
 				 }
 
 				 var headNode = dom.getElementsByTagName("head")[0];
@@ -930,15 +915,8 @@ usesComponent: function(classPath)
 
 						if ( nodeName == "script")
 						{ 
-							try{  
 
 								this.addScriptNode(node, dirPath, className); 
-							}catch(err)
-							{
-								var mess =  "Error processing <"+nodeName+"> in "+className+" => "+err;
-								logger.error(path,mess);
-								return {result:false, message: mess, className: className, classPath:classPath, url: url, path:path, stack:err.stack}; 
-							}
 
 						}
 						else
@@ -974,7 +952,7 @@ usesComponent: function(classPath)
 
 					if (defined(bodyNode))
 					{
-						try{
+
 							var html = getXml(bodyNode);
 							var parentClassName = window[className].prototype.parentClassName;
 
@@ -990,11 +968,6 @@ usesComponent: function(classPath)
 							window[className].prototype.html = html;
 							window[className].prototype.bodyNode = bodyNode;
 
-						}
-						catch(e)
-						{ 
-							return {result:false, message:e.message, className: className, classPath:classPath, url: url, path:path, Class: null};
-						}
 					}
 					/*else
 					{         
