@@ -1176,14 +1176,14 @@ usesComponent: function(classPath)
 
 	addScriptNode: function(node, dirPath, className)
 	{ 
-		var type = node.getAttribute("type");
+		var subtype = node.getAttribute("subtype");
 		var src = node.getAttribute("src");
 
 		if (src == null)
 		{
-			var script = getText(node); //Attention si <!DOCTYPE html> est mis en haut du fichier, PB IE8
+			var script = getText(node);
 			
-			if ((className != null) && ( type == "text/x-class-definition"))
+			if ((className != null) && ( subtype == "text/x-class-definition"))
 			{ 
 				script = this.processCode(script, className); 
 			}
@@ -1196,7 +1196,7 @@ usesComponent: function(classPath)
 			if (!this.loadedJs[url.toLowerCase()])
 			{         
 				var r = this.loadFile(this.getUrlWithVersion(url));
-				if ((className != null) && ( type == "text/x-class-definition")){
+				if ((className != null) && ( subtype == "text/x-class-definition")){
 					r.data = this.processCode(r.data, className)
 				}
 
