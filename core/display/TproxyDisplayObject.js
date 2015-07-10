@@ -78,7 +78,7 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
   	},
   	show: function()
   	{
-  		
+  		this.load( this.args );
   	}
 });
 

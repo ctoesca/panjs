@@ -27,7 +27,9 @@ defineClass("Tlazy_loading", "core.display.Telement", {
 <h1>Lazy loading</h1>
 <p>When a component is loaded (like <code>app.html</code>), by default it loads all his sub-components.
 <br/>
-If you want to load a component "on-demand", add <code>autoload="false"</code> and call <code>load()</code> method later.
+If you want to load a component "on-demand", add <code>autoload="false"</code> and call <code>load(args)</code> or <code>show()</code> method later.
+<br/>
+<code>args</code> is optionnal on <code>load()</code> method.
 </p>
 
 <h3>Modify <code>app.html</code></h3>
