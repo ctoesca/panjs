@@ -19,7 +19,7 @@
 
 </style>
 
-<script subtype="text/x-class-definition">
+<script data-subtype="text/x-class-definition">
 //<![CDATA[
 
 uses("core.collections.TarrayCollection");
@@ -32,6 +32,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 	nullLabelItem: '                           ',
 	insertNullItem: false,
 	placeholder: "Sélectionnez une valeur",
+	leftIcon: null,
 
 	_dataProvider: null,
 	_selectedItem: null,
@@ -46,6 +47,7 @@ defineClass("TdropdownBase", "core.display.Telement", {
 		if (args)
 		{
 			this.injectParam("labelField", args.labelfield,false);	
+			this.injectParam("leftIcon", args.leftIcon,false);	
 			this.injectParam("placeholder", args.placeholder,false, this.placeholder);
 			this.injectParam("insertNullItem", args.insertnullitem,false, this.insertNullItem);
 			this.injectParam("nullLabelItem", args.nulllabelitem,false, this.nullLabelItem);
@@ -58,6 +60,11 @@ defineClass("TdropdownBase", "core.display.Telement", {
 	
 		this._setEvents();	
 		this._setLabel(null);
+
+		if (this.leftIcon != null)
+		{
+			this.button.prepend($(this.leftIcon+" "));
+		}
 	},
 		
 	_onInitialized: function()

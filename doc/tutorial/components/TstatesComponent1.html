@@ -11,7 +11,7 @@
   }        
   </style>
 
-  <script subtype="text/x-class-definition">
+  <script data-subtype="text/x-class-definition">
     //<![CDATA[      
     defineClass("TstatesComponent1", "core.display.Telement", { 
 
@@ -52,14 +52,14 @@
 
 <body>  
 
-    <button id="btnConnect" includeIn="disconnected connecting" class="btn btn-success" data-onclick="this.connect">
-        <span includeIn="disconnected">Connect</span> 
-        <span includeIn="connecting">Connecting...<i class="fa fa-cog fa-spin"/></span>         
+    <button id="btnConnect" data-include-in="disconnected connecting" class="btn btn-success" data-onclick="this.connect">
+        <span data-include-in="disconnected">Connect</span> 
+        <span data-include-in="connecting">Connecting...<i class="fa fa-cog fa-spin"/></span>         
     </button>
 
-    <button id="btnDisconnect" includeIn="connected disconnecting" class="btn btn-danger" data-onclick="this.disconnect">       
-        <span includeIn="connected">Disconnect</span> 
-        <span includeIn="disconnecting">Disconnecting...<i class="fa fa-power-off fa-spin"/></span> 
+    <button id="btnDisconnect" data-include-in="connected disconnecting" class="btn btn-danger" data-onclick="this.disconnect">       
+        <span data-include-in="connected">Disconnect</span> 
+        <span data-include-in="disconnecting">Disconnecting...<i class="fa fa-power-off fa-spin"/></span> 
     </button> 
 </body>
 </html> 

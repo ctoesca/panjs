@@ -1,7 +1,7 @@
 <html>        
   <head>
 
-    <script subtype="text/x-class-definition">
+    <script data-subtype="text/x-class-definition">
       //<![CDATA[      
 
       defineClass("Tusing_states1", "core.display.Telement", { 
@@ -24,11 +24,11 @@
     <br/>The code can can be very verbose and difficult to maintain.</p>
     
     <p>With panjs, each component instance can be in one or more states: it's a simple 'state machine'. Elements can be shown/hidden/styled according to the component's states.</p>
-    <p>Use the <code>includeIn</code> and <code>excludeFrom</code> attributes to specify the set of states in which a element/component is included, where:</p>
+    <p>Use the <code>data-include-in</code> and <code>data-exclude-from</code> attributes to specify the set of states in which a element/component is included, where:</p>
     <ul>
-        <li>The <code>includeIn</code> attribute specifies the list of states where the element appears. This attribute takes a white space delimited list of state names.</li>
-        <li>The <code>excludeFrom</code> attribute specifies the list of states where the component is hidden. This attribute takes a white space delimited list of state names.</li>
-        <li>The <code>excludeFrom</code> and <code>includeIn</code> attributes are mutually exclusive; it is an error to define both on a single tag.</li>
+        <li>The <code>data-include-in</code> attribute specifies the list of states where the element appears. This attribute takes a white space delimited list of state names.</li>
+        <li>The <code>data-exclude-from</code> attribute specifies the list of states where the component is hidden. This attribute takes a white space delimited list of state names.</li>
+        <li>The <code>data-exclude-from</code> and <code>data-include-in</code> attributes are mutually exclusive; it is an error to define both on a single tag.</li>
         <li>CSS classes are added or removed on the component when the state changes: their names are the names of the component's states.<br/>
         <p>For example: if you want to disable buttons on a component 'TstatesComponent1' that is in state "working", you would do something like this (in LESS):</p>
 
@@ -48,7 +48,7 @@
 
 <h3>Create the file <code>TstatesComponent1.html</code> in "components" directory</h3>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.TstatesComponent1.html" id="codeCompo1" autoload="true" />
+    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.TstatesComponent1.html" id="codeCompo1" />
     
     <h4>Notes:</h4>
     <ul>

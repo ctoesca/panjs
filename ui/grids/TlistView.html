@@ -9,7 +9,7 @@
 
 </style>
 
-<script subtype="text/x-class-definition">
+<script data-subtype="text/x-class-definition">
 //<![CDATA[
 
 
@@ -21,6 +21,7 @@ defineClass("TlistView", "core.display.Telement", {
 	_dataProvider: null,
 	primaryKeyFields:null,
 	itemRendererClass: null,
+	functionRenderer: null,
 	filterFunction: null,
 
 	/* METHODES */	
@@ -29,6 +30,7 @@ defineClass("TlistView", "core.display.Telement", {
 		this.primaryKeyFields = ["idhj"];
 		this._super.constructor.call(this,args);	
 		this.injectParam("itemRendererClass", args.itemRendererClass );
+		this.injectParam("functionRenderer", args.functionRenderer );
 		if (defined(args, "primaryKeyFields" ))
 			this.primaryKeyFields = args.primaryKeyFields.split(',');
 	},
@@ -48,9 +50,9 @@ defineClass("TlistView", "core.display.Telement", {
 		this._dataProvider = null;
 	},
 	setDataProvider: function(dataProvider)
-	{		
+	{	
 		if (this._dataProvider != dataProvider)
-		{
+		{	
 			if (this._dataProvider != null)
 				this._dataProvider.offByCtx(this);
 
@@ -113,6 +115,7 @@ defineClass("TlistView", "core.display.Telement", {
 	{
 		var item = e.data.item;
 		var newItem = e.data.newItem;	
+		this.refreshItem(newItem);
 	},
 	_itemIsVisible: function(item){
 		var r = ((this.filterFunction==null) || this.filterFunction(item));
@@ -121,10 +124,18 @@ defineClass("TlistView", "core.display.Telement", {
 	refreshItem: function( item )
 	{	
 		var el = this.getLIFromItem(item); 	
+
 		if (el!=null)
 		if (this._itemIsVisible(item))
 		{
-			el[0].owner.setData(item);
+			if (this.itemRendererClass){
+				el[0].owner.setData(item);
+				
+			}else{	
+				var newEl = $(this.createLI(item, true));
+			
+				el.replaceWith(newEl);
+			}
 			el.show();
 		}else{
 			if (el) el.hide();
@@ -171,6 +182,7 @@ defineClass("TlistView", "core.display.Telement", {
 		this.filterFunction = f;
 		this.render();
 	},
+	
 	createLI: function(item, visible){
 		if (this.itemRendererClass)
 		{
@@ -178,6 +190,17 @@ defineClass("TlistView", "core.display.Telement", {
 			LIcompo.container.attr("item_id", this.getPrimaryKeyValue(item));
 			LIcompo.setData(item);
 			var LI = LIcompo.container[0];
+
+		}else if (this.functionRenderer)
+		{	
+			var html = this.functionRenderer(item);
+			if (typeof html == "string"){
+				var LI = document.createElement('LI');		
+				LI.innerHTML = this.functionRenderer(item);	
+			}else{
+				LI = html;
+			}
+			LI.setAttribute("item_id", this.getPrimaryKeyValue(item));
 		}else{
 			var LI = document.createElement('LI');
 			LI.setAttribute("item_id", this.getPrimaryKeyValue(item));

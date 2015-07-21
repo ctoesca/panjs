@@ -916,7 +916,7 @@ usesComponent: function(classPath)
 						if ( nodeName == "script")
 						{ 
 
-								this.addScriptNode(node, dirPath, className); 
+								this.addScriptNode(node, dirPath, className, classPath); 
 
 						}
 						else
@@ -1038,7 +1038,7 @@ usesComponent: function(classPath)
 
 					if (r.result)
 					{
-						r.data = this.processCode(r.data, className);
+						r.data = this.processCode(r.data, className, dirPath, classPath, '.js');
 						panjs.exec(r.data);
 
 						if (panjs.setSourceInComponents)
@@ -1166,17 +1166,18 @@ usesComponent: function(classPath)
 
 	},
 
-	processCode: function(code, className)
+	processCode: function(code, className, dirPath, classPath, ext)
 	{
 		/*
 			Remplace this._super par className._super
 		*/  
-		return code.replace(/this._super/g, className+"._super");   
+		var r = code.replace(/this._super/g, className+"._super")+'\n//@ sourceURL='+dirPath+"/"+className+ext;   
+		return r;
 	},
 
-	addScriptNode: function(node, dirPath, className)
+	addScriptNode: function(node, dirPath, className, classPath)
 	{ 
-		var subtype = node.getAttribute("subtype");
+		var subtype = node.getAttribute("data-subtype");
 		var src = node.getAttribute("src");
 
 		if (src == null)
@@ -1185,7 +1186,7 @@ usesComponent: function(classPath)
 			
 			if ((className != null) && ( subtype == "text/x-class-definition"))
 			{ 
-				script = this.processCode(script, className); 
+				script = this.processCode(script, className, dirPath, classPath, '.html'); 
 			}
 			panjs.exec(script);
 		}
@@ -1197,7 +1198,9 @@ usesComponent: function(classPath)
 			{         
 				var r = this.loadFile(this.getUrlWithVersion(url));
 				if ((className != null) && ( subtype == "text/x-class-definition")){
-					r.data = this.processCode(r.data, className)
+					r.data = this.processCode(r.data, className, dirPath, classPath, '.js')
+				}else{
+					r.data += '\n//@ sourceURL='+src+'.js';
 				}
 
 				panjs.exec(r.data);

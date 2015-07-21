@@ -121,16 +121,16 @@
 	},
 	processStates:function(element)
 	{
-		var includeIn = element.getAttribute("includeIn");		
+		var includeIn = element.getAttribute("data-include-in");		
 		if (includeIn != null)
 			includeIn = includeIn.split(" ");
-		var includeLogic = element.getAttribute("includeLogic") ||"OR"; 
+		var includeLogic = element.getAttribute("data-include-logic") ||"OR"; 
 
 
-		var excludeFrom = element.getAttribute("excludeFrom");
+		var excludeFrom = element.getAttribute("data-exclude-from");
 		if (excludeFrom != null)
 			excludeFrom = excludeFrom.split(" ");
-		var excludeLogic = element.getAttribute("excludeLogic") ||"OR"; 			
+		var excludeLogic = element.getAttribute("data-exclude-logic") ||"OR"; 			
 
 
 		if ((excludeFrom != null) && (includeIn != null))
@@ -463,12 +463,13 @@
 						else
 						{
 
-							var autoload = !(el.getAttribute("autoload") === "false");
+							var autoload = !(el.getAttribute("data-autoload") === "false");
 							
 							if (autoload)
 							{
 									//creation instance du composant
 									var compo = this.createComponent(dataType,{elem:el, parent:this});	
+									
 
 									/*if (compo.className == "TerrorElement"){
 										panjs.stack.push("Unable to create "+dataType+" : "+compo.message);
@@ -498,7 +499,7 @@
 									el.loaded = true;
 									el.compo = compo;
 									compo.loaded = true;
-
+									
 								}
 								else
 								{

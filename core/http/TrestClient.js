@@ -140,6 +140,7 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 		url += "&";
 
 		var urlParams = this.extraUrlParams;
+		
 		if (defined(params))
 		{
 			if (typeof params == "object")
@@ -156,7 +157,7 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 		urlParams = urlParams.replace(/#/g, '%23');
 
 		var path = this.baseUrl+url+urlParams;
-	
+
 		logger.debug("TrestClient._call requestId:"+token.requestId,", method:", method,", path: ",path,", dataType="+dataType);
 
 		var req = $.ajax({ 
@@ -172,7 +173,7 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 				dataType: dataType,	//json: fonctionne pas en crossdomain sur IE8
 									//nécessité d'utiliser XdomainRequest (CORS pour IE8)
 				success: function(data, textStatus, req) {
-					
+				
 					if (token.aborted){
 						logger.debug("Requête AJAX "+token.requestId+" ANNULEE sur ",url);
 						return;
@@ -214,7 +215,28 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 						logger.debug("Requête "+token.requestId+" ANNULEE sur ",url);
 						return;
 					}
-					
+
+					if (jqXHR.status == 200)
+					{
+						var isOk = false;
+						//PB Jquery...
+						try{
+							var data = JSON.parse(jqXHR.responseText);
+							var e = this._getSuccessEvent(data,jqXHR, token);
+							this.dispatchEvent(e);
+							var isOk = true;
+						}catch(err){
+
+						}
+						if (isOk)
+						{
+							if (defined(success))
+								success(e, token);
+							return;
+						}
+						
+					}
+
 					logger.error("TrestClient._call.error: Echec requête "+token.requestId+": "+errorThrown+" sur ",url);
 
 					var readyState = "?";
@@ -243,6 +265,9 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 
 					var e = this._getErrorEvent(jqXHR, method, errorThrown,path, token);
 
+					if (e.data.status == 401){
+						e.data.responseText = "Vous n'êtes pas connecté.";
+					}
 					this.dispatchEvent(e);
 
 					if (defined(failure))

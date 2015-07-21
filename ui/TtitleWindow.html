@@ -17,13 +17,15 @@
 		
 }
 .TtitleWindow .iconContainer  img{
-			max-width:32px; 
-			max-height:32px;
+		max-width:32px; 
+		max-height:32px;
 }
-
+.TtitleWindow .iconContainer {
+	padding-top:2px;
+}
 </style>
 
-<script subtype="text/x-class-definition">
+<script data-subtype="text/x-class-definition">
 //<![CDATA[
 
 defineClass("TtitleWindow", "core.display.Telement", { 
@@ -46,16 +48,17 @@ defineClass("TtitleWindow", "core.display.Telement", {
 		}
 	
 		this.setTitle(this._title);
+		this.setIcon( this.iconHtml);
 
-		if (this.iconHtml != "")
-		{
-			this.iconContainer.show();
-			var icon = $(this.iconHtml);
-			this.iconContainer.append(icon);
-		}
-
-		
 	},	
+	setIcon: function(iconHtml){
+		if (iconHtml){
+			this.iconContainer.show();			
+			this.iconContainer.html(iconHtml);		
+		}else{
+			this.iconContainer.hide();
+		}
+	},
 	setTitle: function(value)
 	{
 		this._title = value;

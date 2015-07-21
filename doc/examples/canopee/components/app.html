@@ -11,7 +11,7 @@
 }
 </style>
 
-<script subtype="text/x-class-definition">
+<script data-subtype="text/x-class-definition">
 //<![CDATA[
 
 defineClass("app", "core.display.Telement", { 
@@ -20,6 +20,7 @@ defineClass("app", "core.display.Telement", {
 
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);
+	
 	
 	},
 	test: function(){
@@ -36,7 +37,7 @@ defineClass("app", "core.display.Telement", {
 <body>
 
 	<button id="btn1" class="btn btn-primary" data-onclick="this.test">app</button>
-	<div id="selectPays" data-compo="components.TselectPays.html" autoload="false"/>
+	<div id="selectPays" data-compo="components.TselectPays.html" data-autoload="false"/>
 			
 	<!--CONTENT-->
 </body>

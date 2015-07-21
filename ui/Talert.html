@@ -18,7 +18,7 @@
 
 </style>
 
-<script subtype="text/x-class-definition">
+<script data-subtype="text/x-class-definition">
 //<![CDATA[
 
 defineClass("Talert", "ui.TtitleWindow.html", { 
@@ -34,7 +34,7 @@ defineClass("Talert", "ui.TtitleWindow.html", {
 		this.iconHtml = '<i class="fa fa-2x fa-question" ></i>';
 
 		this._super.constructor.call(this,args);	
-		
+	
 		this.iconContainer.css("color", "#F87217");
 
 		this.injectParam("message", args.message,false, this.message);	

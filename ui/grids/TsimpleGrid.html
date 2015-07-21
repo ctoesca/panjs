@@ -96,7 +96,7 @@ Exemple:
 }
 </style>
 
-<script subtype="text/x-class-definition">
+<script data-subtype="text/x-class-definition">
 //<![CDATA[
 
 
@@ -190,6 +190,8 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 
 			this.content.remove();			
 		}
+
+		
 
 		if (this._tableClass != null)
 		this.table.addClass(this._tableClass);
@@ -1024,8 +1026,8 @@ defineClass("TsimpleGrid", "core.display.Telement", {
 
 <body>	
 
-<div id="tableContainer" style="height: 100%">
-	 <table class="table-responsive table-striped table-condensed table-bordered" id="table">
+<div id="tableContainer" style="height: 100%" >
+	 <table class="table table-striped table-condensed table-bordered" id="table">
           <tbody id="tbody">
           
           </tbody>                 

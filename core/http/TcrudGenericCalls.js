@@ -342,6 +342,7 @@ defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", {
 				this.updateModel(evt.data);
 			}
 		}	
+
        	//Pour recharger les grilles attachées au modèle
         this._onupdateDefault(evt, token);
 	},

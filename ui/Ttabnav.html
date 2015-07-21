@@ -9,7 +9,7 @@
 
 </style>
 
-<script subtype="text/x-class-definition">
+<script data-subtype="text/x-class-definition">
 
 //<![CDATA[      
 
@@ -119,7 +119,7 @@ defineClass("Ttabnav", "core.display.Telement", {
 		if  ((this.parent == null)||(tab.subComponentsLoaded)|| (this.autoloadComponents == false))
 			return;
 
-		var composToLoad = tab.elem.getElements('[autoload="false"]');
+		var composToLoad = tab.elem.getElements('[data-autoload="false"]');
 		for (var i = 0; i < composToLoad.length; i++) {
 			var compo = composToLoad[i];
 			this.parent[compo[0].originalId].load();

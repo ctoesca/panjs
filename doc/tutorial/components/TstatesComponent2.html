@@ -5,7 +5,7 @@
       font-size: 150%;
     }
   </style>
-  <script subtype="text/x-class-definition">
+  <script data-subtype="text/x-class-definition">
     //<![CDATA[      
 
     defineClass("TstatesComponent2", "core.display.Telement", { 
@@ -57,10 +57,10 @@
 
   </div>
       
-  <label class="label label-danger" id="DisconnectedLabel" excludeFrom="connected">Disconnected</label>
-  <label class="label label-success" id="connectedLabel"  includeIn="connected" >connected 
-    <i class="fa fa-male" id="maleIcon" includeIn="male"/> 
-    <i class="fa fa-female" id="femaleIcon" includeIn="female"/> 
+  <label class="label label-danger" id="DisconnectedLabel" data-exclude-from="connected">Disconnected</label>
+  <label class="label label-success" id="connectedLabel"  data-include-in="connected" >connected 
+    <i class="fa fa-male" id="maleIcon" data-include-in="male"/> 
+    <i class="fa fa-female" id="femaleIcon" data-include-in="female"/> 
   </label>
 
 </body>
