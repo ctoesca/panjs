@@ -15,7 +15,7 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 
 		this.injectParam("sourceElement", args.sourceElement,true);
 		this.sourceElement.style.display = "none";
-		this.sourceElement.setAttribute("loaded", "false");
+		this.sourceElement.setAttribute("data-loaded", "false");
 		this.dataType = this.sourceElement.getAttribute("data-compo");	
 
 		this.args = args;
@@ -59,7 +59,8 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 		
 			$(h).replaceWith(compo.container);
 			compo.container[0].originalId = origId;
-
+			compo.container[0].loaded = true;
+			
 			compo.loaded = true;		
 
 			if (compo.visible)

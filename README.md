@@ -1,4 +1,4 @@
-#panJS v0.7.6
+#panJS v0.7.7
 > A 38 ko javascript framework 
 
 panJs is a javascript framework that uses Jquery and allows you to create application easily, by making resusable components.

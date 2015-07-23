@@ -56,10 +56,26 @@ defineClass("TsearchCombobox", "core.display.Telement", {
         this.container.prepend(this.waitingIcon);
          this.container.prepend(this.errorElement);
 
-        this._combo = this.select.combobox().data('combobox') ;
+        this._combo = this.select.combobox({
+            //matcher ne tenant pas comptre de accents (français).
+            matcher: function (item) {  
+                var translate_re = /[àáâçèéêëîïôöúû]/g;
+                var translate = 'aaaceeeeiioouu';
+                item = (item.toLowerCase().replace(translate_re, function(match){
+                    return translate.substr(translate_re.source.indexOf(match)-1, 1); })
+                );
+                var query = (this.query.toLowerCase().replace(translate_re, function(match){
+                    return translate.substr(translate_re.source.indexOf(match)-1, 1); })
+                );
+
+                return ~item.indexOf(query.toLowerCase());
+            }
+
+
+        }).data('combobox') ;
 
     },
-
+  
     getDataProvider: function(dp)
     {
         return this._dataProvider;

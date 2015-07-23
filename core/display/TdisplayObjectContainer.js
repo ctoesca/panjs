@@ -496,7 +496,7 @@
 										logger.info("PAS DE replaceWith pour ",compo.id ," visible = ",compo.visible," ",typeof compo.visible);
 									}*/
 
-									el.loaded = true;
+									compo.container[0].loaded = true;
 									el.compo = compo;
 									compo.loaded = true;
 									

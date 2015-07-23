@@ -196,7 +196,7 @@ String.prototype.contains = function(it) {
   return this.indexOf(it) > -1; 
 };
 
-String.prototype.gauche = function(souschaine)
+String.prototype.leftOf = function(souschaine)
 {
  var index = this.indexOf(souschaine,0);
  if (index >=0)
@@ -204,6 +204,7 @@ String.prototype.gauche = function(souschaine)
  else
  return '';
 }
+String.prototype.gauche = String.prototype.leftOf;
 
 String.prototype.capitalizeFirstLetter = function()
 {
