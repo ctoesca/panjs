@@ -9,7 +9,7 @@
 <script data-subtype="text/x-class-definition">
 //<![CDATA[
               
-defineClass("TradioGroup", "core.display.Telement", { 
+defineClass("TradioGroup", "panjs.core.display.Telement", { 
 	baseElement: "div",
 	labelField: null,
 	selectedField: null,
@@ -34,7 +34,7 @@ defineClass("TradioGroup", "core.display.Telement", {
 		this.dp = dp;
 		if (this.dp != null){
 			for (var i = 0; i < dp.length; i++) {
-				var radio = this.createComponent("ui.fuelUx.Tradiobutton.html",{parent:this});
+				var radio = this.createComponent("panjs.ui.fuelUx.Tradiobutton.html",{parent:this});
 				var data = dp._source[i];
 				radio.setLabel( data[this.labelField]);
 				radio.setSelected( data[this.selectedField]);

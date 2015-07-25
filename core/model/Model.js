@@ -1,4 +1,4 @@
-defineClass("Model", "core.events.TeventDispatcher",
+defineClass("Model", "panjs.core.events.TeventDispatcher",
 { 
 
   owner: null,

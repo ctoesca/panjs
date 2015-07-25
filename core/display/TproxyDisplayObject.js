@@ -1,5 +1,5 @@
 
-defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
+defineClass("TproxyDisplayObject", "panjs.core.events.TeventDispatcher",
 { 
 	autoload: false,
 	loaded: false,
@@ -60,6 +60,7 @@ defineClass("TproxyDisplayObject", "core.events.TeventDispatcher",
 			$(h).replaceWith(compo.container);
 			compo.container[0].originalId = origId;
 			compo.container[0].loaded = true;
+			compo.container.attr("data-loaded", "true");
 			
 			compo.loaded = true;		
 

@@ -27,7 +27,7 @@ render
 */
 
 
-defineClass("TdisplayObject", "core.events.TeventDispatcher",
+defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 { 
 	/* PROPRIETES */
 
@@ -43,7 +43,6 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 	_realVisible: false,
 	args: null,
 	
-	/* METHODES */
 	load:function(){
 		/* Si on ne sait pas si l'objet est un proxy ou pas, on appelle load 
 		ça ne génèrera pas d'erreur, bien que le composant soit déjà chargé
@@ -73,7 +72,7 @@ defineClass("TdisplayObject", "core.events.TeventDispatcher",
 
 		window[this.className].lastId ++;
 
-		//parfois on a besoin d'un id unique (voir Tcheckbox).				
+		//parfois on ne veut pas que l'id soit modifié (voir Tcheckbox).				
 		//if (!defined(args, "id")) 
 			this._setId( this.className+window[this.className].lastId );
 		//else

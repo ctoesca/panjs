@@ -10,7 +10,7 @@
 
 //<![CDATA[      
 
-defineClass("Tlazy_loading", "core.display.Telement", { 
+defineClass("Tlazy_loading", "panjs.core.display.Telement", { 
   
 	baseElement: "div",	
 
@@ -33,7 +33,7 @@ If you want to load a component "on-demand", add <code>data-autoload="false"</co
 </p>
 
 <h3>Modify <code>app.html</code></h3>
-<div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.app7.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp1"/>
+<div data-compo="panjs.ui.TcodeHighlight.html" data-source-classpath="components.app7.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp1"/>
 
 <h3>Result</h3>
 <p>When you click on the load button, you can see in the browser console that a ajax request is done, in order to load <code>components.TtestButton.html</code>.</p>

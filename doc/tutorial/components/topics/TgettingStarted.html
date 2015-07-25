@@ -10,7 +10,7 @@
 
 //<![CDATA[      
 
-defineClass("TgettingStarted", "core.display.Telement", { 
+defineClass("TgettingStarted", "panjs.core.display.Telement", { 
   
 	baseElement: "div",	
 
@@ -61,10 +61,10 @@ defineClass("TgettingStarted", "core.display.Telement", {
 For convenience, we use <b><a target_="_blank" href="http://getbootstrap.com/">bootstrap</a></b> style sheet and <b><a target_="_blank" href="http://http://fontawesome.io">FontAwesome</a></b> but it's optional.
 </p>
 
-  <div id="tabnav" data-compo="ui.Ttabnav.html"  data-autoload-components="true">  
+  <div id="tabnav" data-compo="panjs.ui.Ttabnav.html"  data-autoload-components="true">  
 
       <div label="index.html" id="tab1">
-      <div data-compo="ui.TcodeHighlight.html">
+      <div data-compo="panjs.ui.TcodeHighlight.html">
 &lt;!DOCTYPE html&gt;
 &lt;html lang="en"&gt;
       &lt;head&gt;
@@ -83,8 +83,8 @@ For convenience, we use <b><a target_="_blank" href="http://getbootstrap.com/">b
           version: "0.7.5", //panjs version
                 
           namespaces:{
-            "core": {path: "../panjs/core"},
-            "ui": {path: "../panjs/ui"},
+            "panjs.core": {path: "../panjs/core"},
+            "panjs.ui": {path: "../panjs/ui"},
             "components": {path: "./components"}     
             }
           };  
@@ -107,7 +107,7 @@ For convenience, we use <b><a target_="_blank" href="http://getbootstrap.com/">b
         </div>
       </div>
       <div label="app.html" id="tab2">
-          <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.app1.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp1" data-autoload="false"/>
+          <div data-compo="panjs.ui.TcodeHighlight.html" data-source-classpath="components.app1.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp1" data-autoload="false"/>
       </div>
   </div>
 
@@ -132,7 +132,7 @@ For convenience, we use <b><a target_="_blank" href="http://getbootstrap.com/">b
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-              <div data-compo="ui.TcodeHighlight.html">&lt;div data-compo="app.TtestButton.html"/&gt; </div> 
+              <div data-compo="panjs.ui.TcodeHighlight.html">&lt;div data-compo="app.TtestButton.html"/&gt; </div> 
           </div>
           <div class="col-sm-6" >
               <div data-compo="app.TtestButton.html">  </div> 

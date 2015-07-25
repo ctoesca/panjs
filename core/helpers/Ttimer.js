@@ -1,4 +1,4 @@
-defineClass("Ttimer", "core.events.TeventDispatcher",
+defineClass("Ttimer", "panjs.core.events.TeventDispatcher",
 { 
 	delay: null,
 	running: false,

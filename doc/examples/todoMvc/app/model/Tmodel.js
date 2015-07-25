@@ -1,7 +1,7 @@
-uses("core.collections.TarrayCollection");
+uses("panjs.core.collections.TarrayCollection");
 uses("services.TlocalService");
 
-defineClass("Tmodel", "core.events.TeventDispatcher", { 
+defineClass("Tmodel", "panjs.core.events.TeventDispatcher", { 
 	
 	todos: null,
 	$filter: null,

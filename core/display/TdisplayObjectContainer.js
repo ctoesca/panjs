@@ -1,21 +1,5 @@
-/*
-	numChildren : int
-
-	addChild(child:DisplayObject):DisplayObject
-	addChildAt(child:DisplayObject, index:int):DisplayObject
-	contains(child:DisplayObject):Boolean
-	getChildAt(index:int):DisplayObject
-	getChildByName(name:String):DisplayObject
-	getChildIndex(child:DisplayObject):int
-	removeChild(child:DisplayObject):DisplayObject
-	removeChildAt(index:int):DisplayObject
-	removeChildren(beginIndex:int = 0, endIndex:int = 0x7fffffff):void
-	setChildIndex(child:DisplayObject, index:int):void
-	swapChildren(child1:DisplayObject, child2:DisplayObject):void
-	swapChildrenAt(index1:int, index2:int):void
-	*/
 	
-	defineClass("TdisplayObjectContainer", "core.display.TdisplayObject",
+	defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject",
 	{ 	
 
 		_statesElements: null,
@@ -505,7 +489,7 @@
 								{
 									//Le composant n'est pas instancié: on met un proxy à la place, qui a la fonction LOAD()
 									el.setAttribute("id", this.id+"_"+id);
-									uses("core.display.TproxyDisplayObject");
+									uses("panjs.core.display.TproxyDisplayObject");
 									var proxyCompo = new TproxyDisplayObject({sourceElement:el});
 									
 									proxyCompo.parent = this;

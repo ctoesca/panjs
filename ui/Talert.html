@@ -21,7 +21,7 @@
 <script data-subtype="text/x-class-definition">
 //<![CDATA[
 
-defineClass("Talert", "ui.TtitleWindow.html", { 
+defineClass("Talert", "panjs.ui.TtitleWindow.html", { 
 
 	_data : null,
 	message: "",
@@ -114,8 +114,8 @@ Talert.CANCEL = "Annuler";
 
 Talert.show = function(message, buttons, closeHandler, data, iconhtml, title, fade)
 {
-	uses("ui.managers.TpopupManager.html");
-	message = message.replace(/\n/g,'<br/>');
+	uses("panjs.ui.managers.TpopupManager.html");
+	//message = message.replace(/\n/g,'<br/>');
 	
 	var p = panjs.PopupManager.createPopup(Talert, 
 	{

@@ -4,7 +4,7 @@
     <script data-subtype="text/x-class-definition">
       //<![CDATA[      
 
-      defineClass("Tusing_states1", "core.display.Telement", { 
+      defineClass("Tusing_states1", "panjs.core.display.Telement", { 
       	
       	baseElement:"div",
 
@@ -32,7 +32,7 @@
         <li>CSS classes are added or removed on the component when the state changes: their names are the names of the component's states.<br/>
         <p>For example: if you want to disable buttons on a component 'TstatesComponent1' that is in state "working", you would do something like this (in LESS):</p>
 
-     <div data-compo="ui.TcodeHighlight.html" data-language="html">&lt;style type="text/less"&gt;
+     <div data-compo="panjs.ui.TcodeHighlight.html" data-language="html">&lt;style type="text/less"&gt;
 .TstatesComponent1.working{  
           button{
             cursor: not-allowed;
@@ -48,7 +48,7 @@
 
 <h3>Create the file <code>TstatesComponent1.html</code> in "components" directory</h3>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.TstatesComponent1.html" id="codeCompo1" />
+    <div data-compo="panjs.ui.TcodeHighlight.html" data-source-classpath="components.TstatesComponent1.html" id="codeCompo1" />
     
     <h4>Notes:</h4>
     <ul>
@@ -63,7 +63,7 @@
     <h3>Put the component in <code>app.html</code></h3>
     <p>Modify app.html <code>&lt;body&gt;</code></p>
 
-     <div data-compo="ui.TcodeHighlight.html">
+     <div data-compo="panjs.ui.TcodeHighlight.html">
 &lt;body&gt;
   &lt;div data-compo="components.TstatesComponent1.html"&gt;&lt;/div&gt;
 &lt;/body&gt;

@@ -16,7 +16,7 @@
 <script data-subtype="text/x-class-definition">
 //<![CDATA[
               
-defineClass("Tselectize", "core.display.Telement", { 
+defineClass("Tselectize", "panjs.core.display.Telement", { 
 	/* PROPRIETES */
 	baseElement: "select",
 	
@@ -38,6 +38,8 @@ defineClass("Tselectize", "core.display.Telement", {
 	_dataProvider: null,
 	_data: null,
 	_postCreateActions: null,
+	_inlineStyle: null,
+	_isReady: false,
 
 	constructor: function(args){
 		
@@ -52,7 +54,10 @@ defineClass("Tselectize", "core.display.Telement", {
 		this.injectParam("sortField", args["sortField"],false);
 		this.injectParam("theme", args["theme"],false);
 		this.injectParam("maxItems", args["maxItems"],false);
-		
+		this.injectParam("_inlineStyle", args["inlineStyle"]);
+
+	
+
 		panjs.loader.loadCssFile("/libs/selectize/0.12.1/dist/css/selectize."+this.theme+".css");
 
 		if (this.searchField == null)
@@ -60,8 +65,9 @@ defineClass("Tselectize", "core.display.Telement", {
 		if (this.sortField == null)
 			this.sortField = this.labelField;
 		if (this.width != null)
-			this.container.attr("width", this.width);
+			this.container.css("width", this.width);
 
+	
      	this.setPlaceholder(this.placeholder);
 
 	},
@@ -106,8 +112,16 @@ defineClass("Tselectize", "core.display.Telement", {
 		for (var i=0; i< this._dataProvider._items.length; i++)
 			this._data.push(  this._transformItem( this._dataProvider._items[i] ) );
 		this.refresh();		
+		this._setIsReady(true);
 	},
-
+	_setIsReady: function(value){
+		this._isReady = value;
+		if (value)
+			this.dispatchEvent( new Tevent(Tevent.READY));
+	},
+	isReady: function(){
+		return this._isReady;
+	},
 	_onAfterCreateComponent: function(){
 
 		for (var i=0; i< this._postCreateActions.length; i++)
@@ -128,13 +142,23 @@ defineClass("Tselectize", "core.display.Telement", {
 		if (this._control != null)
 			this._control.destroy();
 
+	
+
 		this._control = this.container.selectize(opt)[0].selectize;
+
+		if (this._inlineStyle)
+		this._control.$wrapper.attr("style", this._inlineStyle);	
+
+
 		this.setPlaceholder(this.placeholder);
 		this._onAfterCreateComponent();
 
 		return this._control;	
 	},
-
+	highlight: function(){
+		if (this._control)
+			this._control.$wrapper.css("opacity", "0.2").fadeTo('slow', 1.0);
+	},
 	_getOptions: function(){
 		var render ={};
 
@@ -196,6 +220,7 @@ defineClass("Tselectize", "core.display.Telement", {
 
 	},
 	addSelectedValues: function(values, propname, silent){
+
 		if ((this._control != null))
 		{
 			var items = [];
@@ -211,6 +236,25 @@ defineClass("Tselectize", "core.display.Telement", {
 		}
 		else{
 			this._postCreateActions.push( { callback: this.addSelectedValues.bind(this, values, propname, silent)} );
+		}
+	},
+	removeSelectedValues: function(values, propname, silent){
+		
+		if ((this._control != null))
+		{
+			var items = [];
+			if (arguments.length<2)
+				var propname = this.valueField;
+
+			for (var i=0; i<values.length; i++)
+			{
+	 			var item = this._dataProvider.getByProp(propname, values[i]);
+	 			if (item != null)
+	 				this._control.removeItem(item[this.valueField], silent);
+			}
+		}
+		else{
+			this._postCreateActions.push( { callback: this.removeSelectedValues.bind(this, values, propname, silent)} );
 		}
 	},
 	getSelectedItems: function()

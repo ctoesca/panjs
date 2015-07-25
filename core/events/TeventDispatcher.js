@@ -3,9 +3,9 @@ TeventDispatcher
 _eventTypes: { type1:[listener1, listener2 ...], type2:[listener1, listener2 ...], ...}
 */
 
-uses("core.events.Tevent");
+uses("panjs.core.events.Tevent");
 
-defineClass("TeventDispatcher", "core.Tobject", { 
+defineClass("TeventDispatcher", "panjs.core.Tobject", { 
 
 	_listeners: null,
 	

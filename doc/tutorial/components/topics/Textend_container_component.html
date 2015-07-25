@@ -10,7 +10,7 @@
 
 //<![CDATA[      
 
-defineClass("Textend_container_component", "core.display.Telement", { 
+defineClass("Textend_container_component", "panjs.core.display.Telement", { 
   
 	baseElement: "div",	
 
@@ -28,7 +28,7 @@ defineClass("Textend_container_component", "core.display.Telement", {
 
 <h3>Create the file <code>TpanelExt.html</code> in "components" directory</h3>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.TpanelExt.html" id="codeCompo1" data-max-height="500px"/>
+    <div data-compo="panjs.ui.TcodeHighlight.html" data-source-classpath="components.TpanelExt.html" id="codeCompo1" data-max-height="500px"/>
       <h4>Notes:</h4>
     <ul>
         <li>The <code>&lt;body&gt;</code> of this component is injected in the <code>&lt;!--CONTENT--&gt;</code> of the parent.</li>
@@ -38,7 +38,7 @@ defineClass("Textend_container_component", "core.display.Telement", {
     <h3>Modify <code>app.html</code></h3>
     <p>In app.html <code>&lt;body&gt;</code>, replace <code>Tpanel</code> by <code>TpanelExt</code></p>
 
-     <div data-compo="ui.TcodeHighlight.html">
+     <div data-compo="panjs.ui.TcodeHighlight.html">
 &lt;body&gt;
   &lt;p&gt;&lt;code&gt;app.html&lt;/code&gt; component&lt;/p&gt;
   &lt;div data-compo="components.TpanelExt.html"&gt;
@@ -64,7 +64,7 @@ defineClass("Textend_container_component", "core.display.Telement", {
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-              <div data-compo="ui.TcodeHighlight.html">&lt;div data-compo="app.TtestButton.html"/&gt; </div> 
+              <div data-compo="panjs.ui.TcodeHighlight.html">&lt;div data-compo="app.TtestButton.html"/&gt; </div> 
           </div>
           <div class="col-sm-6" >
               <div data-compo="app.TtestButton.html">  </div> 

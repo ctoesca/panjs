@@ -10,7 +10,7 @@
 
 //<![CDATA[      
 
-defineClass("Tcreate_component_programmatically", "core.display.Telement", { 
+defineClass("Tcreate_component_programmatically", "panjs.core.display.Telement", { 
   
 	baseElement: "div",	
 
@@ -27,17 +27,17 @@ defineClass("Tcreate_component_programmatically", "core.display.Telement", {
 <h1>Create components programmatically</h1>
 
 <h3>Instantiate a component</h3>
-<div data-compo="ui.TcodeHighlight.html" > var compo = panjs.createComponent("components.TtestButton.html");</div>
+<div data-compo="panjs.ui.TcodeHighlight.html" > var compo = panjs.createComponent("components.TtestButton.html");</div>
 
 <p>When you instanciate a component from another component, it's better to use <code>this.createComponent</code>.<br/>
 The component will be owned by its creator component. When the creator is destroyed, the component created programmatically will also be destroyed.</p>
-<div data-compo="ui.TcodeHighlight.html" > var compo = this.createComponent("components.TtestButton.html");</div>
+<div data-compo="panjs.ui.TcodeHighlight.html" > var compo = this.createComponent("components.TtestButton.html");</div>
 
 <h3>Append the component to the DOM</h3>
-<div data-compo="ui.TcodeHighlight.html" > compo.appendTo(&lt;Jquery object&gt;);</div>
+<div data-compo="panjs.ui.TcodeHighlight.html" > compo.appendTo(&lt;Jquery object&gt;);</div>
 
 <h3>Example</h3>
- <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.app8.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp1"/>
+ <div data-compo="panjs.ui.TcodeHighlight.html" data-source-classpath="components.app8.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp1"/>
 
 
 <p>Notes</p>

@@ -8,7 +8,7 @@ Cette classe n'est pas perenne car à chaque instanciation, on doit binder les p
 que c'est au niveau du prototype que ça devrait être fait (starter -> extend).
 */
 
-defineClass("TbindableObject", "core.events.TeventDispatcher",
+defineClass("TbindableObject", "panjs.core.events.TeventDispatcher",
 {  
 
 	test:0,

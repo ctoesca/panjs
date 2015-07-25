@@ -10,7 +10,7 @@
 
 //<![CDATA[      
 
-defineClass("Textend_component", "core.display.Telement", { 
+defineClass("Textend_component", "panjs.core.display.Telement", { 
   
 	baseElement: "div",	
 
@@ -28,7 +28,7 @@ defineClass("Textend_component", "core.display.Telement", {
 
 <h3>Create the file <code>TtestButtonExt.html</code> in "components" directory</h3>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.TtestButtonExt.html" id="codeCompo1" data-max-height="500px"/>
+    <div data-compo="panjs.ui.TcodeHighlight.html" data-source-classpath="components.TtestButtonExt.html" id="codeCompo1" data-max-height="500px"/>
     <h4>Notes:</h4>
     <ul>
         <li>In the <code>defineClass</code> function, the component inherits from <code>components.TtestButton.html</code></li>
@@ -41,7 +41,7 @@ defineClass("Textend_component", "core.display.Telement", {
     <h3>Put the component in <code>app.html</code></h3>
     <p>Modify app.html <code>&lt;body&gt;</code></p>
 
-     <div data-compo="ui.TcodeHighlight.html">
+     <div data-compo="panjs.ui.TcodeHighlight.html">
 &lt;body&gt;
   &lt;p&gt;&lt;code&gt;app.html&lt;/code&gt; component&lt;/p&gt;
   &lt;div data-compo="components.TtestButton.html"/&gt;
@@ -64,7 +64,7 @@ defineClass("Textend_component", "core.display.Telement", {
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-              <div data-compo="ui.TcodeHighlight.html">&lt;div data-compo="app.TtestButton.html"/&gt; </div> 
+              <div data-compo="panjs.ui.TcodeHighlight.html">&lt;div data-compo="app.TtestButton.html"/&gt; </div> 
           </div>
           <div class="col-sm-6" >
               <div data-compo="app.TtestButton.html">  </div> 

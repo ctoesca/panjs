@@ -10,10 +10,10 @@
 
 <script data-subtype="text/x-class-definition">
 //<![CDATA[
-uses("core.helpers.Ttimer");
+uses("panjs.core.helpers.Ttimer");
 
-uses("core.collections.TarrayCollection");
-defineClass("app", "core.display.Telement", { 
+uses("panjs.core.collections.TarrayCollection");
+defineClass("app", "panjs.core.display.Telement", { 
 
 	baseElement: "div",	
 	data: null,
@@ -93,7 +93,7 @@ defineClass("app", "core.display.Telement", {
 		</div>
 
 		<div class="col-md-6">
-			<div id="grid" data-compo="ui.grids.TsimpleGrid.html">
+			<div id="grid" data-compo="panjs.ui.grids.TsimpleGrid.html">
 				<div field="" itemRenderer="components.TeditItemRenderer.html"></div>
 				<div field="key">key</div>
 				<div field="value">value</div>

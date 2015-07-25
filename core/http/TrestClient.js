@@ -2,7 +2,7 @@
 TrestClient 
 ***/
 
-defineClass("TrestClient", "core.events.TeventDispatcher",
+defineClass("TrestClient", "panjs.core.events.TeventDispatcher",
 {  	
 	dataType: "json",
 	/*
@@ -133,20 +133,20 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 		if (!token.requestId)
 			token.requestId = token.id;
 
-
-		if (url.lastIndexOf("?") == -1)
-			url += "?";
+		var urlParams = "";
+		if (url.lastIndexOf("?") != -1){
+			urlParams = url.droite("?");
+			url = url. gauche("?");
+		}
 		
-		url += "&";
-
-		var urlParams = this.extraUrlParams;
+		urlParams += "&"+this.extraUrlParams;
 		
 		if (defined(params))
 		{
 			if (typeof params == "object")
 			{
 				for (p in params){
-					urlParams += urlParams + "&"+ p +"="+params[p];
+					urlParams += "&"+ p +"="+params[p];
 				}
 			}
 			else
@@ -154,9 +154,12 @@ defineClass("TrestClient", "core.events.TeventDispatcher",
 				urlParams += "&"+params;
 			}
 		}
+
+		//
+		urlParams = encodeURI(urlParams);
 		urlParams = urlParams.replace(/#/g, '%23');
 
-		var path = this.baseUrl+url+urlParams;
+		var path = this.baseUrl+url+"?"+urlParams;
 
 		logger.debug("TrestClient._call requestId:"+token.requestId,", method:", method,", path: ",path,", dataType="+dataType);
 

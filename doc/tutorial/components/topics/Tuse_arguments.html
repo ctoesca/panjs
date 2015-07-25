@@ -10,7 +10,7 @@
 
 //<![CDATA[      
 
-defineClass("Tuse_arguments", "core.display.Telement", { 
+defineClass("Tuse_arguments", "panjs.core.display.Telement", { 
   
 	baseElement: "div",	
 
@@ -36,7 +36,7 @@ Use small letters for attributes names.
 </p>
 
 <h4>Example : </h4>
-<div data-compo="ui.TcodeHighlight.html" >&lt;body&gt;
+<div data-compo="panjs.ui.TcodeHighlight.html" >&lt;body&gt;
     &lt;div data-max-clicks="3" data-compo="components.TtestButton.html"&gt;&lt;/div&gt;
 &lt;/body&gt;
 </div>
@@ -47,9 +47,9 @@ Use small letters for attributes names.
 <p>Arguments are available in the <code>args</code> object, in the contructor.
 
 </p>
-<div data-compo="ui.TcodeHighlight.html" >&lt;script data-subtype="text/x-class-definition"&gt;
+<div data-compo="panjs.ui.TcodeHighlight.html" >&lt;script data-subtype="text/x-class-definition"&gt;
 //&lt;![CDATA[      
-defineClass("TtestButton", "core.display.Telement", {  
+defineClass("TtestButton", "panjs.core.display.Telement", {  
   baseElement: "div", 
     constructor: function(args){
       this._super.constructor.call(this,args);  
@@ -80,12 +80,12 @@ In the <code>args</code> object, the arguments names are not the same as the att
 
 <p>
 When you load a component lazily, you can pass arguments:</p>
-<div data-compo="ui.TcodeHighlight.html" >load({args1: "bla", arg2: 3})</div>
+<div data-compo="panjs.ui.TcodeHighlight.html" >load({args1: "bla", arg2: 3})</div>
 
 
 <h3>Passing arguments when you create a component programmatically</h3>
 
-<div data-compo="ui.TcodeHighlight.html" > var compo = panjs.createComponent("components.TtestButton.html",{args1: "bla", arg2: 3});</div>
+<div data-compo="panjs.ui.TcodeHighlight.html" > var compo = panjs.createComponent("components.TtestButton.html",{args1: "bla", arg2: 3});</div>
 
 
 </body>

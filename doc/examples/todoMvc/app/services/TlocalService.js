@@ -1,5 +1,5 @@
 
-defineClass("TlocalService", "core.events.TeventDispatcher", { 
+defineClass("TlocalService", "panjs.core.events.TeventDispatcher", { 
 
 	STORAGE_ID: "panjs_todos",
 

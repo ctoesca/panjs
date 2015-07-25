@@ -6,7 +6,7 @@ Event
 params: type:String, bubbles:Boolean = false, cancelable:Boolean = false 
 */
 
-defineClass("Tevent", "core.Tobject",
+defineClass("Tevent", "panjs.core.Tobject",
 {  
 	type: null,
 	data: null,

@@ -3,7 +3,7 @@
 Tobject 
 ***/
 
-defineClass("TkoArrayCollection", "core.collections.TarrayCollection", {
+defineClass("TkoArrayCollection", "panjs.core.collections.TarrayCollection", {
 	  
 	constructor: function(args) { 
 		TkoArrayCollection._super.constructor.call(this,args);

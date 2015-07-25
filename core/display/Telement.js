@@ -3,7 +3,7 @@ Classe basée sur un template.
 Cette classe peut être dérivée mais n'est pas instanciable telle quelle.
 */
 
-defineClass("Telement", "core.display.TdisplayObjectContainer",
+defineClass("Telement", "panjs.core.display.TdisplayObjectContainer",
 { 
 	/* PROPRIETES */
 	html:null,
@@ -21,7 +21,7 @@ defineClass("Telement", "core.display.TdisplayObjectContainer",
 		
 	
 		if (this.enableHashManager == true){
-			uses("core.managers.Trouter");
+			uses("panjs.core.managers.Trouter");
 			
 			if (this.hashKey == null)
 				this.hashKey = this.id;

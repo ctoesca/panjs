@@ -1,7 +1,7 @@
-uses("core.http.TrestClient");
-uses("core.collections.TarrayCollection");
+uses("panjs.core.http.TrestClient");
+uses("panjs.core.collections.TarrayCollection");
 
-defineClass("TrestRessourceService", "core.events.TeventDispatcher", { 
+defineClass("TrestRessourceService", "panjs.core.events.TeventDispatcher", { 
 	apiUrl: null, //Url de base de l'api
 	urlRessource: null, // Url de la ressource. ex: /machines
 	extraUrlParams: null,

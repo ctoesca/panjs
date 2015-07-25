@@ -1,4 +1,4 @@
-#panJS v0.7.7
+#panJS v0.7.8
 > A 38 ko javascript framework 
 
 panJs is a javascript framework that uses Jquery and allows you to create application easily, by making resusable components.
@@ -55,7 +55,7 @@ You put a component in HTML page (or in another HTML component) like this:
 
     <script subtype="text/x-class-definition">
     //<![CDATA[      
-    defineClass("TmyComponent", "core.display.Telement", { 
+    defineClass("TmyComponent", "panjs.core.display.Telement", { 
        baseElement: "div",	
        clickCount:0,
        constructor: function(args){

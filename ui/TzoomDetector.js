@@ -1,5 +1,5 @@
 
-defineClass("TzoomDetector", "core.events.TeventDispatcher",
+defineClass("TzoomDetector", "panjs.core.events.TeventDispatcher",
 { 
 	isReady: false,
 

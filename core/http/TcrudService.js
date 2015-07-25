@@ -1,7 +1,7 @@
-uses("core.http.TrestClient");
-uses("core.http.TcrudGenericCalls");
+uses("panjs.core.http.TrestClient");
+uses("panjs.core.http.TcrudGenericCalls");
 
-defineClass("TcrudService", "core.events.TeventDispatcher", { 
+defineClass("TcrudService", "panjs.core.events.TeventDispatcher", { 
 
 	objectClasses: [],
 	apiUrl:null,

@@ -1,5 +1,5 @@
 
-defineClass("Trouter", "core.events.TeventDispatcher", {
+defineClass("Trouter", "panjs.core.events.TeventDispatcher", {
 	
 	hash: "",
     sendEvents: true,

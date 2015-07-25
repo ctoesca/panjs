@@ -7,7 +7,7 @@
 
 //<![CDATA[      
 
-defineClass("Tcontainer_component", "core.display.Telement", { 
+defineClass("Tcontainer_component", "panjs.core.display.Telement", { 
   
 	baseElement: "div",	
 
@@ -25,13 +25,13 @@ defineClass("Tcontainer_component", "core.display.Telement", {
 
 <h3>Create the file <code>Tpanel.html</code> in "components" directory</h3>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.Tpanel.html" id="codeCompo1" data-max-height="500px"/>
+    <div data-compo="panjs.ui.TcodeHighlight.html" data-source-classpath="components.Tpanel.html" id="codeCompo1" data-max-height="500px"/>
     
 
     <h3>Put the component in <code>app.html</code></h3>
     <p>Modify app.html <code>&lt;body&gt;</code></p>
 
-     <div data-compo="ui.TcodeHighlight.html">
+     <div data-compo="panjs.ui.TcodeHighlight.html">
 &lt;body&gt;
   &lt;p&gt;&lt;code&gt;app.html&lt;/code&gt; component&lt;/p&gt;
   &lt;div data-compo="components.Tpanel.html"&gt;
@@ -61,7 +61,7 @@ defineClass("Tcontainer_component", "core.display.Telement", {
       </div>
       <div class="row">    
           <div class="col-sm-6" >    
-              <div data-compo="ui.TcodeHighlight.html">&lt;div data-compo="app.TtestButton.html"/&gt; </div> 
+              <div data-compo="panjs.ui.TcodeHighlight.html">&lt;div data-compo="app.TtestButton.html"/&gt; </div> 
           </div>
           <div class="col-sm-6" >
               <div data-compo="app.TtestButton.html">  </div> 

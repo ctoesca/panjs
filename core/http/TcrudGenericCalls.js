@@ -1,7 +1,7 @@
-uses("core.http.TrestClient");
-uses("core.collections.TarrayCollection");
+uses("panjs.core.http.TrestClient");
+uses("panjs.core.collections.TarrayCollection");
 
-defineClass("TcrudGenericCalls", "core.events.TeventDispatcher", { 
+defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", { 
 
 	apiUrl: null, // Url de base de l'api. ex: http://cid/apis/cmdb/1.0/index.php
 	

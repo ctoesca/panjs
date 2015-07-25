@@ -76,7 +76,7 @@
 			if (typeof r == "string")
 			r = { message: r, className: className};
 
-			uses("core.display.TerrorElement.html");
+			uses("panjs.core.display.TerrorElement.html");
 			object = new TerrorElement(r);
 
 			panjs.stack.push(r.message);
@@ -145,7 +145,7 @@
 
 				var m = "Error instantiating "+className+": "+err;
 				logger.error(m);
-				uses("core.display.TerrorElement.html");  
+				uses("panjs.core.display.TerrorElement.html");  
 				var path = panjs.getAbsoluteUrlFromClassPath(classPath);    
 				var url = panjs.loader.getUrlWithVersion(path)
 				var object = new TerrorElement({message: m, path: path,url:url, className:className});
@@ -305,7 +305,7 @@
 				}
 				else
 				{
-					uses("core.display.TproxyDisplayObject");
+					uses("panjs.core.display.TproxyDisplayObject");
 					var compo = new TproxyDisplayObject({sourceElement:el[0]});
 					compo.parent = this;
 					el[0].loaded = false;
@@ -362,13 +362,12 @@
 			}
 			else
 			{
-				if (!classPath.contains("."))
+				var classPathWithoutExt = classPath.removeEnd(".html");
+				if (!classPathWithoutExt.contains("."))
 				{
 				//fichier à la racine
 				r = classPath;
-				if (isHtm)
-					r = r +".html";
-				else
+				if (!isHtm)
 					r = r +".js";
 			}else
 			{
@@ -377,13 +376,12 @@
 				{
 					if (classPath.startsWith(k+"."))
 					{
-						var r = classPath.removeEnd(".html").replace(/\./g, "/");
-						r = r.replace(k, panjs.namespaces[k].path);
-						if (isHtm)
-							r = r +".html";
-						else
+						var r = panjs.namespaces[k].path+ "/"+classPath.droite(k+".").removeEnd(".html").replace(/\./g, "/");
+						
+						if (!isHtm)
 							r = r +".js";
-
+						else
+							r = r +".html";						
 						break;
 					}
 				}        
@@ -592,7 +590,7 @@ Tlogger.
 Inclu ici car loader a besoin du logger.
 ***/
 
-defineClass("Tlogger", "core.Tobject", {
+defineClass("Tlogger", "panjs.core.Tobject", {
 	_level: null,
 	name: "MAIN",
 	creationDate: null,
@@ -764,7 +762,7 @@ Ttracer.getLogger = function(name){
 Tloader: loads other classes or components (synchronous)
 ***/
 
-defineClass("Tloader", "core.Tobject", {
+defineClass("Tloader", "panjs.core.Tobject", {
 	queue: [],
 	_count: 0,
 	maxImbrications: 10,
@@ -1134,16 +1132,16 @@ usesComponent: function(classPath)
 
 	},  
 	loadCssFile: function(url, type , rel){
+		
+		if (arguments.length == 0)
+			throw "loadCssFile(url, type , rel): Missing url";
+
 		var r = false;
 		
 		url = this.getUrlWithVersion(url);
 
 		if (this.loadedCss[url.toLowerCase()])
 			return r;
-		
-		var l = arguments.length;
-		if (l == 0)
-			throw "loadCssFile(url, type , rel): Missing url";
 		
 		if (typeof type == "undefined")
 			var type = "text/css";

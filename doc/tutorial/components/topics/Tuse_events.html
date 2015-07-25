@@ -10,7 +10,7 @@
 
 //<![CDATA[      
 
-defineClass("Tuse_events", "core.display.Telement", { 
+defineClass("Tuse_events", "panjs.core.display.Telement", { 
   
 	baseElement: "div",	
 
@@ -27,17 +27,17 @@ defineClass("Tuse_events", "core.display.Telement", {
 <h1>Events</h1>
 
 <p>Each component inherits from <code>TeventDispatcher</code> and can send events : </p>
-<div data-compo="ui.TcodeHighlight.html">this.dispatchEvent( new Tevent("CLICK"));</div>
+<div data-compo="panjs.ui.TcodeHighlight.html">this.dispatchEvent( new Tevent("CLICK"));</div>
 
 
 <p>To listen for a event : </p>
-<div data-compo="ui.TcodeHighlight.html">this.compo.on("CLICK", function(evt){
+<div data-compo="panjs.ui.TcodeHighlight.html">this.compo.on("CLICK", function(evt){
   alert("Click !");
 });</div>
 
 <h3>Create a component <code>TtestButtonExt2.html</code> that inherits from TtestButton</h3>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.TtestButtonExt2.html" id="codeCompo1" data-max-height="500px"/>
+    <div data-compo="panjs.ui.TcodeHighlight.html" data-source-classpath="components.TtestButtonExt2.html" id="codeCompo1" data-max-height="500px"/>
       <h4>Notes:</h4>
     <ul>
         <li><code>TtestButtonExt2</code> send a event with <code>clickCount</code> in the <code>data</code> field of the event. The callback function can get this data in <code>evt.data</code></li>
@@ -47,7 +47,7 @@ defineClass("Tuse_events", "core.display.Telement", {
     <h3>Modify the <code>app.html</code> component</h3>
     <p>Modify app.html <code>&lt;body&gt;</code></p>
 
-    <div data-compo="ui.TcodeHighlight.html" data-source-classpath="components.app6.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp" data-max-height="500px"/>
+    <div data-compo="panjs.ui.TcodeHighlight.html" data-source-classpath="components.app6.html" data-replace-mask="app[0-9]*" data-replace-by="app" id="codeApp" data-max-height="500px"/>
     <ul>
          <li>In the callback function  <code>this</code> will be the <code>app</code> component because we used <code>bind(this)</code></li>
     </ul>

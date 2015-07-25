@@ -3,7 +3,7 @@
 Tobject 
 ***/
 
-defineClass("TarrayCollection", "core.events.TeventDispatcher", {
+defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 	_source:null,
 	length:0,
   key: null,
