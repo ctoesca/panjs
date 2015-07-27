@@ -10,6 +10,11 @@
 	panjs.stack = [];
 	panjs.stackLevel = 0;
 	panjs.setSourceInComponents = false;
+	panjs.idList = {}; 
+
+	if (typeof panjs.preserveElementsId == "undefined")
+		panjs.preserveElementsId = false;
+	
 
 	panjs.messages = {
 		CLASSNAME_MATCHS_FILENAME: "The name of the class (%1) must match the file name %2 (case sensitive)",
@@ -253,6 +258,23 @@
 
 
 		}
+		panjs._setDOMId = function( DOMel, originalId , classPath ){
+
+			var id = originalId;
+
+			if (!panjs.preserveElementsId)
+			{
+				if (typeof panjs.idList[originalId] == "undefined"){
+					panjs.idList[originalId] = 0;				
+				}else{
+					panjs.idList[originalId] ++;
+					id = originalId+panjs.idList[originalId];
+				}	
+			}
+			
+			DOMel.setAttribute( "id", id );
+			DOMel.setAttribute( "data-original-id", originalId );
+		}
 
 		panjs._load = function(element)
 		{ 
@@ -270,7 +292,7 @@
 			{
 				var el = compolist[i];    
 				var dataCompo = el.attr("data-compo");
-				var autoload = (el.attr("autoload") !== "false");
+				var autoload = (el.attr("data-autoload") !== "false");
 				var id = el.attr("id");
 
 				if (autoload == true)
@@ -286,8 +308,8 @@
 					compo.parent = this;
 					el[0].loaded = false;
 					el.hide();     
-					el[0].setAttribute("id", panjs.root.id+"_"+id);          
-					el[0].originalId = id;       
+					//el[0].setAttribute("id", panjs.root.id+"_"+id);          
+					   
 					el[0].owner = panjs.root;          
 				}
 
@@ -1047,6 +1069,7 @@ usesComponent: function(classPath)
 						window[className].prototype.classPathDir = this.getClassPathDir(classPath);
 						window[className].prototype.dirPath = dirPath;
 						window[classPath] = window[className];
+						window[className].lastId = 0;
 					}
 			//logger.debug(className+" = "+typeof window[className]+" path = "+path+", result="+r.result);
 			this._count --;

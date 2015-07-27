@@ -72,7 +72,7 @@ Exemple:
 }
 
 
-.TsimpleGrid .imgWait
+.TsimpleGrid .scrollWait
 {
 	/*overflow: auto;
 	height:500px;*/
@@ -93,6 +93,13 @@ Exemple:
 .TsimpleGrid tr.detailRow td{
 	/*background-color: white;
 	cursor: default;*/
+}
+.TsimpleGrid i.tableWaiting{
+ color:#0099CC; 
+ position:absolute; 
+ margin-top: 40px;
+ opacity: 0.7;
+ display:none;
 }
 </style>
 
@@ -201,6 +208,18 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		this._setEvents();
 
 	},
+	setWaiting: function(v){
+		if (v){
+			var left = this.table.width() /2 - 20;
+			if (left < 0)
+				left = 0;
+			this.tableWaiting.css("margin-left", left + "px");
+		}
+		this.tableWaiting.toggle(v);		
+	},
+	setTableVisibility: function(v){
+		this.table.css("visibility", v);
+	},
 	setAllowSelection: function(v){
 		this._allowSelection = v;
 		if (v)
@@ -252,7 +271,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 			if ( this.container.is(":visible") == false)
 				return;
 						
-			this.imgWait.show();
+			this.scrollWait.show();
 			setTimeout(this.showMore.bind(this),500);		
        	}
 	},
@@ -269,7 +288,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		if (end >= this._dataProvider.length)
 			end = this._dataProvider.length-1;
 		if (end<start){
-			this.imgWait.hide();
+			this.scrollWait.hide();
 			return;
 		}
 		var debut = new Date();
@@ -286,7 +305,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		}
 
 		this.tbody[0].appendChild(docFragment);
-		this.imgWait.hide();
+		this.scrollWait.hide();
 		logger.debug("Temps exécution showMore : "+(new Date() - debut)+" ms");
 	},
 
@@ -398,7 +417,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 			if ( this.container.is(":visible") == false)
 				return;
 						
-			this.imgWait.show();
+			this.scrollWait.show();
 			setTimeout(this.showMore.bind(this),500);		
        	}
 	},
@@ -692,8 +711,8 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		this.tableContainer.append(this.table);
 		this.table.on("click", this.onTableClick.bind(this));
 
-		this.imgWait.remove();
-		this.container.append(this.imgWait);
+		this.scrollWait.remove();
+		this.container.append(this.scrollWait);
 
 		this.loaded = true;  
 		this._isEmpty = false;
@@ -1026,7 +1045,10 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 
 <body>	
 
+<i class="fa fa-spinner fa-spin fa-5x tableWaiting" id="tableWaiting" ></i>
+
 <div id="tableContainer" style="height: 100%" >
+	
 	 <table class="table table-striped table-condensed table-bordered" id="table">
           <tbody id="tbody">
           
@@ -1034,6 +1056,8 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
      </table>
  </div>
     <!--CONTENT-->
-     <h2 id="imgWait" class="imgWait">Chargement en cours...</h2>
+    
+
+     <h2 id="scrollWait" class="scrollWait">Chargement en cours...</h2>
 </body>
 </html> 

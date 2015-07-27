@@ -7,17 +7,29 @@ defineClass("TproxyDisplayObject", "panjs.core.events.TeventDispatcher",
 	parent: null,
 	args: null,
 	dataType: null,
+	origId:null,
 
 	/* METHODES */
 	constructor: function(args) { 
 		TproxyDisplayObject._super.constructor.call(this,args);
+		TproxyDisplayObject.lastId ++;
+
 		this.className = "TproxyDisplayObject"; //!! pas valorisé si chargé dans panjs.min.js car on appelle pas uses
 
 		this.injectParam("sourceElement", args.sourceElement,true);
 		this.sourceElement.style.display = "none";
 		this.sourceElement.setAttribute("data-loaded", "false");
-		this.dataType = this.sourceElement.getAttribute("data-compo");	
 
+		var origId = this.sourceElement.getAttribute("id");
+		if (origId){
+			this.origId = origId;
+			panjs._setDOMId(this.sourceElement, this.origId, this.dataType);	
+		}
+		
+
+		this.dataType = this.sourceElement.getAttribute("data-compo");	
+		
+	
 		this.args = args;
 
 		if (this.args == null)
@@ -35,8 +47,7 @@ defineClass("TproxyDisplayObject", "panjs.core.events.TeventDispatcher",
 
 		if ((h != null) && (this.loaded == false))
 		{	
-			var origId = h.originalId;
-			logger.debug("LOADING "+this.dataType+"."+origId);
+			logger.debug("LOADING "+this.dataType+"."+this.origId);
 
 			this.args.elem = h;
 			this.args.parent = this.parent;
@@ -55,19 +66,21 @@ defineClass("TproxyDisplayObject", "panjs.core.events.TeventDispatcher",
 	
 			this.args.elem.compo = compo;
 			compo.parent = this.parent;
-			h.owner[origId] = compo;
+			h.owner[this.origId] = compo;
 		
 			$(h).replaceWith(compo.container);
-			compo.container[0].originalId = origId;
+			
 			compo.container[0].loaded = true;
 			compo.container.attr("data-loaded", "true");
-			
+			panjs._setDOMId(compo.container[0], this.origId, this.dataType);	
+
+
 			compo.loaded = true;		
 
 			if (compo.visible)
 			compo.show();
 	
-			h.setAttribute("id", h.owner.id+"_"+origId);
+			//h.setAttribute("id", h.owner.id+"_"+origId);
 
 			var evt = new Tevent( Tevent.LOADED, compo);
 			this.dispatchEvent( evt);
@@ -83,6 +96,7 @@ defineClass("TproxyDisplayObject", "panjs.core.events.TeventDispatcher",
   		this.load( this.args );
   	}
 });
+TproxyDisplayObject.lastId = 0;
 
 
 

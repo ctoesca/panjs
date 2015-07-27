@@ -72,12 +72,6 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 
 		window[this.className].lastId ++;
 
-		//parfois on ne veut pas que l'id soit modifié (voir Tcheckbox).				
-		//if (!defined(args, "id")) 
-			this._setId( this.className+window[this.className].lastId );
-		//else
-		//	this._setId(args.id);
-
 		this.container[0].owner = this;
 		
   		//logger.debug("init TdisplayObject: ",this.className,", id=",this.id);
@@ -100,12 +94,6 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
   		this.container.prependTo(elem);		
 	},
 
-	_setId: function(value)
-	{
-		/* attention: ici this.container n'est pas encore un objet jquery*/
-		this.id = value;
-		this.container.attr("id", "ctn"+this.id);
-	},
   	hide: function(args){	 
  
   		this.container.hide(args);

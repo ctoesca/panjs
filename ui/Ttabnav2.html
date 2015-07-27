@@ -203,9 +203,9 @@ defineClass("Ttabnav2", "panjs.core.display.Telement", {
 		for (var i = 0; i < composToLoad.length; i++) {
 			var compo = composToLoad[i];
 
-			if (typeof this.parent[compo[0].originalId] != "undefined"){
-				this.parent[compo[0].originalId].load();
-			}
+			var origId = compo[0].getAttribute("data-original-id");
+			if (origId)
+				this.parent[origId].load();
 		};
 		tab.subComponentsLoaded = true;
 		/* on ne charge que les composants de 1er niveau */

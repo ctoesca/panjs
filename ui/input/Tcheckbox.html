@@ -79,14 +79,10 @@ defineClass("Tcheckbox", "panjs.core.display.Telement", {
 		if (defined(args, "enabled"))
 			this.enable(args.enabled);
 
-		this.input = this.container.getElement("input");
 		this.labelElement = this.container.getElement("label");
-
-		this.input.attr("id", "input_"+this.id);
-		this.labelElement.attr("for", "input_"+this.id);
+		this.labelElement.attr("for", this.input.attr("data-original-id"));
 
 		this.input.on("change", this.onChanged.bind(this));
-		
 
 		if (defined(args,"elem"))
 			this.label = args.elem.innerHTML;

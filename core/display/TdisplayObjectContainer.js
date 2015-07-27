@@ -432,6 +432,7 @@
 							
 							var fId = panjs.getFormatedIdName(id);
 							this[fId] = jqobj;
+							panjs._setDOMId(el, id, dataType);
 							r.push(id);	
 						}
 						this.bindEvents( jqobj );
@@ -467,6 +468,8 @@
 											logger.error('2-Duplication du id "',id,'" sur objet ',this.className);
 
 										this[id] = compo;	
+										
+										panjs._setDOMId(compo.container[0], id, dataType);									
 										r.push(id);										
 									}		
 
@@ -481,6 +484,7 @@
 									}*/
 
 									compo.container[0].loaded = true;
+
 									el.compo = compo;
 									compo.loaded = true;
 									
@@ -488,10 +492,11 @@
 								else
 								{
 									//Le composant n'est pas instancié: on met un proxy à la place, qui a la fonction LOAD()
-									el.setAttribute("id", this.id+"_"+id);
+									
 									uses("panjs.core.display.TproxyDisplayObject");
 									var proxyCompo = new TproxyDisplayObject({sourceElement:el});
 									
+
 									proxyCompo.parent = this;
 									el.loaded = false;
 									el.compo = proxyCompo;
@@ -502,8 +507,7 @@
 
 							}						
 						}
-						el.originalId = id;	
-
+						
 						el.owner = this;
 						this.processStates(el);							
 
