@@ -1,0 +1,146 @@
+<html>        
+<head>
+
+
+
+<style type="text/less">	
+.TinputRange
+{
+	display: inline-block;
+
+	.range-text{
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+	.TinputNumber{
+		max-width: 120px;
+	}
+}
+</style>
+
+<script data-subtype="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("TinputRange", "panjs.core.display.Telement", { 
+
+	baseElement: 'div',
+	operators: null,
+	_defaultOperator: '=',
+	_defaultValues: null,
+	format: 'integer', // float|integer
+	min: null,
+	max: null,
+
+	constructor: function(args){
+		this._super.constructor.call(this,args);
+
+		this.operators = [
+			{label:'=', value:'='},
+			{label:'≤', value:'<='}, 
+			{label:'≥', value:'>='},	
+			{label:'entre', value:'range'}
+		];
+			
+		this.dropdown.setDataProvider( new TarrayCollection(this.operators) );
+
+		this.dropdown.on(Tevent.CHANGE, this._onOperatorChanged.bind(this));
+		this.input1.on(Tevent.CHANGE, this._onInput1Changed.bind(this));
+		this.input2.on(Tevent.CHANGE, this._onInput2Changed.bind(this));
+		
+		/* valeur min */
+		if (args.min){
+			this.min = args.min;
+			this.input1.min = this.min;
+			this.input2.min = this.min;
+		}
+
+		/* valeur max */
+		if (args.max){
+			this.max = args.max;
+			this.input1.max = this.max;
+			this.input2.max = this.max;
+		}
+		/* valeur min */
+		if (args.format)
+			this.format = args.format;
+		
+		/* format: float|integer */
+		this.input1.setFormat(this.format);
+		this.input2.setFormat(this.format);
+
+		/* 
+		Valeurs par défaut passées dans les attributs de l'élément HTML : exemple:
+		data-default-operator="range"
+		data-default-values="[10,100]"
+		*/	
+		/* opérateur par défaut */
+		if (args.defaultOperator)
+			this._defaultOperator = args.defaultOperator;
+		
+		/* valeurs par défaut */
+		if (args.defaultValues)
+		{
+			this._defaultValues = args.defaultValues;
+			if (typeof this._defaultValues == "string")
+				this._defaultValues = JSON.parse(this._defaultValues);
+		}
+
+		this.val({operator: this._defaultOperator, values: this._defaultValues});
+	},
+
+	_onInput1Changed: function(e){
+		this.dispatchEvent( new Tevent(Tevent.CHANGE, this.val()));
+	},
+	_onInput2Changed: function(e){
+		this.dispatchEvent( new Tevent(Tevent.CHANGE, this.val()));
+	},
+	_onOperatorChanged: function(e){
+		this.toggleState("range", (e.data.value == "range"));
+		this.dispatchEvent( new Tevent(Tevent.CHANGE, this.val()));
+	},
+
+	val: function(v){
+		/* Renvoie ou affecte un objet du type:
+			{operator: "...", values:[...]}
+		*/
+		if (arguments.length == 1)
+		{
+			/* initialisation */
+			this.dropdown.val(this._defaultOperator);
+			this.input1.val("");
+			this.input2.val("");
+
+			/* Affectation des valeurs et de l'opérateur quand ils existent*/
+			if (v.operator)
+				this.dropdown.val(v.operator);
+						
+			if ((v.values) && (v.values.length>0))
+			{
+				this.input1.val(v.values[0]);
+				if (v.values.length > 1)
+					this.input2.val(v.values[1]);
+			}
+
+		}else{
+			/* Renvoie un objet représentant les valeurs saisies*/
+			var r = { 
+				operator: this.dropdown.val(), 
+				values: [this.input1.val()]
+			};
+			if (r.operator == "range")
+				r.values.push(this.input2.val());
+			return r;
+		}
+	}
+});
+//]]>
+</script>
+
+</head>
+<body>
+	<div id="dropdown" data-compo="panjs.ui.dropdown.Tdropdown.html"/>
+	<div id="input1" data-compo="panjs.ui.input.TinputNumber.html" title="TEST TEST"/>
+	<span class="range-text" data-include-in="range">et</span>
+	<div data-include-in="range" id="input2" data-compo="panjs.ui.input.TinputNumber.html"/>
+</body>
+</html> 

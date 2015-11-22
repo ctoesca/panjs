@@ -1,0 +1,20 @@
+.PopupManager.mask {
+	  position:fixed;
+	  top:0;
+	  left:0;
+	 /* z-index:9000;*/
+	  background-color:#000;
+	  opacity:0;
+	  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; 
+	  filter: alpha(opacity=0);	
+}
+
+.PopupManager.window {
+	 
+	  position:absolute;
+	  margin: auto;
+	 /* z-index:9001; */
+	  width:100%;
+	  
+	 	
+}

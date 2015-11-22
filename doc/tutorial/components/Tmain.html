@@ -60,8 +60,8 @@ defineClass("Tmain", "panjs.core.display.Telement", {
   },
 
   onBtn4click: function(e){
-    uses("panjs.ui.managers.TpopupManager.html");
-    compo = panjs.PopupManager.createPopup("app.Tpanel.html",{}, {closeOnMaskClick:true});
+    uses("panjs.ui.managers.PopupManager.html");
+    compo = PopupManager.createPopup("app.Tpanel.html",{}, {closeOnMaskClick:true});
     compo.container.css("margin", "40px auto auto auto");
 
 
@@ -343,18 +343,18 @@ defineClass("Tmain", "panjs.core.display.Telement", {
  <article>
       <div class="row">  
           <div class="col-sm-12" >
-              <h3>ui.managers.TpopupManager</h3>
+              <h3>ui.managers.PopupManager</h3>
           </div>
       </div>
       <div class="row">    
           <div class="col-sm-6" > 
-          <p>TpopupManager opens any component in a modal.</p>   
+          <p>PopupManager opens any component in a modal.</p>   
                 <pre>&lt;button class="btn btn-success" id="btn4">Click here to show alert&lt;/button&gt;</pre>
                 <p>Javascript (on button click):</p>
-                <pre>uses("panjs.ui.managers.TpopupManager.html");
-panjs.PopupManager.createPopup("app.Tpanel.html",{}, {closeOnMaskClick:true});
+                <pre>uses("panjs.ui.managers.PopupManager.html");
+PopupManager.createPopup("app.Tpanel.html",{}, {closeOnMaskClick:true});
 </pre>
-<p>Open the console (F12): ui.manager.TpopupManager and app.Tpanel.html are lazy loaded.</p>
+<p>Open the console (F12): ui.manager.PopupManager and app.Tpanel.html are lazy loaded.</p>
           </div>
           <div class="col-sm-6" >
                 <button class="btn btn-success" id="btn4">Click here to show popup</button>  

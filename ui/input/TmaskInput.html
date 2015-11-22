@@ -1,22 +1,19 @@
 <html>        
 <head>
 
+<script src="../../lib/opentip/2.4.6/downloads/opentip-jquery.min.js"></script>
+<link href="../../lib/opentip/2.4.6/css/opentip.css" rel="stylesheet" type="text/css" />
+
 <style type="text/less">	
 
 .TmaskInput
 {
-
+	vertical-align: middle;
 }
 .TmaskInput.error{
 		color:#c9302c;
-		border-color:red;
-		border-width: 2px;
-	}
-/*width:100px;*/
-	.red-tooltip + .tooltip > .tooltip-inner {background-color: #aa0000;}
-	.red-tooltip + .tooltip > .tooltip-arrow {border-bottom-color: #aa0000;}
-	.red-tooltip{
-		margin-top:-30px; margin-left: 0px
+		border-color:#c9302c;
+		border-width: 1px;
 	}
 </style>
 
@@ -32,13 +29,15 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 	mask: null,
 	placeholder: "",
 	/* METHODES */
-	tooltip: null,
-	mandatory: false,
+	required: false,
+
+	_value: null, 
+	inputOpentip: null,
 
 	constructor: function(args){
 		
 		this._super.constructor.call(this,args);
-
+		
 		this.input = this.container;
 
 		if (args)
@@ -47,8 +46,8 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 			if (args.style)
 				this.container.attr("style", args.style);
 		}
-		if (defined(args, "mandatory"))
-			this.mandatory = args.mandatory;
+		if (defined(args, "required"))
+			this.required = args.required;
 
 		if (defined(args, "size"))
 		{
@@ -67,9 +66,13 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 			v = args.value;
 		this.val(v);
 		this._setEvents();
-
-		
 	
+	},
+	free: function(){
+		this._super.free.call(this);
+		if (this.inputOpentip){
+			this.inputOpentip.deactivate();
+		}
 	},
 	enabled: function(v){
 		if (v)
@@ -92,58 +95,30 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 			e.preventDefault();
 	},
 	_onFocusOut:function(e)
-	{
+	{logger.error(this.getFormatedVal());
 		this.container.val( this.getFormatedVal());
 	},
 	hideError: function(v)
 	{
 		this.container.removeClass("error");
+		if (this.inputOpentip)
+			this.inputOpentip.deactivate();
 	},
 	showError: function(v)
 	{
 		this.container.addClass("error");
-	},
-	/*hideError: function(v)
-	{
-		if (this.tooltip != null)
-		if (this.tooltip.tooltipIsVisible)
+		
+		if (this.inputOpentip == null)
 		{
-			//this.tooltip.tooltip('hide');
-			this.tooltip.hide();
-			this.tooltip.tooltipIsVisible = false;
-		}
-	},
-	showError: function(v)
-	{
-		if (this.tooltip == null)
-		{
-			//this.tooltip = $('<a href="#" data-toggle="tooltip" class="red-tooltip" title="Valeur incorrecte" style="visibility:hidden"></a>');
-			
-			this.tooltip = $('<div class="error">'+this.errorText+'</div>');
-
-			//this.tooltip.tooltip({placement: "right"});
-
-			//this.container.parent().append(this.tooltip);
-			
-			this.container.parent().append(this.tooltip);
-			
-			this.tooltip.tooltipIsVisible = false;
-
+			Opentip.lastZIndex = 100000;
+			this.inputOpentip = new Opentip(this.container, { showOn: 'mouseover', style: 'alert', 'removeElementsOnHide': true });
 		}
 
-		if (!this.tooltip.tooltipIsVisible)
-		{
-			if (this.errorText != null)
-			this.tooltip.attr("title", this.errorText);
-			//this.tooltip.tooltip('show');
-			this.tooltip.show();
-			
-			logger.info("tooltip "+this.errorText);
-			this.tooltip.tooltipIsVisible = true;
-			
-
-		}	
-	},*/
+		this.inputOpentip.setContent(v);
+      	this.inputOpentip.activate();
+      	this.inputOpentip.show();
+	},
+	
 	isNumberKey: function(evt)
 	{
 		return isNumberKey(evt);
@@ -154,29 +129,36 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 	},
 	isCorrectValue: function()
 	{
-		var isOk = false;
+		var isOk = true;
 		var v = this.container.val();
 
-		if ((v.trim() == "") && (!this.mandatory))
-			isOk = true;
+		if ((v.trim() == "") && (this.required)){
+			isOk = "Valeur requise";
+		}
 		else
-		if (this.mask.test(v)) 
+		if (!this.mask.test(v)) 
 		{
-			isOk = true;			
+			isOk = "Valeur incorrecte";			
 		}
 
 		return isOk;
 	},
 	_onChange:function(e)
 	{	
-		if (this.isCorrectValue()){
+		var isCorrectValue = this.isCorrectValue();
+	
+		if (isCorrectValue === true){
 			this.hideError();
 		}
 		else{
-			this.showError();
+			this.showError(isCorrectValue);
 		}
-		if ((typeof e != "undefined") && ((e.type == 'change') || (e.type == 'keyup')))
-		this.dispatchEvent( new Tevent(Tevent.CHANGE, {sender:this, value: this.val()}));
+		var value = this.val();
+		if (this._value != value){
+			if ((typeof e != "undefined") && ((e.type == 'change') || (e.type == 'keyup')))
+				this.dispatchEvent( new Tevent(Tevent.CHANGE, {sender:this, value: value}));
+		}
+		this._value = value;
 	},
 
 	_onShow: function(e)

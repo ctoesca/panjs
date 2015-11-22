@@ -58,7 +58,7 @@ defineClass("app", "panjs.core.display.Telement", {
 		this.appendMessage('system', 'Connected! Welcome to SockJS chat demo.');
 		this.sock.send(JSON.stringify({
 			type: 'session',
-			clientId: this.clientId
+			clientId: this.getClientId()
 		}));
 		this.timer.stop();
 	},
