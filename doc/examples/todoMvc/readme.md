@@ -1,4 +1,4 @@
-- index.html : standard todoLists
+- index.html : 1 standard todoList
 - index2.html: 2 todoLists with the same model.
 - index3.html: 2 todoLists, each one having his own model
 
