@@ -80,10 +80,10 @@
 
   <h3>Methods</h3>
 
-  <table class="table table-responsive" style="max-width: 1000px">
+  <table class="table table-responsive" style="max-width: 1400px">
     <tr>
-      <th>Method</th>
-      <th>Args</th>
+      <th style="min-width: 240px">Method</th>
+      <th style="min-width: 350px">Args</th>
       <th style="min-width: 200px">Result</th>
       <th>Description</th>
     </tr>
@@ -95,7 +95,7 @@
           <li><code>Array[] of string</code> containing states</li>
         </ul>
       </td>
-      <td><code>true</code> if the component's state has been changed else <code>false</code></td>
+      <td><code>true</code> if the component states has been changed else <code>false</code></td>
       <td>Set the component in one or more states</td>
     </tr>
 
@@ -104,7 +104,7 @@
       <td>
           state: <code>String</code> state name.
       </td>
-      <td><code>true</code> if the component's state has been changed else <code>false</code></td>
+      <td><code>true</code> if the component states has been changed else <code>false</code></td>
       <td>Add one state on the component. If the state already exists, it will not be added.</td>
     </tr>
 
@@ -113,8 +113,40 @@
       <td>
           state: <code>String</code> state name.
       </td>
-      <td><code>true</code> if the component's state has been changed else <code>false</code></td>
+      <td><code>true</code> if the component states has been changed else <code>false</code></td>
       <td>Remove one state on the component. If the state doesn't exists, it will not be removed.</td>
+    </tr>
+    <tr>
+      <td>toggleState(state [, value])</td>
+      <td>
+          <b>state</b>: <code>String</code> state name.
+          <br/>
+          <b>value</b>: <code>boolean</code>: <code>true</code> to activate the state, <code>false</code> to deactivate the state.
+      </td>
+      <td><code>true</code> if the component states has been changed else <code>false</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>toggleState(state, options)</td>
+      <td>
+          <b>state</b>: <code>String</code> state name.
+          <br/>
+          <b>options</b>: <code>string</code>, <code>number</code> or <code>object</code> : (<a href="http://api.jquery.com/show/">jquery display options</a>).
+      </td>
+      <td><code>true</code> if the component states has been changed else <code>false</code></td>
+      <td>If the state is active, remove this state. If the state is not active, add this state.</td>
+    </tr>
+    <tr>
+      <td>toggleState(state, value, options)</td>
+      <td>
+          <b>state</b>: <code>String</code> state name.
+          <br/>
+          <b>value</b>: <code>boolean</code>: <code>true</code> to activate the state, <code>false</code> to deactivate the state.
+          <br/>
+          <b>options</b>: <code>string</code>, <code>number</code> or <code>object</code> : (<a href="http://api.jquery.com/show/">jquery display options</a>).
+      </td>
+      <td><code>true</code> if the component states has been changed else <code>false</code></td>
+      <td></td>
     </tr>
 
     <tr>

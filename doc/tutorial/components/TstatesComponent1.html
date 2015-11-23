@@ -23,7 +23,7 @@
           //logging STATE_CHANGED events
           this.on(Tevent.STATE_CHANGED, this.onStateChanged.bind(this));
 
-          //by default: disconnected
+          //by default: connected
           this.setState(['connected']);
         },
         onStateChanged: function(e){

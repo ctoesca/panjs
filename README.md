@@ -15,8 +15,9 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 * A component is a HTML file that contains CSS, JS, HTML, css <link> like any Html file
 * Components can be integrated in a page or in other components with html markup
 * Components (and their dependencies) are loaded dynamically and you don't have to add js/css in the `<head>` of the page.
-* Cache management (Js/css/html): the framework add '?v=x.x.x' in all loaded files.
-* Inheritance on classes and components (HTML / CSS / JS)
+* Cache management (Js/css/html): the framework add '?v=x.x.x' in all loaded files, or can store components in localstorage (max speed).
+* Inheritance on classes and components (HTML / CSS / JS).
+* Static classes
 * Encapsulation
 * Lazy loading of components and classes
 * You can use LESS in components. panJs converts LESS to CSS.
@@ -57,7 +58,7 @@ You put a component in HTML page (or in another HTML component) like this:
     <script subtype="text/x-class-definition">
     //<![CDATA[      
     defineClass("TmyComponent", "panjs.core.display.Telement", { 
-       baseElement: "div",	
+       baseElement: "div",  
        clickCount:0,
        constructor: function(args){
     	    this._super.constructor.call(this,args);  
@@ -94,7 +95,7 @@ You put a component in HTML page (or in another HTML component) like this:
             env: "dev", // dev or prod
             appName: "myapp"
             appVersion: "0.1", 
-            version: "0.8.1", //panjs version
+            version: "0.8.3", //panjs version
             
             namespaces:{
               "core": {path: "../core"},    //panjs "core" directory

@@ -132,8 +132,9 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 		var isOk = true;
 		var v = this.container.val();
 
-		if ((v.trim() == "") && (this.required)){
-			isOk = "Valeur requise";
+		if (v.trim() == ""){
+			if (this.required)
+				isOk = "Valeur requise";
 		}
 		else
 		if (!this.mask.test(v)) 

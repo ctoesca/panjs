@@ -51,7 +51,7 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 		getSource: function() {
 				return this._items;
 		},
-		setSource: function(value) {
+		setSource: function(value, silent) {
 				if (this._source != value) {
 						this._source = value;
 
@@ -67,7 +67,7 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 										this._byId[this._items[i][this.key]] = this._items[i];
 						}
 						this.length = this._items.length;
-						this.refresh();
+						this.refresh(silent);
 				}
 		},
 		find: function(opt) {
@@ -147,17 +147,18 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				}));
 		},
 
-		refresh: function() {
+		refresh: function(silent) {
 
 				if (this.filterFunction != null)
 						this._items = this._source.filter(this.filterFunction);
 
 				this.length = this._items.length;
-
-				this.dispatchEvent(new Tevent(Tevent.REFRESH, this));
-				this.dispatchEvent(new Tevent(Tevent.CHANGE, {
+				if (!silent){
+					this.dispatchEvent(new Tevent(Tevent.REFRESH, this));
+					this.dispatchEvent(new Tevent(Tevent.CHANGE, {
 						action: "REFRESH"
-				}));
+					}));
+				}
 		},
 
 		/*
@@ -187,7 +188,7 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 		/*
 		 ******************** MODIFICATION DE LA COLLECTION ************************
 		 */
-		_replaceItem: function(indx, item, newItem) {
+		_replaceItem: function(indx, item, newItem, silent) {
 
 				this._items[indx] = newItem;
 				if (this.key != null) {
@@ -196,18 +197,20 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				}
 
 				this.length = this._items.length;
-				this.dispatchEvent(new Tevent(Tevent.REPLACE, {
-						item: item,
-						newItem: newItem
-				}));
-				this.dispatchEvent(new Tevent(Tevent.CHANGE, {
-						action: "REPLACE",
-						item: item,
-						newItem: newItem
-				}));
+				if (!silent){
+					this.dispatchEvent(new Tevent(Tevent.REPLACE, {
+							item: item,
+							newItem: newItem
+					}));
+					this.dispatchEvent(new Tevent(Tevent.CHANGE, {
+							action: "REPLACE",
+							item: item,
+							newItem: newItem
+					}));
+				}
 		},
 
-		replaceItem: function(item, newItem) {
+		replaceItem: function(item, newItem, silent) {
 				if (item == newItem)
 						return;
 
@@ -218,21 +221,21 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				indx = this.getItemIndex(item);
 				if (indx > -1) {
 						if (this.filterFunction == null) {
-								this._replaceItem(indx, item, newItem);
+								this._replaceItem(indx, item, newItem, silent);
 						} else {
 								if (this.filterFunction(newItem)) {
 										//Filtre OK
-										this._replaceItem(indx, item, newItem);
+										this._replaceItem(indx, item, newItem, silent);
 
 								} else {
 										//Filtre KO
-										this._removeItemAt(indx, newItem);
+										this._removeItemAt(indx, newItem, silent);
 								}
 						}
 
 				}
 		},
-		_addItemAt: function(indx, item) {
+		_addItemAt: function(indx, item, silent) {
 
 				if (this.key != null) {
 						if (typeof this._byId[item[this.key]] != "undefined") {
@@ -243,32 +246,33 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 
 				this._items.splice(indx, 0, item);
 				this.length = this._items.length;
-
-				this.dispatchEvent(new Tevent(Tevent.ADDED, {
-						item: item,
-						index: indx
-				}));
-				this.dispatchEvent(new Tevent(Tevent.CHANGE, {
-						action: "ADDED",
-						item: item,
-						index: indx
-				}));
+				if (!silent){
+					this.dispatchEvent(new Tevent(Tevent.ADDED, {
+							item: item,
+							index: indx
+					}));
+					this.dispatchEvent(new Tevent(Tevent.CHANGE, {
+							action: "ADDED",
+							item: item,
+							index: indx
+					}));
+				}
 		},
 
-		addItem: function(item) {
+		addItem: function(item, silent) {
 				this._source.push(item);
 
 				if ((this.filterFunction == null) || (this.filterFunction(item))) {
 						var indx = this.getItemIndex(item);
 						if (indx == -1) {
-								this._addItemAt(this.length, item);
+								this._addItemAt(this.length, item, silent);
 						}
 				}
 		},
 
-		addItemsAt: function(items, indx) {
+		addItemsAt: function(items, indx, silent) {
 				if (indx > this.length) {
-						this.addItems(items);
+						this.addItems(items, silent);
 				} else {
 						var position = indx;
 						for (var i = 0; i < items.length; i++) {
@@ -277,7 +281,7 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 										var indx = this.getItemIndex(items[i]);
 										if (indx > -1) {
 												position++;
-												this._addItemAt(position, items[i]);
+												this._addItemAt(position, items[i], silent);
 										}
 
 								}
@@ -285,23 +289,23 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				}
 		},
 
-		addItems: function(items) {
-				this.addItemsAt(items, this.length);
+		addItems: function(items, silent) {
+				this.addItemsAt(items, this.length, silent);
 		},
-		addItemAt: function(item, indx) {
+		addItemAt: function(item, indx, silent) {
 				if (indx > this.length) {
 						this.addItem(item)
 				} else {
 						this._source.push(item);
 						if ((this.filterFunction == null) || (this.filterFunction(item))) {
-								this._addItemAt(indx, item);
+								this._addItemAt(indx, item, silent);
 						}
 				}
 		},
 		forEach: function(f) {
 				this._items.forEach(f);
 		},
-		removeItems: function(mixed) {
+		removeItems: function(mixed, silent) {
 				if (typeof mixed == "function") {
 						var itemsToRemove = [];
 						for (var i = 0; i < this._items.length; i++)
@@ -312,16 +316,16 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				}
 
 				for (var i = 0; i < itemsToRemove.length; i++)
-						this.removeItem(itemsToRemove[i]);
+						this.removeItem(itemsToRemove[i], silent);
 
 				return itemsToRemove;
 		},
 
-		removeItem: function(item) {
+		removeItem: function(item, silent) {
 				if (item != null) {
 						var indx = this.getItemIndex(item);
 						if (indx >= 0) {
-								this._removeItemAt(indx, item);
+								this._removeItemAt(indx, item, silent);
 						}
 				} else {
 						var indx = -1;
@@ -330,20 +334,21 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				return indx;
 		},
 
-		removeItemAt: function(indx) {
+		removeItemAt: function(indx, silent) {
 				var item = this.getItemAt(indx);
 				if (item != null)
-						this._removeItemAt(indx, item);
+						this._removeItemAt(indx, item, silent);
 		},
 
-		removeAll: function() {
+		removeAll: function(silent) {
 				this._source = [];
 				this._items = [];
 				this._byId = {};
-				this.refresh();
+				this.refresh(silent);
 		},
 
-		_removeItemAt: function(indx, item) {
+		_removeItemAt: function(indx, item, silent) {
+		
 				this._items.splice(indx, 1);
 
 				var indxSource = this._getItemIndex(item, this._source);
@@ -354,11 +359,13 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				this.length = this._items.length;
 				if (this.key != null)
 						delete this._byId[item[this.key]];
-
-				this.dispatchEvent(new Tevent(Tevent.DELETE, {item: item} ));
-				this.dispatchEvent(new Tevent(Tevent.CHANGE, {
-						action: "DELETE",
-						item: item
-				}));
+				if (!silent){
+					this.dispatchEvent(new Tevent(Tevent.DELETE, {item: item} ));
+					this.dispatchEvent(new Tevent(Tevent.CHANGE, {
+							action: "DELETE",
+							item: item
+					}));
+				}
+				
 		}
 });
