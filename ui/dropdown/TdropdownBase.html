@@ -58,8 +58,7 @@ defineClass("TdropdownBase", "panjs.core.display.Telement", {
 			this.injectParam("capitalizeFirstLetter", args.capitalizeFirstLetter,false, this.capitalizeFirstLetter);
 			
 		}
-		if (this.placeholder == "")
-			this.placeholder = '<span style="margin-left: 15px;margin-right: 15px;"></span>';
+		this.setPlaceholder(this.placeholder);
 	
 		this._setEvents();	
 		this._setLabel(null);
@@ -69,7 +68,17 @@ defineClass("TdropdownBase", "panjs.core.display.Telement", {
 			this.button.prepend($(this.leftIcon+" "));
 		}
 	},
-		
+	
+	setPlaceholder: function(v){
+		if (this.placeholder.trim() == "")
+			this.placeholder = '<span style="margin-left: 15px;margin-right: 15px;"></span>';
+		else 
+			this.placeholder = '<span style="color:#999999">'+v+'</span>';
+
+		this._setLabel( this.labelFunction(this.getSelectedItem()) );
+			
+	},
+
 	_onInitialized: function()
 	{
 	},

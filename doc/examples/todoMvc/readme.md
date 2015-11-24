@@ -2,7 +2,6 @@
 - index2.html: 2 todoLists with the same model.
 - index3.html: 2 todoLists, each one having his own model
 
-
 # TodoMVC App Template
 
 > Template used for creating [TodoMVC](http://todomvc.com) apps

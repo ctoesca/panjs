@@ -22,16 +22,13 @@
               
 defineClass("TmaskInput", "panjs.core.display.Telement", { 
 
-	/* PROPRIETES */
-
 	baseElement: "input",
 	errorText: null,
-	mask: null,
+	mask: /.*/,
 	placeholder: "",
-	/* METHODES */
 	required: false,
-
-	_value: null, 
+	size: null,
+	_oldValue: null, 
 	inputOpentip: null,
 
 	constructor: function(args){
@@ -43,23 +40,28 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 		if (args)
 		{
 			this.injectParam("placeholder", args.placeholder,false, this.placeholder);
-			if (args.style)
-				this.container.attr("style", args.style);
+			this.injectParam("required", args.required,false);
+			this.injectParam("size", args.size,false);
+			if (args.mask)
+				this.mask = new RegExp(args.mask);	
 		}
-		if (defined(args, "required"))
-			this.required = args.required;
-
-		if (defined(args, "size"))
+				
+		if (this.size)
 		{
-			var size = args.size;
-			this.container.attr("size", size);
-			this.container.css("width", (size*25)+"px")
+			this.container.attr("size", this.size);
+			var size = this.size*0.6;
+			if ((getChromeVersion() > 0)||(getFirefoxVersion() > 17))
+				size += 3.5;
+			else
+				size += 2;
+			this.container.css("width", size+"em");
 			//this.input.attr("maxLength", args.elem.getAttribute("size")); // ne fonctionne que sur input type="text"
 		}
 
 		this.container.attr("type","text");
 		this.container.addClass("form-control");
-		this.container.attr("placeholder", this.placeholder);
+		this.setPlaceholder( this.placeholder );
+		this.setRequired(this.required);
 
 		var v = "";
 		if (defined(args, "value"))
@@ -67,6 +69,10 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 		this.val(v);
 		this._setEvents();
 	
+	},
+
+	setPlaceholder: function(v){
+		this.container.attr("placeholder", v);
 	},
 	free: function(){
 		this._super.free.call(this);
@@ -84,19 +90,27 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 	_setEvents: function()
 	{
 		this.container.on("change", this._onChange.bind(this));
-		this.container.on("keyup", this._onChange.bind(this));
+		this.container.on("keyup", this._onKeyUp.bind(this));
 		this.container.on("keydown", this._onKeyDown.bind(this));
 		this.container.on("focusout", this._onFocusOut.bind(this));
 	},
-
+	_onKeyUp: function(e){
+		this._onChange(e);
+	},
 	_onKeyDown:function(e)
 	{
-		if (!this.isCharAccepted(e))
-			e.preventDefault();
+		var evt = new Tevent(Tevent.KEYDOWN, {evt: e});
+		this.dispatchEvent( evt );
+		if (!evt.defaultPrevented)
+		{
+			if (!this._isCharAccepted(e))
+				e.preventDefault();	
+		}
 	},
+
 	_onFocusOut:function(e)
-	{logger.error(this.getFormatedVal());
-		this.container.val( this.getFormatedVal());
+	{
+		//this.container.val( this.getFormatedVal());
 	},
 	hideError: function(v)
 	{
@@ -123,11 +137,22 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 	{
 		return isNumberKey(evt);
 	},
-	isCharAccepted: function(evt)
+	_isCharAccepted: function(evt)
 	{	
-		return isControlKey(evt);
+		return true;
 	},
-	isCorrectValue: function()
+	setRequired: function(v){
+		this.required = v;
+		var isValid = this.isValid();
+		if (isValid === true){
+			this.hideError();
+		}
+		else{
+			this.showError(isValid);
+		}
+	},
+
+	isValid: function()
 	{
 		var isOk = true;
 		var v = this.container.val();
@@ -141,25 +166,25 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 		{
 			isOk = "Valeur incorrecte";			
 		}
-
 		return isOk;
 	},
 	_onChange:function(e)
 	{	
-		var isCorrectValue = this.isCorrectValue();
-	
-		if (isCorrectValue === true){
+		var isValid = this.isValid();
+
+		if (isValid === true){
 			this.hideError();
 		}
 		else{
-			this.showError(isCorrectValue);
+			this.showError(isValid);
 		}
 		var value = this.val();
-		if (this._value != value){
+		if (this._oldValue != value){
 			if ((typeof e != "undefined") && ((e.type == 'change') || (e.type == 'keyup')))
 				this.dispatchEvent( new Tevent(Tevent.CHANGE, {sender:this, value: value}));
 		}
-		this._value = value;
+		this._oldValue = value;
+
 	},
 
 	_onShow: function(e)

@@ -22,16 +22,16 @@ defineClass("TinputIp", "panjs.ui.input.TmaskInput.html", {
 	
 	},
 	
-	isCharAccepted: function(evt)
+	_isCharAccepted: function(evt)
 	{
 		var k = evt.which;
 		var accepted = this.isNumberKey(evt) || (k == 110);
-		return accepted || this._super.isCharAccepted.call(this,  evt);
+		return accepted || isControlKey(evt);
 	},
 
-	isCorrectValue: function()
+	isValid: function()
 	{
-		var isOk = this._super.isCorrectValue.call(this);
+		var isOk = this._super.isValid.call(this);
 		
 		if (isOk) 
 		{
@@ -50,7 +50,7 @@ defineClass("TinputIp", "panjs.ui.input.TmaskInput.html", {
 	{
 		var r = this.input.val();
 		
-		if (this.isCorrectValue() && (r!=""))
+		if (this.isValid() && (r!=""))
 		{
 			r = "";
 			var parts = this.input.val().split(".");

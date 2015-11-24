@@ -44,7 +44,7 @@ Tevent.CLOSE = "close";
 Tevent.READY = "ready";
 Tevent.BEFORE_STATE_CHANGE = "before_state_change";
 Tevent.STATE_CHANGED = "state_changed";
-
+Tevent.KEYDOWN = "keydown";
 Tevent.SHOW = "show";
 Tevent.SHOWN = "shown";
 Tevent.HIDE = "hide";

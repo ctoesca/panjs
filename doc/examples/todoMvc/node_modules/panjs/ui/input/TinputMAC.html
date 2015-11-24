@@ -22,9 +22,9 @@ defineClass("TinputMAC", "panjs.ui.input.TmaskInput.html", {
 	
 	},
 	
-	isCharAccepted: function(evt)
+	_isCharAccepted: function(evt)
 	{
-		var r =  this._super.isCharAccepted.call(this,  evt);
+		var r =  this._super._isCharAccepted.call(this,  evt);
 		if (r)
 			return true;
 
@@ -34,9 +34,9 @@ defineClass("TinputMAC", "panjs.ui.input.TmaskInput.html", {
 		return accepted;
 	},
 
-	isCorrectValue: function()
+	isValid: function()
 	{
-		var isOk = this._super.isCorrectValue.call(this);
+		var isOk = this._super.isValid.call(this);
 		return isOk;
 	},
 	getFormatedVal: function()

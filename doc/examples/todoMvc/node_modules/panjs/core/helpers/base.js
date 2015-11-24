@@ -135,7 +135,7 @@ function defined(obj)
 
 function _extractBrowserVersion( reg ){
   var r = -1;
-    var reg = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+    var reg = new RegExp(reg);
     if (reg.exec(navigator.userAgent) != null)            
       r = parseFloat(RegExp.$1); 
 
