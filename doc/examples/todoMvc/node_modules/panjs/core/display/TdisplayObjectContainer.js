@@ -510,7 +510,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         return changed;
     },
 
-    processElement: function(el, parent, setObject) {
+    _processElement: function(el, parent, setObject) {
         if (el.nodeType == 1) {
             //nodeType = ELEMENT	
 
@@ -642,7 +642,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
 
         for (var i = 0; i < element.childNodes.length; i++) {
             var el = element.childNodes[i];
-            this.processElement(el, element, setObject);
+            this._processElement(el, element, setObject);
 
         }
         
