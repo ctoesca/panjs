@@ -1,0 +1,313 @@
+<html>        
+<head>
+  <link href="../../lib/bootstrap-multiselect/0.9.13/dist/css/bootstrap-multiselect.css" rel="stylesheet"/>
+  <script type="text/javascript" src="../../lib/bootstrap-multiselect/0.9.13/dist/js/bootstrap-multiselect.js"></script>
+
+<style>	
+.TmultiSelect{
+	display: inline-block;
+}
+
+</style>
+
+<script data-subtype="text/x-class-definition">
+//<![CDATA[
+              
+defineClass("TmultiSelect", "panjs.core.display.Telement", { 
+	/* PROPRIETES */
+	baseElement: "div",
+	_opt: null,
+	_opened: false,
+	_localDataProvider: null,
+	_enabled: true,
+
+	constructor: function(args){
+		
+		this._super.constructor.call(this,args);
+		this._opt = {
+			multiple : true, 
+			fixedIcon: null,
+			labelField: "label",
+			valueField: "value",
+			titleField: "title",
+			selectedField: "selected",
+
+
+			/* options plugin */
+			selectAllText: 'Tout sélectionner',
+			nonSelectedText: 'Aucun sélection',
+			nSelectedText: "sélections",
+			allSelectedText: "Tout sélectionné",
+			includeSelectAllOption: true,
+			disableIfEmpty: true,
+			numberDisplayed: 3,
+			maxHeight: 600,
+			enableClickableOptGroups: true,
+
+			onDropdownShown: this._onOpen.bind(this),
+			onDropdownHidden : this._onClose.bind(this),
+			onSelectAll: this._onSelectAll.bind(this),
+		
+			onChange: this._onChanged.bind(this)
+
+			//buttonText: this._buttonText
+		};
+
+		for (var k in args){
+			this._opt[k] = args[k];
+		}
+
+		if (!this._opt.multiple)
+			this.selectElem.removeAttr("multiple");
+		if (this._opt.width)
+			this._opt.buttonWidth = this._opt.width;
+		
+		this.selectElem.multiselect(this._opt);
+		
+		this._button = this.selectElem.multiselect().data().multiselect.$button;
+
+		if (this._opt.fixedIcon)
+			this._button.prepend(this._opt.fixedIcon+' ');
+
+	},
+	_buttonText: function(options, select) {
+                if (options.length === 0) {
+                    return 'Aucun sélection ...';
+                }
+                else if (options.length > 3) {
+                    return 'Plus de 3 catégories';
+              	}
+    },
+    
+    _onSelectAll: function(v){
+    	/* Ces évènements font doublon avec Tevent.CHANGE */
+    	/*if (v){
+    		this.dispatchEvent( new Tevent("SELECT_ALL"));
+    	}
+    	else{
+    		this.dispatchEvent( new Tevent("DESELECT_ALL"));
+    	}*/
+
+    	var evtData = {"items": this._dataProvider.getItems(), "selected": v};
+    	this.dispatchEvent( new Tevent(Tevent.CHANGE, evtData));
+    },
+
+	_onOpen: function(e)
+	{
+		if (this._opened == false)
+		this.dispatchEvent( new Tevent(Tevent.OPEN));
+		this._opened = true;
+	},
+	_onClose: function(e)
+	{
+		if (this._opened == true)
+		this.dispatchEvent( new Tevent(Tevent.CLOSE));
+		this._opened = false;
+	},
+
+	buildLocalData: function( dp ){
+		this._localDataProvider = [];
+
+		for (var i=0; i< this._dataProvider._source.length; i++)
+		{
+			var it = this._dataProvider._source[i];
+						
+			this._localDataProvider.push({
+				label: it[ this._opt.labelField],
+				value: it[ this._opt.valueField],
+				title: it[ this._opt.titleField],
+				selected: it[ this._opt.selectedField]
+			});
+
+		}
+	},
+	setDataProvider: function(dp)
+	{
+		/*
+		  {label: 'Option 1', title: 'Option 1', value: '1', selected: true}
+		*/
+		this._dataProvider = dp;	
+		var localData = this.buildLocalData( this._dataProvider );
+
+		this.selectElem.multiselect('dataprovider', localData);	
+	
+	},
+
+	free: function(){
+
+		this.selectElem.multiselect('destroy');
+		this._super.free.call(this);
+	},
+	getDataProvider: function()
+	{
+		return this._dataProvider;
+	},
+	refresh: function() {
+
+		if (this._dataProvider == null)
+		{
+			this.setSelectedItems(null);
+			return;
+		}
+		this.selectElem.multiselect('rebuild');
+		
+	},
+
+	getSelectedValues:function(){
+		var r = [];
+		var sel = this.getSelectedItems();
+		for (var i=0; i< sel.length; i++){
+			r.push(sel[i][this._opt.valueField]);
+		}
+		return  r;
+	},
+
+	setSelectedValues:function(values)
+	{
+		var items = [];
+		for (var i = 0; i < values.length; i++) {
+			var item = this._dataProvider.getByProp(this._opt.valueField, values[i]);
+			if (item != null)
+				items.push(item);
+		};
+		this.setSelectedItems(items);
+	},
+
+	getSelectedItems: function()
+	{  
+		var r = [];
+
+		if (this._dataProvider == null)
+			return r;
+
+		this.container.getElements('option:selected').each(function(indx, el) {
+		 	var item = this._dataProvider.getByProp(this._opt.valueField, el.val());
+           	r.push(item);
+        }.bind(this));
+   
+		return r;
+	},
+	getSelectedCount: function(){
+		return this.container.getElements('option:selected').length;
+	},
+	setSelectedItems: function(arr)
+	{
+		if (this._dataProvider == null)
+			return;
+		
+		this.deselectAll();
+
+		var values = [];
+		for (var i=0; i< arr.length; i++){
+			var item = arr[i];
+			values.push( arr[i][this._opt.valueField]); 
+		}
+
+		this.selectElem.multiselect('select', values); /* Pas d'evt onChange par défaut. mettre arg triggerOnChange ?*/
+	},
+
+	selectAll:function(){
+		this.selectElem.multiselect('selectAll', false);
+		this.selectElem.multiselect('updateButtonText');
+	},
+	deselectAll:function(){
+		this.selectElem.multiselect('deselectAll', false);
+		this.selectElem.multiselect('updateButtonText');
+	},
+	isSelected: function(value){
+		if (typeof value == "object")
+			value = value[this._opt.valueField];
+
+		var option = this.container.getElement('option[value="'+value+'"]:selected');
+		return (option != null);
+	},
+	select: function(value, triggerOnChange){
+		//value: array or value
+
+		if (arguments.length == 1)
+			var triggerOnChange = true;
+
+		this.selectElem.multiselect('select', value, triggerOnChange);
+	},
+
+	deselect: function(value, triggerOnChange){
+		//value: array or value
+		if (arguments.length == 1)
+			var triggerOnChange = true;
+		this.selectElem.multiselect('deselect', value, triggerOnChange);
+	},
+
+	show: function(args){
+		if (this._button){
+			this._super.show.call(this, args);
+			this._button.show();
+		}
+	},
+	hide: function(args){
+
+		if (this._button){
+			this._super.hide.call(this, args);
+			this._button.show();
+		}
+	},
+	toggle: function()
+	{
+		if (this._button)		
+		this._button.toggle();
+	},
+	
+
+	_onChanged: function(options, checked)
+	{	
+		if (this._dataProvider != null)
+		{
+			var items = [];
+			for (var i=0; i<options.length; i++)
+			{
+				var opt = $(options[i]);
+				var item = 	this._dataProvider.getByProp(this._opt.valueField, opt.val());
+				if (item != null)
+					items.push(item);
+			}
+
+			/* On envoie l'évènement seulement si onSelectAll ne sera pas déclenché 
+			(sinon, il y a 2 évt CHANGE qui pertent)
+			*/
+			var selCount = this.getSelectedCount();
+			if ((items.length > 0) && (selCount < this._dataProvider.length) && (selCount > 0))
+			{
+				var evtData = {"items": items, "selected": checked};
+				this.dispatchEvent( new Tevent(Tevent.CHANGE, evtData));
+			}
+		}
+	},
+
+	enabled: function(value){
+		
+
+		if (arguments.length == 0)
+		{
+			return this._enabled;
+		}
+		else
+		{
+			this._enabled = value;
+			if (v)
+				this.selectElem.multiselect('enable')
+			else
+				this.selectElem.multiselect('disable')
+			
+		}
+	}
+});
+//]]>
+</script>
+
+
+</head>
+<body>
+<select id="selectElem" multiple="multiple">
+</select>
+</body>
+</html> 
+

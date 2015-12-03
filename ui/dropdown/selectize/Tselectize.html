@@ -31,6 +31,8 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 	canCreate: false,
 
 	theme: "default",
+	optgroupField: null,
+	optgroups: null,
 
 	/* PRIVATE */
 	_data: null,
@@ -58,8 +60,9 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 		this.injectParam("maxItems", args["maxItems"],false);
 		this.injectParam("_inlineStyle", args["inlineStyle"]);
 		this.injectParam("canCreate", args["canCreate"]);
+		this.injectParam("optgroupField", args["optgroupField"]);
+		this.injectParam("optgroups", args["optgroups"]);
 		
-
 
 		panjs.loader.loadCssFile(panjs.namespaces["panjs.core"].path+"/../lib/selectize/0.12.1/dist/css/selectize."+this.theme+".css");
 
@@ -199,6 +202,9 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 					searchField: this.searchField,
 					sortField: this.sortField,
 					create: this.canCreate,
+					optgroupField: this.optgroupField,
+					optgroups : this.optgroups,			
+					lockOptgroupOrder: false,
 					openOnFocus: true,
 					maxOptions: 1000,
 					hideSelected: true,

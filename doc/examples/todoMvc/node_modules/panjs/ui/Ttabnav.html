@@ -221,9 +221,11 @@ defineClass("Ttabnav", "panjs.core.display.Telement", {
 			if (el.nodeType == 1)
 			{			
 				var dataType = el.getAttribute("data-compo");
+				//var autoload = (el.getAttribute("data-autoload") === "true");
+				var autoload = true;
 				var loaded = el.getAttribute("data-loaded");
 
-				if (dataType != null)
+				if ((dataType != null)&&(autoload != false))
 				{
 					if (!loaded)
  						r.push( el );
@@ -245,6 +247,7 @@ defineClass("Ttabnav", "panjs.core.display.Telement", {
 		var composToLoad = this._getSubComponentsFirstLevelNotLoaded(tab.elem[0])
 		for (var i = 0; i < composToLoad.length; i++) {
 			var compoElem = composToLoad[i];
+
 			$(compoElem).load();
 			/*var origId = compoElem.getAttribute("data-original-id");
 			

@@ -1,6 +1,41 @@
 <html>        
 <head>
+<!--
+https://github.com/One-com/one-validation
 
+
+
+    function position(error, $target) {
+        /*jshint validthis:true */
+        error.css('position', 'absolute');
+
+        var offset = $target.offset(),
+            location = $target[0].getAttribute('data-location') || this.options.location;
+
+        if (filters.topbottom.test(location)) {
+            error.offset({left: offset.left});
+
+            if (location === 'top') {
+                error.offset({top: offset.top - error.outerHeight() - 2});
+            }
+
+            if (location === 'bottom') {
+                error.offset({top: offset.top + error.outerHeight()});
+            }            
+        } else if (filters.leftright.test(location)) {
+            error.offset({top: (offset.top + $target.outerHeight() / 2) - (error.outerHeight() / 2)});
+
+            if (location === 'left') {
+                error.offset({left: offset.left - error.outerWidth() - 2});
+            }
+
+            if (location === 'right') {
+                error.offset({left: offset.left + $target.outerWidth() + 2});
+            }            
+        }        
+    }
+
+    -->
 <script src="../../lib/opentip/2.4.6/downloads/opentip-jquery.min.js"></script>
 <link href="../../lib/opentip/2.4.6/css/opentip.css" rel="stylesheet" type="text/css" />
 

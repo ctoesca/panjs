@@ -251,7 +251,11 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 					logger.info("Upload terminé avec succès: "+data);
 					if (typeof data != "object")
 					{
-						logger.error("ECHEC UPLOAD =>"+data);
+						logger.error("ECHEC UPLOAD => data="+data);
+
+						if (data == "")
+							data = "ECHEC UPLOAD";
+										
 						if (defined(failure)){
 							failure(data);
 						}
@@ -423,6 +427,8 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 	       		if (item._isNew == true){
 					var count = this.addItemInModels(item);
 					logger.info("updateModel: "+count+" objet(s) "+this.className+" ajouté(s)");
+	       		}else{
+	       			logger.info("updateModel: objet '"+this.className+"', id="+item[this.IDField]+" non trouvé en local");
 	       		}
 	       		
 	       	}	

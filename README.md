@@ -1,8 +1,8 @@
-#panJS v0.8.4
+#panJS v0.8.5
 > A 40 ko javascript framework 
 <p><a href="http://www.nexilearn.com/panjs/doc/change-log/"><b>Change log</b></a>. <b>API documentation is coming soon!</b></p>
 
-panJs is a javascript framework that uses Jquery and allows you to create applications easily, by making resusable components.
+panJs is a javascript framework that uses Jquery and allows you to create easily applications, making resusable components.
 <br/>You can integrate panJS in a existing application (only parts of the application can be managed by panJs).
 </p>
 <p><a href="http://www.nexilearn.fr/libs/panjs/trunk/doc/examples/demo"><b>Basic demo</b></p>
@@ -12,10 +12,10 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 <p><a href="http://www.nexilearn.fr/libs/panjs/trunk/doc/tutorial"><b>Tutorial</b></p>
 ## Feature Highlights
 
-* A component is a HTML file that contains CSS, JS, HTML, css <link> like any Html file
+* A component is a HTML file that contains CSS, JS, HTML like any Html file
 * Components can be integrated in a page or in other components with html markup
-* Components (and their dependencies) are loaded dynamically and you don't have to add js/css in the `<head>` of the page.
-* Cache management (Js/css/html): the framework add '?v=x.x.x' in all loaded files, or can store components in localstorage (max speed).
+* Components (and their dependencies) are dynamically loaded and you don't have to add js/css in the `<head>` of the page.
+* Cache management (Js/css/html): the framework adds '?v=x.x.x' in all loaded files, or can store components in localstorage (max speed).
 * Inheritance on classes and components (HTML / CSS / JS).
 * Static classes
 * Encapsulation
@@ -28,7 +28,7 @@ panJs is a javascript framework that uses Jquery and allows you to create applic
 * ...
 
 
-###What panJs does not:
+###What panJs doesn't do:
 
 * panJs doesn't choose the architecture of your application (MVC, MVVC etc)</li>
 * Data binding (but you can use some data binding frameworks if you want like KnockoutJS, Mustach ...)</li>

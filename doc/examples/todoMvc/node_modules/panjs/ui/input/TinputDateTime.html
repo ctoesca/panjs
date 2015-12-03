@@ -86,6 +86,9 @@ defineClass("TinputDateTime", "panjs.core.display.Telement", {
 				this.pickTime = args.picktime;
 
 
+			if (typeof args.icon != "undefined")
+				this.inputGroupIcon.html(args.icon);
+
 			if (typeof args.minutestepping != "undefined")
 				this.opt.stepping = parseInt(args.minutestepping);
 
@@ -275,7 +278,7 @@ defineClass("TinputDateTime", "panjs.core.display.Telement", {
 
                 <div class="input-group date" id="datePicker" >
                     <input type="text" class="form-control" id="input" />
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                    <span class="input-group-addon" id="inputGroupIcon"><span class="glyphicon glyphicon-calendar"></span>
                     </span>
                 </div>
 </body>
