@@ -92,6 +92,7 @@ defineClass("Tcheckbox", "panjs.core.display.Telement", {
 		this.labelElement.attr("for", this.input.attr("id"));
 
 		this.input.on("change", this.onChanged.bind(this));
+		this.input.on("click", this.onClick.bind(this));
 
 		if (defined(args,"elem"))
 			this.label = args.elem.innerHTML;
@@ -107,6 +108,9 @@ defineClass("Tcheckbox", "panjs.core.display.Telement", {
 
 		this.labelElement.html(this.label);
 	},
+	onClick: function(e){
+		this.dispatchEvent(new Tevent(Tevent.CLICK, this.val()));
+	},	
 	onChanged: function(e){
 
 		if (!this.eventsDisabled){

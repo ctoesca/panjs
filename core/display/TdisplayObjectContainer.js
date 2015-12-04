@@ -510,7 +510,20 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         return changed;
     },
 
-    _processElement: function(el, parent, setObject) {
+    processElement: function(jqObject , opt){
+        var el = jqObject[0];
+        if (arguments.length == 1) 
+            var opt = {};
+
+        var r = this._processElement(el, jqObject.parent()[0], true);
+        
+        if (opt && (opt.processStates == true))
+            this.setState(this.currentState);
+
+        return r;
+    },
+
+    _processElement: function(el, parent, setObject, autoload) {
         if (el.nodeType == 1) {
             //nodeType = ELEMENT	
 
@@ -518,7 +531,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
             var dataType = el.getAttribute("data-compo");
 
             var jqObj = $(el);
-
+            var r = null;
 
             if (dataType == null) {
 
@@ -539,7 +552,8 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
                     logger.error("Référence circulaire dans " + this.classPath);
                 } else {
 
-                    var autoload = !(el.getAttribute("data-autoload") === "false");
+                    if (arguments.length < 4 )
+                        var autoload = !(el.getAttribute("data-autoload") === "false");
 
                     if (autoload) {
                         //creation instance du composant
@@ -580,6 +594,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
                         this.processStates(compo.container[0]);
 
                         compo._triggerOnAdded();
+                        r = compo;
 
                     } else {
                         panjs._setDOMId(el, id, dataType);
@@ -620,6 +635,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
                 this.content = $(c);
             }
         }
+        return r;
     },
     _populateElements: function(element, setObject) {
 

@@ -204,7 +204,7 @@
 				/*CONFIG_END:manageErrors*/
 
 				var r = panjs.loader.usesComponent(classPath);
-				if (!r.result)		
+				if ((r==null)||(!r.result))
 					return _getErrorComponent(classPath, className, r);
 
 				/*CONFIG_START:manageErrors*/
@@ -538,15 +538,14 @@ function defineClass(className, parentClassPath, def, isStatic ) {
 		throw mess;
 	}
 
-	if ((typeof window[parentClasseName] == "undefined") && (typeof window[parentClassPath] == "undefined"))
+	if ((typeof panjs._classes[parentClassPath] == "undefined") && (parentClasseName != "Tloader") && (parentClasseName != "Tlogger")&& (parentClasseName != "Tobject"))
 	{
 		if (isHtm)
 			panjs.loader.usesComponent(parentClassPath);
 		else
 			panjs.loader.uses(parentClassPath);
 
-
-		if (typeof window[parentClasseName] == "undefined") {
+		if (typeof panjs._classes[parentClassPath] == "undefined") {
 			if (logger)
 				logger.error("Unable to inherit from " + parentClassPath + ": class is not loaded");
 
@@ -1022,7 +1021,11 @@ defineClass("Tloader", "panjs.core.Tobject", {
 					}
 
 				}
-
+				if (typeof panjs._classes[classPath] == "undefined")
+				{
+					r.message = "Classe "+classPath+" not loaded";
+					return r;
+				}
 				var Class = panjs._classes[classPath].Class;
 
 				for (var i = 0; i < linkNodes.length; i++) {
@@ -1123,6 +1126,12 @@ defineClass("Tloader", "panjs.core.Tobject", {
 			if (data.result) {
 				data.data = this._processCode(data.data, className, dirPath, classPath, '.js');
 				panjs._exec(data.data);
+
+				if (typeof panjs._classes[classPath] == "undefined")
+				{
+					r.message = "Classe "+classPath+" not loaded";
+					return r;
+				}
 
 				var Class = panjs._classes[classPath].Class;
 
