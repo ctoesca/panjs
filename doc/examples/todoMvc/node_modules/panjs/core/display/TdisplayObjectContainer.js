@@ -204,6 +204,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         }
 
         /*<ENV:dev>*/
+        if (panjs.capture)
         panjs.capture("createComponent",{classPath: compo.classPath, componentId: compo.id, from: {id: this.id, className: this.className, classPath: this.classPath}});
         /*</ENV:dev>*/
     },
