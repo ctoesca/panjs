@@ -20,6 +20,9 @@ set scripts=%scripts% %repPanjs%\core\display\Telement.js
 %pathFusionneur% %scripts% %repPanjs%\core\panjs_core.%env%.js
 IF %errorlevel% NEQ 0 GOTO ERROR
 
+php transform.php panjs_core.%env%.js panjs_core.%env%.js %env%
+
+
 echo ***** COMPRESSION - panjs_core.%env%.js ***
 echo "%JAVA_HOME%\bin\java"
 "%JAVA_HOME%\bin\java" -jar compiler.jar --js %repPanjs%\core\panjs_core.%env%.js --js_output_file %repPanjs%\core\panjs_core.%env%.min.js
