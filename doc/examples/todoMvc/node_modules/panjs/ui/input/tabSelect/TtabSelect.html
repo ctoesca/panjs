@@ -251,8 +251,13 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 		return this._dp;
 	},
 	getSelectedElements:function(){
-		return this.container.getElements("span.tab.active");
+		var r = [];
+		this.container.find("span.tab.active").each(function(indx, el){
+			r.push($(el));
+		});
+		return r;
 	},
+
 	getSelectedItem:function(){
 		var r = null; 
 		var items = this.getSelectedItems();
@@ -270,9 +275,9 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 	getSelectedItems:function()
 	{
 		var r = [];
-		var selectedEl = this.container.getElements("span.tab.active");
+		var selectedEl = this.container.find("span.tab.active");
 		for (var i=0; i< selectedEl.length; i++){
-			var item = selectedEl[i].prop("item");
+			var item = $(selectedEl[i]).prop("item");
 			r.push(item);
 		}
 		return r;

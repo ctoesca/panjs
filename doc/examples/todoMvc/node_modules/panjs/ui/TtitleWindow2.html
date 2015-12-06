@@ -30,9 +30,8 @@ defineClass("TtitleWindow2", "panjs.core.display.Telement", {
 
 		/* Clic sur boutons = fermeture fenêtre*/
 		this.buttonClose.on("click", this.close.bind(this));
-		this.footer.getElements("button").each(function(indx, el){
-			el.on("click", this.close.bind(this));
-		}.bind(this));
+		this.footer.getElements("button").on("click", this.close.bind(this));
+			
 	},	
 	close: function(e)
 	{	

@@ -180,15 +180,15 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 		if (this._dataProvider == null)
 			return r;
 
-		this.container.getElements('option:selected').each(function(indx, el) {
-		 	var item = this._dataProvider.getByProp(this._opt.valueField, el.val());
+		this.container.find('option:selected').each(function(indx, el) {
+		 	var item = this._dataProvider.getByProp(this._opt.valueField, $(el).val());
            	r.push(item);
         }.bind(this));
    
 		return r;
 	},
 	getSelectedCount: function(){
-		return this.container.getElements('option:selected').length;
+		return this.container.find('option:selected').length;
 	},
 	setSelectedItems: function(arr)
 	{

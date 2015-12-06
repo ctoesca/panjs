@@ -11,9 +11,8 @@
             //by default: 'state1'
             this.setState(['state1']);
 
-            this.menu.getElements("li a").each(function(indx, el){
-                el.on("click", this.onMenuClick.bind(this));
-            }.bind(this));
+            this.menu.getElements("li a").on("click", this.onMenuClick.bind(this));
+        
         },
         onMenuClick: function(e){
           var state = $(e.target).attr("data-target-state").split(" ");

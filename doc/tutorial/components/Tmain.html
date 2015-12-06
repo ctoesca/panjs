@@ -39,16 +39,11 @@ defineClass("Tmain", "panjs.core.display.Telement", {
     if (hash == "")
    return;
 
-    this.container.getElements('.topicCompo').each( function(indx,el){
-      el.hide();
-    });
+    this.container.getElements('.topicCompo').hide();
+    
 
-    this.container.getElements('a[href^="#main="]').each(function(indx, el){
-      el.removeClass("active");
-    });
-    this.container.getElements('a[href="#main='+hash+'"]').each(function(indx, el){
-      el.addClass("active");
-    });
+    this.container.getElements('a[href^="#main="]').removeClass("active");
+    this.container.getElements('a[href="#main='+hash+'"]').addClass("active");
 
     if( typeof this[hash] != "undefined"){
       this[hash].load();

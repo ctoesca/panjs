@@ -55,6 +55,10 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 	free: function(){
 		TdisplayObject._super.free.call(this);
 		this.container.remove();
+		/*<ENV:dev>*/
+        panjs.capture("free",{classPath: this.classPath, componentId: this.id});
+        /*</ENV:dev>*/
+
 	},
 
 	_onInitialized: function()
@@ -73,8 +77,8 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 		this.container = $('<'+this.baseElement+"/>");
 		//this.container.css("display", "none");	
 
-		window[this.className].lastId ++;
-		this.id = window[this.className].lastId;
+		panjs._classes[this.classPath].lastId ++;
+		this.id = this.classPath+"_"+panjs._classes[this.classPath].lastId;
 
 		
 		this.container[0].owner = this;
@@ -88,8 +92,11 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
   	removeClass: function(v){
   		this.container.removeClass(v);
   	},
-  	createComponent: function(classPath, args){
-  		var compo = panjs.createComponent(classPath,args);
+  	createComponent: function(classPath, args, sendData){
+
+  		var compo = panjs.createComponent(classPath,args, false);
+  		
+
   		return compo;
   	},
   	_triggerOnAdded: function(){

@@ -52,6 +52,13 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				return this._items;
 		},
 		setSource: function(value, silent) {
+			
+			if ((typeof value != "object")||(typeof value.push != "function"))
+			{
+				logger.error("TarrayCollection.setSource: data must be a array !");
+
+			}else{
+				
 				if (this._source != value) {
 						this._source = value;
 
@@ -69,6 +76,8 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 						this.length = this._items.length;
 						this.refresh(silent);
 				}
+			}
+
 		},
 		find: function(opt) {
 				var r = [];

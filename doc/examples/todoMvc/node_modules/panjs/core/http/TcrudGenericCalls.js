@@ -614,51 +614,65 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 				if (k != "data")
 					extraData[k] = evt.data[k];
 			}
+	
+				var dataIsArray = !((typeof evt.data.data != "object")||(typeof evt.data.data.push != "function"));
 
-			var tokens = this.getSearchRequests(token.reqHashCode); //requetes  actives ou aborted
-			for (var i=0; i<tokens.length; i++)
-			{	
-				var localToken = tokens[i];
-
-				if (!localToken.aborted)
-				{
-					var debut = new Date();
-					var tempsAppel = (debut - token.start);
-					var tempsCpuServeur =  Math.round(evt.xTime);
-				
-					logger.debug("Temps total ("+tempsAppel +"ms) = Traitement serveur ("+tempsCpuServeur+"ms) + encodage/decodage Json etc ("+ (tempsAppel - tempsCpuServeur)+" ms) token.updateModel="+token.updateModel) ;
+				var tokens = this.getSearchRequests(token.reqHashCode); //requetes  actives ou aborted
+				for (var i=0; i<tokens.length; i++)
+				{	
+					var localToken = tokens[i];
 					
-					if (evt.data == null){	
-						evt.data = {status: 200, responseText: "Résultat non conforme: La requête a réussi (status="+evt.req.status+") mais a renvoyé null."};
-						if (defined(localToken.extFailure)){
-							localToken.extFailure(evt, localToken);
-						}
-										
-					}
-					else{
-						if (localToken.updateModel)
+					if (!localToken.aborted)
+					{
+						if (!dataIsArray)
 						{
-							//On met à jour le model
-							var model = this.getModel(localToken.nomModel, true);		
-							model.total = evt.data.total;
-							model.setSource(evt.data.data);
-						}
-						else
-						{	
-							//On renvoie une nouvelle collection
-							var model = new TarrayCollection();
-							model.setSource(evt.data.data);
-							model.total = evt.data.total;				
-						}
+							logger.error("TarrayCollection.setSource: data must be a array !");
+							if (defined(localToken.extFailure)){
+								localToken.extFailure(evt, localToken);
+							}
+						}else{
+
+							var debut = new Date();
+							var tempsAppel = (debut - token.start);
+							var tempsCpuServeur =  Math.round(evt.xTime);
 						
-						this._onsearchDefault(model, localToken, extraData);
-						var fin = new Date(); 			
-						logger.debug("Temps maj model (updateModel="+localToken.updateModel+") = "+ (fin - debut)+" ms") ;
-					}		
+							logger.debug("Temps total ("+tempsAppel +"ms) = Traitement serveur ("+tempsCpuServeur+"ms) + encodage/decodage Json etc ("+ (tempsAppel - tempsCpuServeur)+" ms) token.updateModel="+token.updateModel) ;
+							
+							if (evt.data == null){	
+								evt.data = {status: 200, responseText: "Résultat non conforme: La requête a réussi (status="+evt.req.status+") mais a renvoyé null."};
+								if (defined(localToken.extFailure)){
+									localToken.extFailure(evt, localToken);
+								}
+												
+							}
+							else{
+								if (localToken.updateModel)
+								{
+									//On met à jour le model
+									var model = this.getModel(localToken.nomModel, true);		
+									model.total = evt.data.total;
+									model.setSource(evt.data.data);
+								}
+								else
+								{	
+									//On renvoie une nouvelle collection
+									var model = new TarrayCollection();
+									model.setSource(evt.data.data);
+									model.total = evt.data.total;				
+								}
+								
+								this._onsearchDefault(model, localToken, extraData);
+								var fin = new Date(); 			
+								logger.debug("Temps maj model (updateModel="+localToken.updateModel+") = "+ (fin - debut)+" ms") ;
+							}	
+						}	
+						
+						
+					}
+
+					this.removeSearchRequest(localToken);
 				}
-				
-				this.removeSearchRequest(localToken);
-			}
+			
 		}	
 		
 			

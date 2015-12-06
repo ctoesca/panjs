@@ -116,7 +116,7 @@ defineClass("Tcheckbox", "panjs.core.display.Telement", {
 		if (!this.eventsDisabled){
 			this.updateStyle();
 			this.dispatchEvent(new Tevent(Tevent.CHANGE, this.val()));
-			this.dispatchEvent(new Tevent(Tevent.CLICK, this.val()));
+			//this.dispatchEvent(new Tevent(Tevent.CLICK, this.val()));
 		}
 	},
 

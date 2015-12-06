@@ -8,9 +8,12 @@
 		appVersion: "1.0.0",
 		logLevel	: "DEBUG",
 		env			: "dev",
-		version 	: "0.8.3",
+		version 	: "0.9.1",
 		preserveElementsId: false,
 		setSourceInComponents: false,
+		stats: {
+			active: false
+		},
 		cache:{
 			useLocalStorage: false
 		},
@@ -46,7 +49,7 @@
 		components: {}
 	};
 	panjs.loader = null;
-
+	
 
 	panjs.basePath = location.pathname.removeEnd(location.pathname.rightRightOf("/"));
 	panjs.basePath = panjs.basePath.removeEnd("/");
@@ -129,6 +132,95 @@
 		return object;
 	};
 
+	/*<ENV:dev>*/
+	
+	panjs.initCaptures = function(){
+		
+		var appName = panjs.appName;
+		var baseUrl =  panjs.stats.url;
+		var fullUrl = baseUrl+'/init';
+		var username = panjs.stats.username;
+		var password = panjs.stats.password;
+
+		var data = {
+			appName: appName
+		};
+
+		var req = $.ajax({ 
+
+		        url: fullUrl,
+		        async:true,   
+		        type: "post",
+		        async: false,
+		        data: JSON.stringify(data),
+		        username: username, 
+		        password: password,
+		        success: function(data, textStatus, jqXHR){
+		             logger.debug("initCaptures: success");
+		        },
+		        error: function(jqXHR, textStatus, errorThrown){
+		         	logger.error("initCaptures: failure: "+jqXHR.responseText);
+		        }
+		});
+	}
+	panjs.capture = function(message, opt)
+	{
+		if (this.stats.active == false)
+			return;
+
+		var appName = panjs.appName;
+		var baseUrl =  panjs.stats.url;
+		var fullUrl = baseUrl;
+		var username = panjs.stats.username;
+		var password = panjs.stats.password;
+		var groupId = 1;
+
+		var data = {
+		  message: message,
+		  classPath: opt.classPath,
+		  componentId: null,
+		  fromClassName: null,
+		  fromClassPath: null,
+		  appName: appName,
+		  groupId: groupId,
+		  fromId: null,
+		  isStatic: null,
+		  timestamp: new Date().getTime()
+		}
+
+		if (opt.from != null){
+			data.fromClassName = opt.from.className;
+			data.fromClassPath = opt.from.classPath;
+			if (opt.from.id != null)
+				data.fromId = opt.from.id;
+		}
+		if (opt.componentId != null)
+		    data.componentId = opt.componentId;
+
+		if  (data.message == "createStaticObject")
+			data.isStatic = true;
+		if  (data.message == "createComponent")
+			data.isStatic = false;
+
+		var req = $.ajax({ 
+
+		        url: fullUrl,
+		        async:true,   
+		        type: "post",
+		        data: JSON.stringify(data),
+		        username: username, 
+		        password: password,
+		        success: function(data, textStatus, jqXHR){
+		             logger.debug("Send stats: success");
+		        },
+		        error: function(jqXHR, textStatus, errorThrown){
+		         	logger.error("Send stats: failure: "+jqXHR.responseText);
+		        }
+		    });
+
+	}
+	/*</ENV:dev>*/
+	
 	panjs._exec = function(s) {
 
 		if (s == "") return;
@@ -143,27 +235,31 @@
 	/* public functions */
 	panjs._setDOMId = function(DOMel, originalId, classPath) {
 
-		var id = originalId;
-		var elPreserveId = DOMel.getAttribute("data-preserve-id");
+		if (originalId){
 
-		if (elPreserveId == null) {
-			elPreserveId = panjs.preserveElementsId;
-		} else {
-			elPreserveId = (elPreserveId == "true");
-		}
+			var elPreserveId = DOMel.getAttribute("data-preserve-id");
 
-		if (!elPreserveId) {
-			if (typeof _idList[originalId] == "undefined") {
-				_idList[originalId] = 0;
+			if (elPreserveId == null) {
+				elPreserveId = panjs.preserveElementsId;
 			} else {
-				_idList[originalId]++;
-				id = originalId + _idList[originalId];
+				elPreserveId = (elPreserveId == "true");
+			}
+
+			if (!elPreserveId) {
+				var nodeName = DOMel.nodeName.toLowerCase();
+				if (typeof _idList[nodeName] == "undefined") {
+					_idList[nodeName] = 1;
+				} else {
+					_idList[nodeName]++;				
+				}
+				
+				DOMel.setAttribute("id", nodeName + _idList[nodeName]);		
+				DOMel.setAttribute("data-original-id", originalId);			
 			}
 		}
-
-		DOMel.setAttribute("id", id);
-		DOMel.setAttribute("data-original-id", originalId);
+			
 	}
+
 	panjs.getClass = function(classPath) {
 
 		if (typeof panjs._classes[classPath] == "undefined")
@@ -192,7 +288,7 @@
 	};
 	
 
-	panjs.createComponent = function(classPath, args) {
+	panjs.createComponent = function(classPath, args, sendData) {
 		
 		_stackLevel++;
 		var className = panjs._getClassNameFromClassPath(classPath);
@@ -239,7 +335,18 @@
 			object._onInitialized();
 
 		panjs.root.components[classPath] = object;
-		
+		/*<ENV:dev>*/
+			if (sendData !== false){
+				var statsData = {classPath:classPath, componentId: object.id,  classPath: classPath, from: null};
+				if (typeof sendData == 'object'){
+					if (typeof statsData.from != "undefined"){
+						statsData.from = sendData.from;					
+					}
+				}
+				panjs.capture("createComponent", statsData);
+			}
+		/*</ENV:dev>*/
+
 		return object;
 	}
 
@@ -298,10 +405,10 @@
 		if (element.attr("data-compo") != null)
 			compolist.push(element);
 		else
-			compolist = element.getElements("[data-compo]");
+			compolist = element.find("[data-compo]");
 
 		for (var i = 0; i < compolist.length; i++) {
-			var el = compolist[i];
+			var el = $(compolist[i]);
 			var dataType = el.attr("data-compo");
 			var autoload = (el.attr("data-autoload") !== "false");
 			var id = el.attr("id");
@@ -485,6 +592,8 @@ var Tobject = {
 
 function defineStaticClass(className, parentClassPath, def) {
 	defineClass(className, parentClassPath, def, true);
+
+
 }
 function defineClass(className, parentClassPath, def, isStatic ) {
 
@@ -528,20 +637,25 @@ function defineClass(className, parentClassPath, def, isStatic ) {
 		if ( panjs._classes[parentClassPath] )
 			var Class = panjs._classes[parentClassPath].Class.extend(def, className, parentClasseName);
 		else
+			//pour Tloader, Tlogger Tobject
 			var Class = window[parentClasseName].extend(def, className, parentClasseName);
 			
 		panjs._classes[classPath] = {
 			Class: Class,
-			isComponent: isHtm
+			isComponent: isHtm,
+			lastId: 0
 		}
 		
 		Class.prototype.classPath = classPath;
 		Class.prototype.className = className;
 
-		if (isStatic)
+		if (isStatic){
 			window[className] = new Class();
-		else
+			window[className].id = classPath;
+		}
+		else{
 			window[className] = Class;
+		}
 
 		var classNames = classPath.split(".");
 		var nsObject = window;
@@ -559,6 +673,19 @@ function defineClass(className, parentClassPath, def, isStatic ) {
 
 	__CLASSPATH__ = null;
 	panjs._lastDefinedClassName = className;
+
+	/*<ENV:dev>*/
+	if (isStatic){
+		var statsData = {classPath:classPath, componentId: window[className].id, from: null};
+		if (typeof sendData == 'object'){
+			if (typeof statsData.from != "undefined"){
+				statsData.from = sendData.from;					
+			}
+		}
+		panjs.capture("createStaticObject", statsData);
+	}
+	/*</ENV:dev>*/
+
 }
 
 function uses(classPath) {
@@ -1079,7 +1206,7 @@ defineClass("Tloader", "panjs.core.Tobject", {
 				Class.prototype.classPathDir = this.getClassPathDir(classPath);
 				Class.prototype.dirPath = dirPath;
 			
-				Class.lastId = 0;
+				panjs._classes[classPath].lastId = 0;
 				
 				r.result = true;
 				r.message = "ok";
@@ -1244,3 +1371,8 @@ defineClass("Tloader", "panjs.core.Tobject", {
 
 panjs.loader = new Tloader();
 panjs.loader.init();
+
+/*<ENV:dev>*/
+if (panjs.stats.active)
+	panjs.initCaptures();
+/*</ENV:dev>*/

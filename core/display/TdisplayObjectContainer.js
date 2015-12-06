@@ -96,6 +96,9 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         if (this._children == null)
             this._children = [];
         this._children.push(compo);
+       /*<ENV:dev>*/
+        panjs.capture("createComponent",{classPath: classPath, componentId: compo.id, from: {id: this.id, className: this.className, classPath: this.classPath}});
+        /*</ENV:dev>*/
         return compo;
     },
 
@@ -200,7 +203,9 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
             }
         }
 
-
+        /*<ENV:dev>*/
+        panjs.capture("createComponent",{classPath: compo.classPath, componentId: compo.id, from: {id: this.id, className: this.className, classPath: this.classPath}});
+        /*</ENV:dev>*/
     },
 
     getChildren: function() {
@@ -213,9 +218,9 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         else
             var selector = '[data-compo*="' + classPath + '"]';
 
-        this.container.getElements(selector).each(function(indx, el) {
+        this.container.find(selector).each(function(indx, el) {
             if (el.isCompo())
-                r.push(el[0].owner);
+                r.push(el.owner);
         });
         return r;
     },

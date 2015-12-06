@@ -161,11 +161,11 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		this._cols = [];
 		
 		if (this.content != null){
-			var listeCol = this.content.getElements("div");
+			var listeCol = this.content.find("div");
 			
 			for (var i=0; i< listeCol.length; i++)
 			{
-				var el = listeCol[i];
+				var el = $(listeCol[i]);
 				var datafield = el.attr("field");
 				var title = el.html();
 				var itemRenderer = el.attr("itemRenderer")||null;
@@ -353,7 +353,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		this._cols[indx] = col;
 		this.refresh();
 	},
-	addCols : function(cols)
+	addCols : function(cols, indx)
 	{
 		//Col exemple: { field: "warning" , searchable:false, title:"Warning", cellClass:"cellWarning",  headerClass:"cellWarning", itemRenderer:"TdateItemRenderer"}
 		for (var i=0; i< cols.length; i++)
@@ -370,12 +370,14 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 			if (typeof col.cellClass == u) col.cellClass = null;
 			if (typeof col.headerClass == u) col.headerClass = null;
 			if (typeof col.itemRenderer == u) col.itemRenderer = null;
+			if (typeof col.functionRenderer == u) col.functionRenderer = null;
 			if (typeof col.titleInfo == u) col.titleInfo = null;	
 			if (typeof col.sortField == u) col.sortField = col.field;	
 			if (typeof col.width == u) col.width = null;	
 			
 			col._itemsRenderersInstances = {};
-			this._cols.push(col);
+			this._cols.splice(indx, 0, col);
+		
 		}
 	},
 	_onShow: function()

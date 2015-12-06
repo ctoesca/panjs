@@ -72,7 +72,8 @@ defineClass("TtodoList", "panjs.core.display.Telement", {
 		this.clearCompleted.toggle( completedCount > 0 );
 
 		//add/remove class 'selected' on footer links
-		this.filters.getElements("a").each(function(indx, link){
+		this.filters.find("a").each(function(indx, link){
+			link = $(link);
 			var h = link.attr("href").rightOf("=") || null;
 			link.toggleClass("selected", (h == this.model.filter));
 		}.bind(this));

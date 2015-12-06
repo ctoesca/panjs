@@ -8,9 +8,12 @@
 		appVersion: "1.0.0",
 		logLevel	: "DEBUG",
 		env			: "dev",
-		version 	: "0.8.3",
+		version 	: "0.9.1",
 		preserveElementsId: false,
 		setSourceInComponents: false,
+		stats: {
+			active: false
+		},
 		cache:{
 			useLocalStorage: false
 		},
@@ -46,7 +49,7 @@
 		components: {}
 	};
 	panjs.loader = null;
-
+	
 
 	panjs.basePath = location.pathname.removeEnd(location.pathname.rightRightOf("/"));
 	panjs.basePath = panjs.basePath.removeEnd("/");
@@ -129,6 +132,7 @@
 		return object;
 	};
 
+	
 	panjs._exec = function(s) {
 
 		if (s == "") return;
@@ -143,27 +147,31 @@
 	/* public functions */
 	panjs._setDOMId = function(DOMel, originalId, classPath) {
 
-		var id = originalId;
-		var elPreserveId = DOMel.getAttribute("data-preserve-id");
+		if (originalId){
 
-		if (elPreserveId == null) {
-			elPreserveId = panjs.preserveElementsId;
-		} else {
-			elPreserveId = (elPreserveId == "true");
-		}
+			var elPreserveId = DOMel.getAttribute("data-preserve-id");
 
-		if (!elPreserveId) {
-			if (typeof _idList[originalId] == "undefined") {
-				_idList[originalId] = 0;
+			if (elPreserveId == null) {
+				elPreserveId = panjs.preserveElementsId;
 			} else {
-				_idList[originalId]++;
-				id = originalId + _idList[originalId];
+				elPreserveId = (elPreserveId == "true");
+			}
+
+			if (!elPreserveId) {
+				var nodeName = DOMel.nodeName.toLowerCase();
+				if (typeof _idList[nodeName] == "undefined") {
+					_idList[nodeName] = 1;
+				} else {
+					_idList[nodeName]++;				
+				}
+				
+				DOMel.setAttribute("id", nodeName + _idList[nodeName]);		
+				DOMel.setAttribute("data-original-id", originalId);			
 			}
 		}
-
-		DOMel.setAttribute("id", id);
-		DOMel.setAttribute("data-original-id", originalId);
+			
 	}
+
 	panjs.getClass = function(classPath) {
 
 		if (typeof panjs._classes[classPath] == "undefined")
@@ -192,31 +200,31 @@
 	};
 	
 
-	panjs.createComponent = function(classPath, args) {
+	panjs.createComponent = function(classPath, args, sendData) {
 		
 		_stackLevel++;
 		var className = panjs._getClassNameFromClassPath(classPath);
 		var object = null;
 
 		if (typeof panjs._classes[classPath] == "undefined") {
-			/*CONFIG_START:manageErrors*/
+			/*<ENV:prod>*/
 			try {
-				/*CONFIG_END:manageErrors*/
+				/*</ENV:prod>*/
 
 				var r = panjs.loader.usesComponent(classPath);
 				if ((r==null)||(!r.result))
 					return _getErrorComponent(classPath, className, r);
 
-				/*CONFIG_START:manageErrors*/
+				/*<ENV:prod>*/
 			} catch (r) {
 				return _getErrorComponent(classPath, className, r);
 			}
-			/*CONFIG_END:manageErrors*/
+			/*</ENV:prod>*/
 		}
 
-		/*CONFIG_START:manageErrors*/
+		/*<ENV:prod>*/
 		try {
-			/*CONFIG_END:manageErrors*/
+			/*</ENV:prod>*/
 
 			if (typeof args == "undefined")
 				var args = {};
@@ -237,7 +245,7 @@
 
 			object = new panjs._classes[classPath].Class(args);
 
-			/*CONFIG_START:manageErrors*/
+			/*<ENV:prod>*/
 		} catch (err) {
 
 			var m = "Error instantiating " + className + ": " + err;
@@ -254,7 +262,7 @@
 			_stack.push(m);
 		}
 
-		/*CONFIG_END:manageErrors*/
+		/*</ENV:prod>*/
 
 		_stackLevel--;
 		if (_stackLevel <= 0) {
@@ -268,7 +276,7 @@
 			object._onInitialized();
 
 		panjs.root.components[classPath] = object;
-		
+
 		return object;
 	}
 
@@ -327,10 +335,10 @@
 		if (element.attr("data-compo") != null)
 			compolist.push(element);
 		else
-			compolist = element.getElements("[data-compo]");
+			compolist = element.find("[data-compo]");
 
 		for (var i = 0; i < compolist.length; i++) {
-			var el = compolist[i];
+			var el = $(compolist[i]);
 			var dataType = el.attr("data-compo");
 			var autoload = (el.attr("data-autoload") !== "false");
 			var id = el.attr("id");
@@ -514,6 +522,8 @@ var Tobject = {
 
 function defineStaticClass(className, parentClassPath, def) {
 	defineClass(className, parentClassPath, def, true);
+
+
 }
 function defineClass(className, parentClassPath, def, isStatic ) {
 
@@ -553,27 +563,32 @@ function defineClass(className, parentClassPath, def, isStatic ) {
 		}
 	}
 
-	/*CONFIG_START:manageErrors*/
+	/*<ENV:prod>*/
 	try {
-		/*CONFIG_END:manageErrors*/
+		/*</ENV:prod>*/
 
 		if ( panjs._classes[parentClassPath] )
 			var Class = panjs._classes[parentClassPath].Class.extend(def, className, parentClasseName);
 		else
+			//pour Tloader, Tlogger Tobject
 			var Class = window[parentClasseName].extend(def, className, parentClasseName);
 			
 		panjs._classes[classPath] = {
 			Class: Class,
-			isComponent: isHtm
+			isComponent: isHtm,
+			lastId: 0
 		}
 		
 		Class.prototype.classPath = classPath;
 		Class.prototype.className = className;
 
-		if (isStatic)
+		if (isStatic){
 			window[className] = new Class();
-		else
+			window[className].id = classPath;
+		}
+		else{
 			window[className] = Class;
+		}
 
 		var classNames = classPath.split(".");
 		var nsObject = window;
@@ -588,15 +603,17 @@ function defineClass(className, parentClassPath, def, isStatic ) {
 			nsObject = nsObject[ns];
 		}
 
-		/*CONFIG_START:manageErrors*/
+		/*<ENV:prod>*/
 
 	} catch (err) {
 		alert(className + " " + err);
 	}
-	/*CONFIG_END:manageErrors*/
+	/*</ENV:prod>*/
 
 	__CLASSPATH__ = null;
 	panjs._lastDefinedClassName = className;
+
+
 }
 
 function uses(classPath) {
@@ -998,12 +1015,12 @@ defineClass("Tloader", "panjs.core.Tobject", {
 					*/
 
 					if (nodeName == "script") {
-						/*CONFIG_START:manageErrors*/
+						/*<ENV:prod>*/
 						try {
-							/*CONFIG_END:manageErrors*/
+							/*</ENV:prod>*/
 
 							this.addScriptNode(node, dirPath, className, classPath);
-							/*CONFIG_START:manageErrors*/
+							/*<ENV:prod>*/
 						} catch (err) {
 							var mess = "Error processing <" + nodeName + "> in " + className + " => " + err;
 							logger.error(r.path + ": "+ mess);
@@ -1011,7 +1028,7 @@ defineClass("Tloader", "panjs.core.Tobject", {
 							r.stack = err.stack;
 							return r;
 						}
-						/*CONFIG_END:manageErrors*/
+						/*</ENV:prod>*/
 
 					} else {
 						if (nodeName == "link")
@@ -1038,9 +1055,9 @@ defineClass("Tloader", "panjs.core.Tobject", {
 				}
 
 				if (defined(bodyNode)) {
-					/*CONFIG_START:manageErrors*/
+					/*<ENV:prod>*/
 					try {
-						/*CONFIG_END:manageErrors*/
+						/*</ENV:prod>*/
 
 						var html = getXml(bodyNode);
 						var parentClassName = Class.prototype.parentClassName;
@@ -1057,12 +1074,12 @@ defineClass("Tloader", "panjs.core.Tobject", {
 						Class.prototype.html = html;
 						Class.prototype.bodyNode = bodyNode;
 
-						/*CONFIG_START:manageErrors*/
+						/*<ENV:prod>*/
 					} catch (e) {
 						r.message = e.message;
 						return r;
 					}
-					/*CONFIG_END:manageErrors*/
+					/*</ENV:prod>*/
 				}
 				/*else
 				{         
@@ -1138,7 +1155,7 @@ defineClass("Tloader", "panjs.core.Tobject", {
 				Class.prototype.classPathDir = this.getClassPathDir(classPath);
 				Class.prototype.dirPath = dirPath;
 			
-				Class.lastId = 0;
+				panjs._classes[classPath].lastId = 0;
 				
 				r.result = true;
 				r.message = "ok";
@@ -1303,3 +1320,4 @@ defineClass("Tloader", "panjs.core.Tobject", {
 
 panjs.loader = new Tloader();
 panjs.loader.init();
+

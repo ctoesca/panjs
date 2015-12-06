@@ -6,6 +6,24 @@
 clone = function(obj) {
 	return jQuery.extend(true, {}, obj);
 }
+/*
+(function( $ ) {
+ 	
+
+    $.fn.panjs = function() {
+  		var selectedObjects = this;
+        return {
+	        getCompo : function() {
+				var r = null;
+				if ($(selectedObjects)[0].compo)
+					r = $(selectedObjects)[0].compo;
+				return r;
+	        }
+    	};
+ 
+    };
+ 
+}( jQuery ));*/
 
 
 $.fn.load = function(args) {
@@ -35,7 +53,7 @@ $.fn.load = function(args) {
 
 			args.elem = el[0];
 
-			var compo = panjs.createComponent(dataCompo, args);
+			var compo = panjs.createComponent(dataCompo, args, false);
 
 			compo.container[0].compo = compo;
 			compo.container[0].loaded = true;
@@ -43,10 +61,14 @@ $.fn.load = function(args) {
 			compo.container.attr("data-loaded", "true");
 			compo.container.attr("data-original-id", originalId);
 
-			compo.id = id;
-
+			
 			if (el[0].owner)
 				el[0].owner._onSubComponentLoaded(compo, el, args);
+			/*<ENV:dev>*/
+			else
+        		panjs.capture("$.fn.load: createComponent without owner",{componentId: compo.id, classPath: compo.classPath, from: null});
+        	/*</ENV:dev>*/
+
 
 			el.trigger(Tevent.LOADED, [compo, args]);
 
@@ -78,6 +100,7 @@ $.fn.isCompo = function() {
 	return ($(this).attr("data-compo") != null)
 }
 $.fn.getCompo = function() {
+	//return $(this).panjs().getCompo();
 	var r = null;
 	if ($(this)[0].compo)
 		r = $(this)[0].compo;
@@ -86,17 +109,16 @@ $.fn.getCompo = function() {
 
 $.fn.getElement = function (selector) {  
     //renvoie un seul element Jquery ou null si aucun élément trouvé 
-		var r = $(selector, this);		     
+		var r = $(this).find(selector);
 		if (r.length == 0)
 			return null;
-			else
-				if (r.length == 1)
-				return r;
-				else
-					if (r.length > 1)
-					return $(r[0]);
+		else
+			return $(r[0]);
 };
+
+/* DEPRECATED */
 $.fn.getElements = function (selector) {  
+	logger.warn("PANJS: $.fn.getElements is deprecated");
     //renvoie un tableau Jquery d'elements Jquery (vide si aucun élément trouvé) 
 		var r = $(selector, this);	//tableau d'élement DOM
 		var result = $([]);

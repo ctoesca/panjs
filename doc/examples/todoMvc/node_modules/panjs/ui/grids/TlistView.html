@@ -110,7 +110,8 @@ defineClass("TlistView", "panjs.core.display.Telement", {
 	},
 	getAllItemsRenderers: function(){
 		var r = [];
-		this.container.getElements('['+this._itemIdAttrName+']').each(function(indx, el){
+		this.container.find('['+this._itemIdAttrName+']').each(function(indx, el){
+			el = $(el);
 			if (el.isCompo())
 				r.push(el.getCompo());
 		});
@@ -153,7 +154,7 @@ defineClass("TlistView", "panjs.core.display.Telement", {
 	},
 	_insertLineAt: function(item, indx)
 	{	
-		var el = this.container.getElements('li['+this._itemIdAttrName+']'); 
+		var el = this.container.find('li['+this._itemIdAttrName+']'); 
 		var LI = $(this.createLI(item));
 			
 		if (el.length < indx+1){

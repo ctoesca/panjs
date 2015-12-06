@@ -1,4 +1,4 @@
-#panJS v0.9.0
+#panJS v0.9.1
 > A 40 ko javascript framework 
 <p><a href="http://www.nexilearn.com/panjs/doc/change-log/"><b>Change log</b></a>. <b>API documentation is coming soon!</b></p>
 
@@ -95,7 +95,7 @@ You put a component in HTML page (or in another HTML component) like this:
             env: "dev", // dev or prod
             appName: "myapp"
             appVersion: "0.1", 
-            version: "0.8.3", //panjs version
+            version: "0.9.1",  //panjs version
             
             namespaces:{
               "core": {path: "../core"},    //panjs "core" directory

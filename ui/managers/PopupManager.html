@@ -17,7 +17,7 @@ defineStaticClass("PopupManager", "panjs.core.events.TeventDispatcher", {
 
 	constructor: function(args){
 		this._super.constructor.call(this,args);		
-
+	
 		this.popups = [];
 
 		$(window).resize(function () {
@@ -106,28 +106,33 @@ defineStaticClass("PopupManager", "panjs.core.events.TeventDispatcher", {
 		
 		return instance;
 	},
-	createPopup: function(className, args , options )
+	createPopup: function(classPath, args , options )
 	{		
+		/*<ENV:dev>*/
+		//capture
+		var statData = {from: {id: this.id, className: this.className, classPath: this.classPath}}
+		/*/<ENV:dev>*/
+
 		if (defined(args)){
-			if (typeof className == "string")
-				var compo = panjs.createComponent(className,args); 
+			if (typeof classPath == "string")
+				var compo = panjs.createComponent(classPath,args, statData ); 
 			else
-				var compo = new className(args); 
+				var compo = new classPath(args); 
 
 		
 		}
 		else{
-			if (typeof className == "string")
-				var compo = panjs.createComponent(className); 
+			if (typeof classPath == "string")
+				var compo = panjs.createComponent(classPath, statData); 
 			else
-				var compo = new className();
+				var compo = new classPath();
 		}
 		
 		if (compo instanceof TtitleWindow){
 			this.addPopup(compo, options);	
 			
 		}else{
-			var titleWin = panjs.createComponent( "panjs.ui.TtitleWindow.html");
+			var titleWin = panjs.createComponent( "panjs.ui.TtitleWindow.html", statData);
 
 			compo.appendTo( titleWin.container.getElement('[data-class="content"]') );
 
