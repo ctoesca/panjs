@@ -356,7 +356,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 	addCols : function(cols, indx)
 	{
 		//Col exemple: { field: "warning" , searchable:false, title:"Warning", cellClass:"cellWarning",  headerClass:"cellWarning", itemRenderer:"TdateItemRenderer"}
-		for (var i=0; i< cols.length; i++)
+		for (var i=cols.length-1; i>=0; i--)
 		{
 			var col = cols[i];
 			col.index = i;
@@ -376,6 +376,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 			if (typeof col.width == u) col.width = null;	
 			
 			col._itemsRenderersInstances = {};
+
 			this._cols.splice(indx, 0, col);
 		
 		}

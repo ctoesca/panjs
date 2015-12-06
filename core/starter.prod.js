@@ -1,10 +1,4 @@
-(function(panjs){
-
-	var iever = getIEVersion();
-    if ((iever < 9) && (iever >0))
-    	alert("Internet Explorer "+getIEVersion()+" is not supported");
-
-	var defaultSettings = {
+var defaultSettings = {
 		appVersion: "1.0.0",
 		logLevel	: "DEBUG",
 		env			: "dev",
@@ -12,19 +6,22 @@
 		preserveElementsId: false,
 		setSourceInComponents: false,
 		stats: {
-			active: false
+			active: false,
+			url: "http://www.nexilearn.com/apis/portail_panjs/captures"
 		},
 		cache:{
 			useLocalStorage: false
 		},
 		errorComponentClass: "panjs.core.display.TerrorElement.html"
-	};
+};
 
-	/* settings */
-	for (var k in defaultSettings)
-		if (!panjs[k])
-		panjs[k] = defaultSettings[k];
+panjs = array_replace_recursive(defaultSettings, panjs);
 
+(function(panjs){
+
+	var iever = getIEVersion();
+    if ((iever < 9) && (iever >0))
+    	alert("Internet Explorer "+getIEVersion()+" is not supported");
 
 	if (!panjs.appName)
 		throw "Config ERROR: panjs.appName is missing";

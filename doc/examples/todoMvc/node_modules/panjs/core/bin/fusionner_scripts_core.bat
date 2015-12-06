@@ -1,7 +1,8 @@
 echo off
 call vars.bat
 
-
+php transform.php starter.js starter.dev.js dev
+php transform.php starter.js starter.prod.js prod
 
 call _fusionner_scripts_core.bat dev
 call _fusionner_scripts_core.bat prod
