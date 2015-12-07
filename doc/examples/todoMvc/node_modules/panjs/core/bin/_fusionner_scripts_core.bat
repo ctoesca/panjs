@@ -34,7 +34,7 @@ echo FUSION 2:  AJOUT LESS AU DEBUT
 IF %errorlevel% NEQ 0 GOTO ERROR
 
 del /Q %repPanjs%\bin\tmp*.js
-rem del /Q %repPanjs%\core\panjs_core.%env%.js
+del /Q %repPanjs%\core\panjs_core.%env%.js
 
 
 
