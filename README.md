@@ -1,4 +1,4 @@
-#panJS v0.9.1
+#panJS v0.9.2
 > A 40 ko javascript framework 
 <p><a href="http://www.nexilearn.com/panjs/doc/change-log/"><b>Change log</b></a>. <b>API documentation is coming soon!</b></p>
 
