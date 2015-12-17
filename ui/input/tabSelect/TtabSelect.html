@@ -270,8 +270,10 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 			r = items[0];
 		return r;
 	},
-	setSelectedItem:function( item ){
-		this.setSelectedItems([item]);
+	setSelectedItem:function( item , silent){
+		if (arguments.length == 1)
+			var silent = false;
+		this.setSelectedItems([item], silent);
 	},
 
 
@@ -289,11 +291,13 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 		return r;
 	},	
 
-	setSelectedValues:function( values, valueField ){
+	setSelectedValues:function( values, valueField , silent){
 		
 		if (typeof values.push != 'function')
 			values = [ values ];
-		
+		if (arguments.length < 3)
+			var silent = false;
+
 		var changed = false;
 		var items = [];
 
@@ -304,7 +308,7 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 				items.push(item);
 		}
 		
-		this.setSelectedItems(items);
+		this.setSelectedItems(items, silent);
 	},
 	
 	isSelected: function(item){
@@ -322,14 +326,17 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 		}
 		return r;
 	},
-	setSelectedItems:function(items)
+	setSelectedItems:function(items, silent)
 	{
 		if (!Array.isArray(items))
 			items = [items];
-				
+
+		if (arguments.length == 1)
+			var silent = false;
+
 		var changed = false;
 		var allItems = this.getDataProvider().getItems();
-
+		
 		for (var i=0; i< allItems.length; i++)
 		{
 			var found = false;
@@ -341,15 +348,14 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 					break;
 				}
 			}
-			if (!found){
-				changed = this.setItemState(allItems[i], false, false) || changed;	
-			}else{
-				changed = this.setItemState(allItems[i], true, false) || changed;	
-			}
-						
+			if (!found)			
+				changed = this.setItemState(allItems[i], false, false) || changed;						
 		}
-	
-		if (changed){
+		for (var i=0; i< items.length; i++)
+			changed = this.setItemState(items[i], true, false) || changed;		
+		
+		if ((changed)&&(!silent))
+		{
 			var evt = new Tevent(Tevent.CHANGE, this.getSelectedItems());
 			this.dispatchEvent(evt);
 		}		
