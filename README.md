@@ -95,7 +95,6 @@ You put a component in HTML page (or in another HTML component) like this:
             env: "dev", // dev or prod
             appName: "myapp"
             appVersion: "0.1", 
-            version: "0.9.1",  //panjs version
             
             namespaces:{
               "core": {path: "../core"},    //panjs "core" directory

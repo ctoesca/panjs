@@ -2,7 +2,8 @@ var defaultSettings = {
 		appVersion: "1.0.0",
 		logLevel	: "DEBUG",
 		env			: "dev",
-		version 	: "0.9.1",
+		version 	: "0.9.2",
+		addIdClass  : false,
 		preserveElementsId: false,
 		setSourceInComponents: false,
 		stats: {
@@ -21,7 +22,7 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 
 	var iever = getIEVersion();
     if ((iever < 9) && (iever >0))
-    	alert("Internet Explorer "+getIEVersion()+" is not supported");
+    	alert("Internet Explorer "+iever+" is not supported");
 
 	if (!panjs.appName)
 		throw "Config ERROR: panjs.appName is missing";
@@ -254,8 +255,12 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 				}
 				
 				DOMel.setAttribute("id", nodeName + _idList[nodeName]);		
-				DOMel.setAttribute("data-original-id", originalId);			
+				DOMel.setAttribute("data-original-id", originalId);	
 			}
+
+			if (panjs.addIdClass)
+				DOMel.className += " "+originalId;
+
 		}
 			
 	}

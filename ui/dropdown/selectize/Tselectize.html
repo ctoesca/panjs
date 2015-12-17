@@ -326,6 +326,7 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 	},
 	getSelectedItems: function()
 	{		
+		
 		var selId = this._control.getValue();	
 		var r = [];
 
@@ -338,6 +339,7 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 
 	setSelectedItems: function(arr, silent)
 	{
+
 		if ((this._control != null))
 		{
 			var items = [];
@@ -365,6 +367,7 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 		if (this.opened == true)
 		this.dispatchEvent( new Tevent(Tevent.CLOSE));
 		this.opened = false;
+		return false;
 	},
 	_onChanged: function(e, data)
 	{

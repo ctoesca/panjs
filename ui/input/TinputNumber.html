@@ -96,20 +96,16 @@ defineClass("TinputNumber", "panjs.ui.input.TmaskInput.html", {
 	{
 		var r = this.input.val();
 		
-		r = r.replace(/,/g, ".");
+		r = r.replace(/,/g, ".");	
 		
-		if (this.isValid() === true)
-		{
-		
-			if (r != ""){
-				if (this.format == "float")
-					r = parseFloat(r);
-				else
-					r = parseInt(r);
-			}
-			else{
-				r = null;
-			}
+		if (r != ""){
+			if (this.format == "float")
+				r = parseFloat(r);
+			else
+				r = parseInt(r);
+		}
+		else{
+			r = null;
 		}
 		
 		return r;

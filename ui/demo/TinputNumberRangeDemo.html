@@ -1,0 +1,51 @@
+﻿<html>        
+  <head>
+
+
+    <script data-subtype="text/x-class-definition">
+
+//<![CDATA[      
+
+defineClass("TinputNumberRangeDemo", "panjs.ui.demo.TbaseDemo.html", { 
+
+  baseElement: "div", 
+      
+    constructor: function(args){
+      this._super.constructor.call(this,args);       
+      this.compo.on(Tevent.CHANGE, this._onChange.bind(this));
+  },
+  _onChange: function(e){
+    this.result.text("this.inputNumberRange.val() = "+JSON.stringify(this.compo.val()));
+  }
+
+});
+//]]>
+</script>
+
+</head>
+<body>
+  
+		<div class="row">  
+         
+          <div class="col-sm-6" >    
+              <p><b>Description:</b> Composant de saisie d'une plage de valeurs (float ou integer).
+              </p>
+             
+          </div>
+
+          <div class="col-sm-6">
+              
+              <pre>&lt;div data-compo="panjs.ui.input.TinputNumberRange.html" data-format="float" data-min="0" data-max="10" /&gt; </pre> 
+
+             	<div id="compo" data-compo="panjs.ui.input.TinputNumberRange.html" data-format="float" data-min="0" data-max="10"/>
+              <p class="result"><code id="result"></code></p>
+          </div>
+      
+    </div>
+
+ 
+    
+
+       
+</body>
+</html> 

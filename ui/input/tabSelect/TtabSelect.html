@@ -78,6 +78,7 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 	canUnselectAll: true,
 	elements: null,
 	labelField: null,
+	count: 0,
 
 	/* METHODES */
 	constructor: function(args){
@@ -99,6 +100,7 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 	init: function()
 	{
 		this.container.html("");
+		this.elements = [];
 		for (var i=0; i< this._dp._source.length; i++)
 		{
 			var item = this._dp._source[i];
@@ -243,6 +245,9 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 
 	setDataProvider: function(dp)
     {
+    	if ((dp.length > 0) && (typeof dp.getItems()[0] != "object"))
+    		throw "TtabSelect.setDataProvider must contain objects";
+
         this._dp = dp;
         this.init();
     },
@@ -265,13 +270,48 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 			r = items[0];
 		return r;
 	},
-	setSelectedItemByValue:function( value ){
-		var item = this.getDataProvider().getByProp("value", value);
-		this.setSelectedItem(item);
-	},
 	setSelectedItem:function( item ){
 		this.setSelectedItems([item]);
 	},
+
+
+	getSelectedValues:function( valueField ){
+		var items = this.getSelectedItems();
+		var r = [];
+		if (items.length > 0){
+			for (var i=0; i< items.length; i++){
+				if (typeof items[i] == 'object')
+					r.push(items[i][valueField]);
+				else
+					r.push(items[i]);
+			}
+		}
+		return r;
+	},	
+
+	setSelectedValues:function( values, valueField ){
+		
+		if (typeof values.push != 'function')
+			values = [ values ];
+		
+		var changed = false;
+		var items = [];
+
+		for (var i=0; i< values.length; i++)
+		{
+			var item = this.getDataProvider().getByProp(valueField, values[i]);		
+			if (items != null)	
+				items.push(item);
+		}
+		
+		this.setSelectedItems(items);
+	},
+	
+	isSelected: function(item){
+		var el = this.getElementFromItem(item);
+		return el.hasClass("active");
+	},
+
 	getSelectedItems:function()
 	{
 		var r = [];
@@ -284,19 +324,35 @@ defineClass("TtabSelect", "panjs.core.display.Telement", {
 	},
 	setSelectedItems:function(items)
 	{
-
 		if (!Array.isArray(items))
 			items = [items];
-
+				
 		var changed = false;
-		for (var i=0; i< items.length; i++)
-		changed = changed || this.setItemState(items[i], true, false);	
+		var allItems = this.getDataProvider().getItems();
+
+		for (var i=0; i< allItems.length; i++)
+		{
+			var found = false;
+			for (var j=0; j< items.length; j++)
+			{
+				if (items[j] == allItems[i])
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found){
+				changed = this.setItemState(allItems[i], false, false) || changed;	
+			}else{
+				changed = this.setItemState(allItems[i], true, false) || changed;	
+			}
+						
+		}
 	
 		if (changed){
 			var evt = new Tevent(Tevent.CHANGE, this.getSelectedItems());
 			this.dispatchEvent(evt);
-		}
-		
+		}		
 	}	
 
 });

@@ -1,0 +1,114 @@
+﻿<html>        
+	<head>
+	
+	<style type="text/css">
+		.result{
+			margin-top:5px;
+			font-family: Consolas;
+			font-size:0.8em;
+		}
+	</style>
+
+	<script data-subtype="text/x-class-definition">
+
+//<![CDATA[      
+
+defineClass("TtabSelectDemo", "panjs.ui.demo.TbaseDemo.html", { 
+
+	baseElement: "div", 
+	
+	constructor: function(args){
+		
+		this._super.constructor.call(this,args);  
+		var dp = [
+			{label:"item1", id:1},{label:"item2", id:2},{label:"item3", id:3},{label:"item4", id:4}
+		];
+		this.tabSelect1.setDataProvider( new TarrayCollection(dp));
+		this.tabSelect1.on(Tevent.CHANGE, this.onTabChanged.bind(this),null, this.result1);
+		this.onTabChanged({currentTarget:this.tabSelect1, relatedData: this.result1});
+
+		this.tabSelect2.setDataProvider( new TarrayCollection(dp));
+		this.tabSelect2.on(Tevent.CHANGE, this.onTabChanged.bind(this),null, this.result2);
+		this.onTabChanged({currentTarget:this.tabSelect2, relatedData: this.result2});
+
+		this.tabSelect3.setDataProvider( new TarrayCollection(dp));
+		this.tabSelect3.on(Tevent.CHANGE, this.onTabChanged.bind(this),null, this.result3);
+		this.onTabChanged({currentTarget:this.tabSelect3, relatedData: this.result3});
+
+	},
+	onTabChanged: function(e){
+
+		var html = 	'<b>this.tabSelect.getSelectedItems() = </b>'+JSON.stringify(e.currentTarget.getSelectedItems())+'<br/>';
+		html += '<b>this.tabSelect.getSelectedValues("id") = </b>'+JSON.stringify(e.currentTarget.getSelectedValues("id"));
+
+		e.relatedData.html( html);
+	}
+
+});
+//]]>
+</script>
+
+</head>
+<body>
+
+<div class="row">  
+<div class="col-sm-12" >    
+<p>Affectation d'une liste d'objets:</p>
+<pre><code>var dp = [
+	{label:"item1", id:1},
+	{label:"item2", id:2},
+	{label:"item3", id:3},
+	{label:"item4", id:4}
+];
+this.tabSelect.setDataProvider( new TarrayCollection(dp));</code></pre>
+</div>
+</div>
+
+
+
+	<div class="row">           
+					<div class="col-sm-4" >    
+							<p>Comportement par défaut. L'attribut <code>label-field</code> est obligatoire.
+							</p>            
+					</div>
+					<div class="col-sm-8 rendu">							
+<pre><code class="language-html hljs xml">&lt;div data-compo="panjs.ui.input.tabSelect.TtabSelect.html" data-label-field="label" /&gt; </code></pre> 
+
+							<div id="tabSelect1" data-compo="panjs.ui.input.tabSelect.TtabSelect.html" data-label-field="label"/>
+							<div class="result" id="result1"></div>
+					</div>      
+		</div>
+
+
+<hr/>
+
+ <div class="row">          
+					<div class="col-sm-4" >    
+							<p>En mode multi-sélection: <code>singleSelection=false</code>.
+							</p>           
+					</div>
+					<div class="col-sm-8 rendu">
+<pre><code class="language-html hljs xml">&lt;div data-compo="panjs.ui.input.tabSelect.TtabSelect.html" data-single-selection="false" data-label-field="label" /&gt;</code></pre> 
+							<div id="tabSelect2" data-compo="panjs.ui.input.tabSelect.TtabSelect.html" data-single-selection="false" data-label-field="label"/>
+							<div class="result" id="result2"></div>
+					</div>      
+		</div>
+
+<hr/>
+
+	 <div class="row">        
+					<div class="col-sm-4" >    
+							<p>Obligation de sélectionner au moins 1 élément: <code>canUnselectAll=false</code>.
+							</p>            
+					</div>
+					<div class="col-sm-8 rendu">
+<pre><code class="language-html hljs xml">&lt;div data-compo="panjs.ui.input.tabSelect.TtabSelect.html" data-can-unselect-all="false" data-single-selection="false" data-label-field="label" /&gt;</code></pre> 
+							<div id="tabSelect3" data-compo="panjs.ui.input.tabSelect.TtabSelect.html" data-can-unselect-all="false" data-label-field="label" data-single-selection="false"/>
+							<div class="result" id="result3"></div>
+					</div>    
+		</div>
+
+
+
+</body>
+</html> 

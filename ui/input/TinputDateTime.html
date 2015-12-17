@@ -82,8 +82,9 @@ defineClass("TinputDateTime", "panjs.core.display.Telement", {
 			if (typeof args.format != "undefined")
 				this.opt.format = args.format;
 			
-			if (typeof args.picktime != "undefined")
+			if (typeof args.picktime != "undefined"){
 				this.pickTime = args.picktime;
+			}
 
 
 			if (typeof args.icon != "undefined")
@@ -123,8 +124,7 @@ defineClass("TinputDateTime", "panjs.core.display.Telement", {
 
 			if (typeof args.placeholder != "undefined")
 				this.placeholder = args.placeholder;
-			else
-				this.placeholder = this.opt.format;
+			
 		}
 
 

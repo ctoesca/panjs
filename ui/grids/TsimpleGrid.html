@@ -353,13 +353,22 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		this._cols[indx] = col;
 		this.refresh();
 	},
+	
+	setCols: function(cols){
+		this._cols = [];
+		this.addCols(cols, 0);
+	},
+
 	addCols : function(cols, indx)
 	{
+		if (arguments.length  == 1 )
+			var indx = this._cols.length;
+
 		//Col exemple: { field: "warning" , searchable:false, title:"Warning", cellClass:"cellWarning",  headerClass:"cellWarning", itemRenderer:"TdateItemRenderer"}
 		for (var i=cols.length-1; i>=0; i--)
 		{
 			var col = cols[i];
-			col.index = i;
+			
 			var u = "undefined";
 			if (typeof col.sortable == u) col.sortable = false;
 			if (typeof col.nullLabel == u) col.nullLabel = "";
@@ -380,9 +389,17 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 			this._cols.splice(indx, 0, col);
 		
 		}
+		for (var i=0; i< this._cols.length; i++)
+		{
+			this._cols[i].index = i;
+		}
 	},
 	_onShow: function()
 	{
+	},
+	
+	_detachDataprovider: function(){
+		this._dataProvider.offByCtx(this);
 	},
 
 	setDataProvider: function(dataProvider)
@@ -390,6 +407,10 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		
 		if (this._dataProvider != dataProvider)
 		{
+			if (this._dataProvider != null){
+				this._detachDataprovider();
+			}
+
 			this._dataProvider = dataProvider;
 			if (!this.progressiveLoad){
 				this.sectionRecordsCount = 100000;
@@ -404,11 +425,11 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 			}
 
 			
-			this._dataProvider.on(Tevent.UPDATE, this._onItemUpdated.bind(this));
-			this._dataProvider.on(Tevent.DELETE, this._onItemRemoved.bind(this));
-			this._dataProvider.on(Tevent.ADDED, this._onItemAdded.bind(this));
-			this._dataProvider.on(Tevent.REFRESH, this.refresh.bind(this));
-			this._dataProvider.on(Tevent.REPLACE, this._onItemReplaced.bind(this));
+			this._dataProvider.on(Tevent.UPDATE, this._onItemUpdated,this);
+			this._dataProvider.on(Tevent.DELETE, this._onItemRemoved, this);
+			this._dataProvider.on(Tevent.ADDED, this._onItemAdded, this);
+			this._dataProvider.on(Tevent.REFRESH, this.refresh, this);
+			this._dataProvider.on(Tevent.REPLACE, this._onItemReplaced, this);
 		}
 
 		this._createTable();
@@ -1166,6 +1187,6 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
     <!--CONTENT-->
     
 
-     <h2 id="scrollWait" class="scrollWait">Chargement en cours...</h2>
+     <h2 id="scrollWait" style="display:none" class="scrollWait">Chargement en cours...</h2>
 </body>
 </html> 

@@ -1,45 +1,14 @@
 <html>        
 <head>
-<!--
-https://github.com/One-com/one-validation
-
-
-
-    function position(error, $target) {
-        /*jshint validthis:true */
-        error.css('position', 'absolute');
-
-        var offset = $target.offset(),
-            location = $target[0].getAttribute('data-location') || this.options.location;
-
-        if (filters.topbottom.test(location)) {
-            error.offset({left: offset.left});
-
-            if (location === 'top') {
-                error.offset({top: offset.top - error.outerHeight() - 2});
-            }
-
-            if (location === 'bottom') {
-                error.offset({top: offset.top + error.outerHeight()});
-            }            
-        } else if (filters.leftright.test(location)) {
-            error.offset({top: (offset.top + $target.outerHeight() / 2) - (error.outerHeight() / 2)});
-
-            if (location === 'left') {
-                error.offset({left: offset.left - error.outerWidth() - 2});
-            }
-
-            if (location === 'right') {
-                error.offset({left: offset.left + $target.outerWidth() + 2});
-            }            
-        }        
-    }
-
-    -->
-<script src="../../lib/opentip/2.4.6/downloads/opentip-jquery.min.js"></script>
-<link href="../../lib/opentip/2.4.6/css/opentip.css" rel="stylesheet" type="text/css" />
 
 <style type="text/less">	
+
+.tooltip-error.tooltip.top .tooltip-inner {
+    background-color:#d9534f;
+}
+.tooltip-error.tooltip.top .tooltip-arrow {
+    border-top-color: #d9534f;
+}
 
 .TmaskInput
 {
@@ -48,7 +17,7 @@ https://github.com/One-com/one-validation
 .TmaskInput.error{
 		color:#c9302c;
 		border-color:#c9302c;
-		border-width: 1px;
+		border-width: 2px;
 	}
 </style>
 
@@ -64,7 +33,7 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 	required: false,
 	size: null,
 	_oldValue: null, 
-	inputOpentip: null,
+	tooltipIsSet: false,
 
 	constructor: function(args){
 		
@@ -104,6 +73,8 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 		this.val(v);
 		this._setEvents();
 	
+		this.input.attr("data-toggle", "tooltip");
+		this.input.attr("data-placement", "top");
 	},
 
 	setPlaceholder: function(v){
@@ -111,8 +82,8 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 	},
 	free: function(){
 		this._super.free.call(this);
-		if (this.inputOpentip){
-			this.inputOpentip.deactivate();
+		if (this.tooltipIsSet){
+			this.input.tooltip("destroy");
 		}
 	},
 	enabled: function(v){
@@ -150,24 +121,42 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 	hideError: function(v)
 	{
 		this.container.removeClass("error");
-		if (this.inputOpentip)
-			this.inputOpentip.deactivate();
+
+		if (this.tooltipIsSet)
+			this.input.tooltip("destroy");
+		this.tooltipIsSet = false;
+		this.errorText = "";
 	},
+
 	showError: function(v)
 	{
-		this.container.addClass("error");
-		
-		if (this.inputOpentip == null)
-		{
-			Opentip.lastZIndex = 100000;
-			this.inputOpentip = new Opentip(this.container, { showOn: 'mouseover', style: 'alert', 'removeElementsOnHide': true });
-		}
+			this.container.addClass("error");
+					
+			if (this.tooltipIsSet)
+			{	
+				if (this.errorText != v){
+					this.input.tooltip('destroy');	
+					callLater(this._initTooltip.bind(this), 200, v);
+				}
 
-		this.inputOpentip.setContent(v);
-      	this.inputOpentip.activate();
-      	this.inputOpentip.show();
+			}else{
+				if (this.errorText != v)
+					this._initTooltip(v);
+			}
+			this.errorText = v;		
+			this.tooltipIsSet = true;
+
 	},
-	
+
+	_initTooltip: function(title){
+		//logger.error("_initTooltip "+title);
+		this.input.tooltip({
+			template: '<div class="tooltip tooltip-error" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
+			title: title
+		});	
+		this.input.tooltip("show");
+	},
+
 	isNumberKey: function(evt)
 	{
 		return isNumberKey(evt);
@@ -201,20 +190,25 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 		{
 			isOk = "Valeur incorrecte";			
 		}
+
 		return isOk;
 	},
 	_onChange:function(e)
 	{	
-		var isValid = this.isValid();
-
-		if (isValid === true){
-			this.hideError();
-		}
-		else{
-			this.showError(isValid);
-		}
-		var value = this.val();
+		
+		var value = this.container.val();
+		
 		if (this._oldValue != value){
+
+			var isValid = this.isValid();
+
+			if (isValid === true){
+				this.hideError();
+			}
+			else{
+				this.showError(isValid);
+			}
+
 			if ((typeof e != "undefined") && ((e.type == 'change') || (e.type == 'keyup')))
 				this.dispatchEvent( new Tevent(Tevent.CHANGE, {sender:this, value: value}));
 		}
