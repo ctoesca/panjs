@@ -42,16 +42,28 @@ $.fn.load = function(args) {
 
 			var id = el.attr("id");
 
-			if (arguments.length == 0) {
-				var args = el.data("args");
+			if (arguments.length == 0){
+				var args = {};	
 			}
 
-			if (typeof args == "undefined")
-				args = {};
+			if (typeof el.data("args") != "undefined")
+			{
+				var _args = el.data("args");
+				for (var k in args)
+					_args[k] = args[k];
+				args = _args;
+			}
 
-			//panjs.setElementArgs(args.elem, args);
+			var owner = null;
+			if (el[0].owner){
+				owner = el[0].owner;
+			}else if (args.owner){
+				owner = args.owner;
+			}
+
 
 			args.elem = el[0];
+			args.owner = owner;
 
 			var compo = panjs.createComponent(dataCompo, args, false);
 
@@ -62,12 +74,16 @@ $.fn.load = function(args) {
 			compo.container.attr("data-original-id", originalId);
 
 			
-			if (el[0].owner)
-				el[0].owner._onSubComponentLoaded(compo, el, args);
-			/*<ENV:dev>*/
-			else
+			if (owner){
+				owner._onSubComponentLoaded(compo, el, args);			
+			}	
+			else{							
+				logger.debug("owner not set: dataCompo="+dataCompo+" originalId="+originalId);
+				/*<ENV:dev>*/
         		panjs.capture("$.fn.load: createComponent without owner",{componentId: compo.id, classPath: compo.classPath, from: null});
-        	/*</ENV:dev>*/
+        		/*</ENV:dev>*/
+			}
+        	
 
 
 			el.trigger(Tevent.LOADED, [compo, args]);

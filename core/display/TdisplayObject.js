@@ -33,8 +33,8 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 
 	container:null,
 	id:null,
-	parent:null,
-	_parent:null,
+	owner:null,
+
 	visible:true,	//Etat de départ
 	autoload: true,
 	

@@ -14,7 +14,21 @@
 	height: 100%;
 }
 
-
+.Ttabnav .close-tab-btn{
+	display:none;
+	border-radius: 0;
+    padding: 2px;
+    margin-left: 10px;
+    vertical-align: inherit;
+}
+.Ttabnav li.active .close-tab-btn{
+	display: inline-block;
+}
+.Ttabnav label{
+	margin-bottom: auto;
+    font-weight: normal;
+    cursor: inherit;
+}
 </style>
 
 <script data-subtype="text/x-class-definition">
@@ -24,43 +38,52 @@
 defineClass("Ttabnav", "panjs.core.display.Telement", { 
 
 	baseElement: "div",	
-	tabs: null,
+	_tabs: null,
 	selectedIndex: 0,
-	headersStyle: null,
-	headersClass: null,
-	autoloadComponents: true,
+	_headersStyle: null,
+	_headersClass: null,
+	_autoloadComponents: true,
+	_showCloseButton: false,
 	
 	constructor: function(args)
 	{	
 		this._super.constructor.call(this,args);
-		this.tabs = [];
+		this._tabs = [];
 
-		if (defined(args, "selectedIndex"))
-			this.selectedIndex = args["selectedIndex"];
-		if (defined(args, "headersStyle"))
-			this.headersStyle = args["headersStyle"];
-		if (defined(args, "headersClass"))
-			this.headersClass = args["headersClass"];
-		if (defined(args, "autoloadComponents"))
-			this.autoloadComponents = args["autoloadComponents"];
+		this.injectParam("selectedIndex", args.selectedIndex);
+		this.injectParam("_headersStyle", args.headersStyle);	
+		this.injectParam("_headersClass", args.headersClass);	
+		this.injectParam("_autoloadComponents", args.autoloadComponents);	
+		this.injectParam("_showCloseButton", args.showCloseButton);	
+
 
 
 		/* Attention sur IE childnodes bouge quand on modifie le conteneur */
 		var tabIndx = -1;
+		var children = [];
 		for (var i=0; i < this.content[0].childNodes.length; i++)
 		{
-			var node = this.content[0].childNodes[i];
+			var child = this.content[0].childNodes[i];
+			children.push( child );
+		}
 
-			if (node.nodeType == 1)
+		for (var i=0; i < children.length; i++)
+		{
+			var child = children[i];
+
+			if (child.nodeType == 1)
 			{	
 				tabIndx ++;
-				el = $(node);
+				el = $(child);
 				
 				this._createTab(el);	
 			}	
 		}
-	
-		this.selectTab(this.selectedIndex);
+
+			
+
+		if (tabIndx > -1)
+			this.selectTab(this.selectedIndex);
 
 		
 	},
@@ -96,204 +119,353 @@ defineClass("Ttabnav", "panjs.core.display.Telement", {
 		logger.debug("FIN _populateElements ***************** "+element.outerHTML);
 		return r;
 	},*/
-	addTab: function(opt){
-		var el;
-		if (opt.html){
-			el = $(opt.html);
-		}
-		else{
-
-			if (opt.el instanceof jQuery)
-			{
-				el = opt.el;
-			}else{
-				if (opt.el instanceof TdisplayObject)
-					el = opt.el.container;
-				else
-					throw "addTab: opt.el type unknown";
-			}
-		}
-		var tabIndx = this.tabs.length;
+	addTab: function(el, label, opt){
 		
-		var label = el.attr("label");
-		if (label == null){
-			if (typeof opt.label  != "undefined"){
-				el.attr("label", opt.label);
-			}else{
+		var tabIndx = this._tabs.length;
+		if (arguments.length < 3)
+			var opt = {};
 
-			}
-		}
-		
-		var autoloadComponents = el.attr("data-autoload-components");
-		if (autoloadComponents == null)
-			if (typeof opt.autoloadComponents != "undefined")
-				el.attr("data-autoload-components", opt.autoloadComponents);
-
-		return this._createTab(el);	
-
-	},
-    _createTab: function(el)
-	{
-	
-		var label = el.attr("label");
-		if (label == null){
-			var labelElement = el.getElement("label");
-
-			if (labelElement == null){
-				label = el.attr("id");
+		if (!(el instanceof jQuery))
+		{
+			if (typeof el == "string"){
+				el = $(el);
 			}
 			else{
-				label = labelElement.html();
-				labelElement.remove();
+
+				if (el instanceof TdisplayObject)
+					el = el.container;
+				else
+					throw "addTab: element type unknown. Accepts: string HTML, jquery object, panjs.core.display.TdisplayObject";
 			}
 		}
 
-		var autoloadComponents = this.autoloadComponents;
+		if (arguments.length < 2)
+			var label = this._getElementLabel(el, tabIndx);			
+		
+		var autoloadComponents = el.attr("data-autoload-components");
+
+		if (autoloadComponents == null){
+			if (typeof opt.autoloadComponents != "undefined")
+				el.attr("data-autoload-components", opt.autoloadComponents);
+			if (typeof opt.showCloseButton != "undefined")
+				el.attr("data-visible", opt.showCloseButton);
+			if (typeof opt.visible != "undefined")
+				el.attr("data-visible", opt.visible);
+			
+		}
+
+		var tab = this._createTab(el, label);	
+	
+		this.owner.processElement(tab.elem);
+		return tab;
+
+	},
+
+	_getElementLabel: function(el, indx){
+		
+		var label = "tab";
+		if (arguments.length > 1 )
+			label += indx;
+
+		if (el.attr("data-label"))
+		{
+			label = el.attr("data-label");
+		}else{
+			var labelElement = el.getElement(">label");
+			if (labelElement != null){
+				label = labelElement;
+			}
+		}
+
+		return label;
+	},
+
+    _createTab: function(el, label)
+	{	
+		var indx = this._tabs.length;
+		if (arguments.length == 1)
+			var label = this._getElementLabel(el);
+
+		var autoloadComponents = this._autoloadComponents;
 		if (el.attr("data-autoload-components") != null)
 			autoloadComponents = (el.attr("data-autoload-components") == "true");
 
+		var showCloseButton = this._showCloseButton;
+		if (el.attr("data-show-close-button") != null)
+			showCloseButton = (el.attr("data-show-close-button") == "true");
+
 		var visible = false;
-		if (el.attr("visible") != "false") visible = true;
+		if (el.attr("data-visible") != "false") visible = true;
 		
 		el.addClass("tab-pane");
 
 
 		var headersStyle = "";	
-		if (this.headersStyle != null)
-			headersStyle = this.headersStyle;
+		if (this._headersStyle != null)
+			headersStyle = this._headersStyle;
 
 		var headersClass = "";	
-		if (this.headersClass != null)
-			headersClass = this.headersClass;
+		if (this._headersClass != null)
+			headersClass = this._headersClass;
 
-		var li = $('<li style="'+headersStyle+'" class="'+headersClass+'"/>');
+		var li = $('<li style="'+headersStyle+'" class="'+headersClass+'"></li>');
 		if (visible == false)
 			li.css("display", "none");
 			
-		var a = $('<a href="#'+el.attr("id")+'" tabIndex="'+(this.tabs.length)+'" data-toggle="tab">'+label+'</a>');
-		a.on('show.bs.tab', this.onTabClick.bind(this));
+		var a = $('<a tabIndex="'+indx+'" data-toggle="tab"></a>');
+		a.append(label);
+		a.on('show.bs.tab', this._onTabClick.bind(this));
 
 		li.append(a);
+
+		if (showCloseButton){
+			var closeBtn = $('<button class="close-tab-btn btn btn-default btn-xs"><i style="float:right" class="fa fa-remove"></i></button>');
+			closeBtn.on("click", this._onCloseTabClick.bind(this));
+			a.append(closeBtn);
+		}
+
+		
+		el.attr("data-index", indx);
+		el.attr("data-visible", visible);
+
 		this.myTab.append(li);
 		this.tabContent.append(el);
-		var tab = {elem:el, link:a, li: li, visible: visible, subComponentsLoaded: false, autoloadComponents: autoloadComponents};
-		this.tabs.push(tab);
+		var tab = {index: indx, elem:el, link:a, li: li, visible: visible, subComponentsLoaded: false, autoloadComponents: autoloadComponents};
+		this._tabs.push(tab);
+
+
 		return tab;
+	},
+	
+	destroyAllTab: function(){
+		var count = this._tabs.length;
+		for (var i = 0; i < count; i++){
+			this.destroyTab(0);
+		}
+	},
+	destroyTab: function(indx){
+
+		var tab = this._getTabObjectByIndex(indx);
+
+		var r = false;
+		if (tab != null)
+		{
+			var evt = new Tevent(Ttabnav.BEFORE_TAB_DESTROY, {indx:indx})
+			this.dispatchEvent( evt );
+
+			if (!evt.defaultPrevented)
+			{
+				var isLast = (indx == this._tabs.length-1);
+				var compos = this._getSubComponents(tab.elem[0])	
+				for (var i = 0; i < compos.length; i++) 
+				{
+					var compo = compos[i];
+					if (compo.isLoaded())
+						compo.free();				
+				}
+				
+				tab.elem.remove();
+				tab.li.remove();
+				this._tabs.splice(indx,1);
+
+				this._setTabIndexOnLinks();
+				
+				r = true;
+
+				var evt = new Tevent(Ttabnav.TAB_DESTROY, {indx:indx})
+				this.dispatchEvent( evt );		
+				if (evt.defaultPrevented)
+					return false;
+
+				if (isLast)
+					this.selectTab( indx-1 );
+				else
+					this.selectTab( indx );
+				
+			}else{
+				r = false;
+			}
+
+		}
+		return r;
+	},
+
+	_setTabIndexOnLinks: function(){
+		for (var i = 0; i < this._tabs.length; i++){
+			this._tabs[i].index = i;
+			this._tabs[i].link.attr("tabIndex", i);
+			this._tabs[i].elem.attr("data-index", i);
+		}
+	},
+
+	free: function(){
+		for (var i=0; i< this._tabs.length; i++){
+			this.destroyTab(i);
+		}
+		this._super.free.call(this);
 	},
 	getTabByIndex: function(indx){
 		var r = null;
-		if (typeof this.tabs[indx] != "undefined")
-			r = this.tabs[indx];
+		if (typeof this._tabs[indx] != "undefined"){
+			var tab = this._tabs[indx];
+			r = {
+				elem: tab.elem,
+				visible: tab.visible
+			}
+		}
 		return r;
 	},
+
+	_getTabObjectByIndex: function(indx){
+		var r = null;
+		if (typeof this._tabs[indx] != "undefined")
+			r = this._tabs[indx];
+		return r;
+	},
+	getTabsCount: function(){
+		return this._tabs.length;
+	},
+	
 	setLabel: function(tab, value){
 		//!! bind sur objet tab
 		if (typeof tab == "number")
-			var tab = this.getTabByIndex(tab);
+			var tab = this._getTabObjectByIndex(tab);
 
 		if (tab != null){
 			tab.link.html(value);
 		}
 	},
-	onTabClick: function(e)
+	_onCloseTabClick: function(e){
+		var a = $(e.target).closest('a[data-toggle="tab"]');
+		var indx = a.attr("tabIndex");
+		this.destroyTab(indx);
+		e.preventDefault();
+		return false;
+	},	
+	_onTabClick: function(e)
 	{
-		var a = $(e.target);
+		var a = $(e.target).closest('a[data-toggle="tab"]');
 		var indx = a.attr("tabIndex");
 		this.selectTab(indx);
 		e.preventDefault();
-		return;
+		return false;
 	},
 
 	_inactivateAll: function()
 	{
-		for (var i=0; i<this.tabs.length; i++){
-			this.tabs[i].elem.removeClass("active");
-			this.tabs[i].link.removeClass("active");
-			this.tabs[i].li.removeClass("active");
+		for (var i=0; i<this._tabs.length; i++){
+			this._tabs[i].elem.removeClass("active");
+			this._tabs[i].link.removeClass("active");
+			this._tabs[i].li.removeClass("active");
 		}
 	},
 
-	_getSubComponentsFirstLevelNotLoaded: function( elem ){
+	_getSubComponents: function( elem ){
 		var r = [];
 		for (var i=0; i < elem.childNodes.length; i++)
 		{			
 			var el = elem.childNodes[i];
 			if (el.nodeType == 1)
 			{			
-				var dataType = el.getAttribute("data-compo");
-				//var autoload = (el.getAttribute("data-autoload") === "true");
-				var autoload = true;
-				var loaded = el.getAttribute("data-loaded");
-
-				if ((dataType != null)&&(autoload != false))
+				var jqElem = $(el);
+				if (jqElem.isCompo() )
 				{
-					if (!loaded)
- 						r.push( el );
+					if (jqElem.isLoaded())
+ 						r.push( jqElem.getCompo() );
+ 					else
+ 						r.push( jqElem );
  				}else{
  					
- 					r.pushArray( this._getSubComponentsFirstLevelNotLoaded( el ) );
-
+ 					r.pushArray( this._getSubComponents( el ) );
  				}
-				
 			}
 		}
 		return r;
 	},
-	loadSubComponents: function(tab)
+	_loadSubComponents: function(tab)
 	{
-		if  ((this.parent == null)||(tab.subComponentsLoaded)|| (tab.autoloadComponents == false))
+		
+		if  ((this.owner == null)||(tab.subComponentsLoaded)|| (tab.autoloadComponents == false))
 			return;
-				
-		var composToLoad = this._getSubComponentsFirstLevelNotLoaded(tab.elem[0])
-		for (var i = 0; i < composToLoad.length; i++) {
-			var compoElem = composToLoad[i];
 
-			$(compoElem).load();
-			/*var origId = compoElem.getAttribute("data-original-id");
-			
-			if (origId)
-				this.parent[origId].load();*/
-			
+		var compos = this._getSubComponents(tab.elem[0])
+		
+		for (var i = 0; i < compos.length; i++) 
+		{
+			var compo = compos[i];
+
+			if (!compo.isLoaded())
+			{
+				
+				//!! ne pas appeler plusieurs fois processElement, même si ça fonctionne.
+				if (!compo.attr("data-original-id")){
+					//this.owner.processElement(compo);					
+				}
+				else{
+					//logger.error("PROCESS ELEMENT déjà fait : original-id="+compo.attr("data-original-id"));
+				}
+
+				compo.load();				
+			}			
 		};
+
 		tab.subComponentsLoaded = true;
 	},
 
 	selectTab: function(indx)
 	{
-		var tab = this.tabs[indx];
-		if (tab.visible == false)
-			this.showTab(indx);
 
-		this.loadSubComponents(tab);
-
-		this._inactivateAll();
-		tab.link.parent().addClass("active");
-		tab.link.focus();
-		tab.elem.addClass("active");
-		if (this.selectedIndex != indx)
+		if ((indx <= this._tabs.length-1)&&(indx >=0))
 		{
-			this.selectedIndex = indx;
-			this.dispatchEvent(new Tevent("TAB_CHANGE", {tab: tab.elem, indx:indx}));
+			var evt = new Tevent( Ttabnav.BEFORE_TAB_CHANGE, {indx:indx});
+			this.dispatchEvent(evt);
+			if (evt.defaultPrevented)
+				return false;
+
+			var tab = this._tabs[indx];
+			if (tab.visible == false)
+				this.showTab(indx);	
+	
+			this._loadSubComponents(tab);
+
+			this._inactivateAll();
+			tab.link.parent().addClass("active");
+			tab.link.focus();
+			tab.elem.addClass("active");
+			if (this.selectedIndex != indx)
+			{
+				this.selectedIndex = indx;
+				this.dispatchEvent(new Tevent( Ttabnav.TAB_CHANGE, {indx:indx}));
+			}
+
 		}
 		
 	},
 
 	hideTab: function(indx)
 	{
-		var tab = this.tabs[indx];		
+		var tab = this._tabs[indx];		
 		tab.li.hide();
 		tab.visible = false;
+		tab.elem.attr("data-visible", "false");
 	},
 	showTab: function(indx)
 	{
-		var tab = this.tabs[indx];		
+		var tab = this._tabs[indx];		
 		tab.li.show();
 		tab.visible = true;
+		tab.elem.attr("data-visible", "true");
 	}
 	
 	
 
 });
+
+Ttabnav.TAB_CHANGE = "TAB_CHANGE";
+Ttabnav.BEFORE_TAB_DESTROY = "BEFORE_TAB_DESTROY";
+Ttabnav.TAB_DESTROY = "TAB_DESTROY";
+Ttabnav.BEFORE_TAB_CHANGE = "BEFORE_TAB_CHANGE";
+
 //]]>
 </script>
 

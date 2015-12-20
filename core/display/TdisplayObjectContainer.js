@@ -22,7 +22,8 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         this._statesElements = [];
         this.currentState = [];
 
-        if (defined(this.html) && (this.html.trim() != "")) {
+        if (defined(this.html) && (this.html.trim() != "")) 
+        {
             this.container.html(this.html);
             this._populateElements(this.container[0], true);
         }
@@ -107,7 +108,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         if (this._children != null) {
             TdisplayObjectContainer._super.free.call(this);
             for (var i = 0; i < this._children.length; i++) {
-                this._children[i].free();
+                this._children[i].free();                
             }
 
             this._children = null;
@@ -180,7 +181,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
 
         var originalId = compo.container.attr("data-original-id");
 
-        panjs._setDOMId(compo.container[0], originalId, compo.classPath);
+        //panjs._setDOMId(compo.container[0], originalId, compo.classPath);
 
         /* el est l'élément Jquery d'origine */
         this.bindEvents(el, compo);
@@ -530,6 +531,9 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
     },
 
     _processElement: function(el, parent, setObject, autoload) {
+        if (el.owner)
+            return; 
+
         if (el.nodeType == 1) {
             //nodeType = ELEMENT	
 
@@ -540,19 +544,22 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
             var r = null;
 
             if (dataType == null) {
+                if (!el.owner){
 
-                if ((setObject) && (id != null)) {
-                    if (defined(this[id]))
-                        logger.error('1-Duplication du id "' + id + '" sur objet ' + this.className);
+                    el.owner = this;
+                    if ((setObject) && (id != null)) {
+                        if (defined(this[id]))
+                            logger.warn('1-Duplication du id "' + id + '" sur objet ' + this.className);
 
-                    var fId = panjs.getCamelCase(id);
-                    this[fId] = jqObj;
-                    panjs._setDOMId(el, id, dataType);
-                    //r.push(id);	
+                        var fId = panjs.getCamelCase(id);
+                        this[fId] = jqObj;
+                        panjs._setDOMId(el, id, dataType);
+                        //r.push(id);	
+                    }
+                    this.bindEvents(jqObj);
+                    this.processStates(el);
+                    this._populateElements(el, setObject);
                 }
-                this.bindEvents(jqObj);
-                this.processStates(el);
-                this._populateElements(el, setObject);
             } else {
                 if (dataType == this.classPath) {
                     logger.error("Référence circulaire dans " + this.classPath);
@@ -561,23 +568,19 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
                     if (arguments.length < 4 )
                         var autoload = !(el.getAttribute("data-autoload") === "false");
 
-                    if (autoload) {
+                    if (autoload)
+                    {
                         //creation instance du composant
                         var compo = this.createComponent(dataType, {
                             elem: el,
-                            parent: this
+                            owner: this
                         });
 
-
-                        /*if (compo.className == "TerrorElement"){
-                        	panjs.stack.push("Unable to create "+dataType+" : "+compo.message);
-                        }*/
-
-                        compo.parent = this;
+                        compo.owner = this;
 
                         if ((setObject) && (id != null)) {
                             if (defined(this[id]))
-                                logger.error('2-Duplication du id "' + id + '" sur objet ' + this.className);
+                                logger.warn('2-Duplication du id "' + id + '" sur objet ' + this.className);
 
                             this[id] = compo;
 
@@ -594,8 +597,8 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
 
                         compo.container[0].loaded = true;
                         compo.container[0].compo = compo;
-                        //logger.error(compo.id+" => "+compo.container[0].getAttribute("data-include-in"));
-
+                        compo.container[0].owner = this;
+                      
                         this.setStatesAttributes(el, compo.container[0]);
                         this.processStates(compo.container[0]);
 
@@ -603,30 +606,23 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
                         r = compo;
 
                     } else {
-                        panjs._setDOMId(el, id, dataType);
+                       
+                        
+                        if (!el.owner){
 
-                        jqObj[0].compo = null;
-                        jqObj[0].owner = this;
-                        this[id] = jqObj;
+                            panjs._setDOMId(el, id, dataType);
+                            jqObj[0].compo = null;
+                            jqObj[0].owner = this;
+                            this[id] = jqObj;
 
-                        this.processStates(el);
-                        //Le composant n'est pas instancié: on met un proxy à la place, qui a la fonction LOAD()
-
-                        /*uses("panjs.core.display.TproxyDisplayObject");
-                        var proxyCompo = new TproxyDisplayObject({sourceElement:el});
-                        proxyCompo.parent = this;
-                        el.loaded = false;
-                        el.compo = proxyCompo;
-                        $(el).hide();
-                        if ((setObject)&&(id != null))
-                        	this[id] = proxyCompo;*/
+                            this.processStates(el);
+                            //this._populateElements(el, setObject);    
+                        }
+                        
                     }
 
                 }
             }
-
-
-
 
         } else if (el.nodeType == 8) {
             var text = "";
@@ -643,7 +639,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         }
         return r;
     },
-    _populateElements: function(element, setObject) {
+    _populateElements: function(element, setObject, autoload) {
 
         //logger.info("_populateElements sur "+this.className+", element.id="+element.getAttribute("id")+", nodeName="+element.nodeName);
 
@@ -661,10 +657,14 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         Les 2 labels sont en fait injecté ici, mais ne font pas partie du template.
         */
 
+        
 
         for (var i = 0; i < element.childNodes.length; i++) {
             var el = element.childNodes[i];
-            this._processElement(el, element, setObject);
+            if (arguments.length < 3)
+                this._processElement(el, element, setObject);
+            else
+                this._processElement(el, element, setObject, autoload);
 
         }
         

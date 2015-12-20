@@ -55,11 +55,10 @@ defineClass("Telement", "panjs.core.display.TdisplayObjectContainer",
 				if (this.content != null)
 				{
 					if (this.sourceElement.innerHTML.trim() != ""){
-					
 						this.content[0].innerHTML = this.sourceElement.innerHTML;
-						if (typeof args.parent != "undefined"){
-							this.parent = args.parent;
-							args.parent._populateElements(this.content[0], true);
+						if (typeof args.owner != "undefined"){
+							this.owner = args.owner;
+							args.owner._populateElements(this.content[0], true);
 						}
 					}
 				}

@@ -2,7 +2,7 @@ var defaultSettings = {
 		appVersion: "1.0.0",
 		logLevel	: "DEBUG",
 		env			: "dev",
-		version 	: "0.9.2",
+		version 	: "0.9.3",
 		addIdClass  : false,
 		preserveElementsId: false,
 		setSourceInComponents: false,
@@ -460,7 +460,7 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 			}
 		}
 
-		logger.info("READY");
+		logger.info("READY. Panjs version: "+panjs.version);
 		if (arguments.length == 2)
 			onReady();
 	}

@@ -51,7 +51,7 @@ Tevent.HIDE = "hide";
 Tevent.HIDDEN = "hidden";
 Tevent.WAITING = "waiting";
 
-
-
+Tevent.BEFORE_DESTROY = "BEFORE_DESTROY";
+Tevent.DESTROY = "DESTROY";
 
 
