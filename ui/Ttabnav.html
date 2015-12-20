@@ -237,7 +237,7 @@ defineClass("Ttabnav", "panjs.core.display.Telement", {
 		return tab;
 	},
 	
-	destroyAllTab: function(){
+	destroyAllTabs: function(){
 		var count = this._tabs.length;
 		for (var i = 0; i < count; i++){
 			this.destroyTab(0);
@@ -263,7 +263,7 @@ defineClass("Ttabnav", "panjs.core.display.Telement", {
 					if (compo.isLoaded())
 						compo.free();				
 				}
-				
+
 				tab.elem.remove();
 				tab.li.remove();
 				this._tabs.splice(indx,1);
@@ -299,9 +299,7 @@ defineClass("Ttabnav", "panjs.core.display.Telement", {
 	},
 
 	free: function(){
-		for (var i=0; i< this._tabs.length; i++){
-			this.destroyTab(i);
-		}
+		this.destroyAllTabs();
 		this._super.free.call(this);
 	},
 	getTabByIndex: function(indx){
