@@ -139,7 +139,7 @@ defineClass("Ttabnav", "panjs.core.display.Telement", {
 			}
 		}
 
-		if (arguments.length < 2)
+		if ((arguments.length < 2) ||(label == null))
 			var label = this._getElementLabel(el, tabIndx);			
 		
 		var autoloadComponents = el.attr("data-autoload-components");
