@@ -1,8 +1,9 @@
 #panJS v1.0.0
 > A 40 ko javascript framework 
-<p><a href="http://www.nexilearn.com/panjs/doc/change-log/"><b>Change log</b></a>. <b>API documentation is coming soon!</b></p>
+<p><a href="http://www.nexilearn.com/panjs/doc/change-log/"><b>Change log</b></a>.</p>
+<p><b><a href="http://www.nexilearn.com/panjs/doc/69/">API documentation</a></b></p>
 
-panJs is a javascript framework that uses Jquery and allows you to create easily applications, making resusable components.
+<p>panJs is a javascript framework that uses Jquery and allows you to create easily applications, making resusable components.
 <br/>You can integrate panJS in a existing application (only parts of the application can be managed by panJs).
 </p>
 <p><a href="http://www.nexilearn.fr/libs/panjs/trunk/doc/examples/demo"><b>Basic demo</b></p>
