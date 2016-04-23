@@ -7,6 +7,13 @@
 .TmultiSelect{
 	display: inline-block;
 }
+.TmultiSelect div.btn-group{
+	width:100%;
+}
+.TmultiSelect button.multiselect{
+	width: 100%;
+	text-align: left;
+}
 
 </style>
 
@@ -21,10 +28,12 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 	_localDataProvider: null,
 	_enabled: true,
 
+
 	constructor: function(args){
 		
 		this._super.constructor.call(this,args);
 		this._opt = {
+			labelFunction: null,
 			multiple : true, 
 			fixedIcon: null,
 			labelField: "label",
@@ -70,6 +79,9 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 			this._button.prepend(this._opt.fixedIcon+' ');
 
 	},
+	setLabelFunction: function(f){
+		this._opt.labelFunction = f;
+	},
 	_buttonText: function(options, select) {
                 if (options.length === 0) {
                     return 'Aucun sélection ...';
@@ -111,15 +123,20 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 		for (var i=0; i< this._dataProvider._source.length; i++)
 		{
 			var it = this._dataProvider._source[i];
-						
+			
+			var label = it[ this._opt.labelField];
+			if (this._opt.labelFunction)
+				label = this._opt.labelFunction(it);
+			
 			this._localDataProvider.push({
-				label: it[ this._opt.labelField],
+				label: label,
 				value: it[ this._opt.valueField],
 				title: it[ this._opt.titleField],
 				selected: it[ this._opt.selectedField]
 			});
 
 		}
+		return this._localDataProvider;
 	},
 	setDataProvider: function(dp)
 	{
@@ -200,7 +217,7 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 		var values = [];
 		for (var i=0; i< arr.length; i++){
 			var item = arr[i];
-			values.push( arr[i][this._opt.valueField]); 
+			values.push( item[this._opt.valueField]); 
 		}
 
 		this.selectElem.multiselect('select', values); /* Pas d'evt onChange par défaut. mettre arg triggerOnChange ?*/
@@ -271,10 +288,11 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 			}
 
 			/* On envoie l'évènement seulement si onSelectAll ne sera pas déclenché 
-			(sinon, il y a 2 évt CHANGE qui pertent)
+			(sinon, il y a 2 évt CHANGE qui partent)
 			*/
 			var selCount = this.getSelectedCount();
-			if ((items.length > 0) && (selCount < this._dataProvider.length) && (selCount > 0))
+
+			if ((items.length > 0) && (selCount <= this._dataProvider.length) && (selCount > 0))
 			{
 				var evtData = {"items": items, "selected": checked};
 				this.dispatchEvent( new Tevent(Tevent.CHANGE, evtData));

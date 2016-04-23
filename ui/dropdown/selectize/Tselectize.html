@@ -33,6 +33,8 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 	theme: "default",
 	optgroupField: null,
 	optgroups: null,
+	closeAfterSelect: false,
+	openOnClick: false,
 
 	/* PRIVATE */
 	_data: null,
@@ -62,6 +64,10 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 		this.injectParam("canCreate", args["canCreate"]);
 		this.injectParam("optgroupField", args["optgroupField"]);
 		this.injectParam("optgroups", args["optgroups"]);
+		this.injectParam("closeAfterSelect", args["closeAfterSelect"]);
+		this.injectParam("openOnClick", args["openOnClick"]);
+
+		
 		
 
 		panjs.loader.loadCssFile(panjs.namespaces["panjs.core"].path+"/../lib/selectize/0.12.1/dist/css/selectize."+this.theme+".css");
@@ -182,6 +188,13 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 		this._control.$wrapper.attr("style", this._inlineStyle);	
 
 
+		if (this.openOnClick){
+			this._control.$wrapper.getElement(".selectize-input").on("click", function(e){	
+				this._control.open();
+			}.bind(this));
+		}
+
+
 		this.setPlaceholder(this.placeholder);
 		
 
@@ -208,7 +221,7 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 					openOnFocus: true,
 					maxOptions: 1000,
 					hideSelected: true,
-					closeAfterSelect: false,
+					closeAfterSelect: this.closeAfterSelect,
 					allowEmptyOption:false,
 					scrollDuration: 60,
 					dropdownParent: null,

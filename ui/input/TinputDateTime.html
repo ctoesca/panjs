@@ -261,6 +261,16 @@ defineClass("TinputDateTime", "panjs.core.display.Telement", {
 			this.val( m);
 		}
 	},
+	setMinDate: function(value)
+	{
+		this.widget.minDate(value);
+		
+	},
+	setMaxDate: function(value)
+	{
+		this.widget.maxDate(value);
+		
+	},
 	getTimeStamp: function()
     {
         var r = this.val(); 

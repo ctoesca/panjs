@@ -104,9 +104,10 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
     },
 
     free: function() {
+     
 
         if (this._children != null) {
-            TdisplayObjectContainer._super.free.call(this);
+           
             for (var i = 0; i < this._children.length; i++) {
                 this._children[i].free();                
             }
@@ -115,6 +116,8 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         }
         //inutile de désaffecter les events sur les objets jquery car remove() le fait.
         //!!par contre, ce n'est pas le cas pour les composants panjs (il faut appeler free() sur tous les compo)
+
+        TdisplayObjectContainer._super.free.call(this);
     },
     __OnPropChanged: function(propName, oldValue, newValue, object) {
         //logger.debug("__OnPropChanged : propName = "+propName+", oldValue = "+oldValue+", newValue = "+newValue);
@@ -526,6 +529,9 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
         
         if (opt && (opt.processStates == true))
             this.setState(this.currentState);
+        
+        if (r == null)
+            r = jqObject;
 
         return r;
     },
@@ -592,7 +598,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
 
                         jqObj.replaceWith(compo.container);
 
-                        compo.container.attr("data-loaded", "true");
+                      
                         el.setAttribute("data-loaded", "true");
 
                         compo.container[0].loaded = true;

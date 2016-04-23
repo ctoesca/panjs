@@ -14,23 +14,25 @@
 defineClass("TinputNumber", "panjs.ui.input.TmaskInput.html", { 
 
 	/* PROPRIETES */
-	errorText: "Nombre attendu",
+	
+	ERR_INCORRECT_VALUE: "Nombre attendu",
 	mask: /^\-?[0-9]+$/,
 	format: "integer",  //'float'|'integer'
-	min: 0,
+	min: null,
 	max: null,
 	
 	constructor: function(args){
 		this._super.constructor.call(this,args);
 		if (args.format)
 			this.format = args.format;
-		this.input.attr("type", "number");
+		//this.input.attr("type", "number");
 		this.setFormat(this.format);
 
 		if (typeof args.max != "undefined")
 			this.max = parseFloat(args.max);
 		if (typeof args.min != "undefined")
 			this.min = parseFloat(args.min);
+
 	},
 	setFormat: function(format){
 	
@@ -63,6 +65,10 @@ defineClass("TinputNumber", "panjs.ui.input.TmaskInput.html", {
 
 			var isDecimal = ( ((k==59)&&(shift==true)) || (k == 188) || (k==110));
 			
+			if ((this.min == null) || (this.min < 0))
+				if (((k==54)&&(shift==false)) || (k==109))
+					return true;
+
 			return isNumberKey(evt) || isControlKey(evt) || isDecimal;		
 		}else{
 			return isNumberKey(evt) || isControlKey(evt);
@@ -74,21 +80,33 @@ defineClass("TinputNumber", "panjs.ui.input.TmaskInput.html", {
 	{
 		var isOk = this._super.isValid.call(this);
 
+
 		if (isOk === true)
 		{
 			//nombre négatifs
 
 			var v = this.input.val();
-			if ((v.trim() == "") && (this.required)){
+			var isEmpty = ((v == null) || (v.trim() == ""));
+
+			if (  isEmpty && this.required){
 				isOk = "Valeur requise";
 			}
 			else{
-				v = parseFloat(v);
-				if ((this.min != null) && (v < this.min))
-					isOk = "Valeur min: "+this.min;
-				if ((this.max != null) && (v > this.max))
-					isOk = "Valeur max: "+this.max;
+				if (!isEmpty){
+					
+					v = parseFloat(v);
+
+					if (isNaN(v))
+						isOk = this.ERR_INCORRECT_VALUE;
+					else if ((this.min != null) && (v < this.min))
+						isOk = "Valeur min: "+this.min;
+					else if ((this.max != null) && (v > this.max))
+						isOk = "Valeur max: "+this.max;						
+				}
+
 			}
+
+
 		}
 		return isOk;
 	},
@@ -98,7 +116,8 @@ defineClass("TinputNumber", "panjs.ui.input.TmaskInput.html", {
 		
 		r = r.replace(/,/g, ".");	
 		
-		if (r != ""){
+		if ((this.isValid() === true)&&(r.trim() != ""))
+		{
 			if (this.format == "float")
 				r = parseFloat(r);
 			else

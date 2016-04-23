@@ -5,18 +5,23 @@
 .Tdropdown
 {
 		button.readonly{
-			opacity:1;
-			pointer-events: none;
 			cursor: not-allowed;
+			/*opacity:1;
+			pointer-events: none;
+			
 			-webkit-box-shadow: none;
 			box-shadow: none;
 			border-style:none;
 			padding-left:0px;
-			background-color: inherit;
+			background-color: inherit;*/
 		}
 		button.error
 		{
 			border-color:red;
+		}
+		button.dropdown-toggle{
+			white-space: normal;
+			text-align: left;
 		}
 }
 </style>
@@ -33,7 +38,14 @@ defineClass("Tdropdown", "panjs.ui.dropdown.TdropdownBase.html", {
 	/* METHODES */
 	constructor: function(args){
 		Tdropdown._super.constructor.call(this,args);
+
 		this.container.addClass("btn-group");
+
+		if (this._maxWidth){
+
+			this.container.css("max-width", this._maxWidth);
+			this.button.css("max-width", this._maxWidth);
+		}
 
 	},
 
@@ -41,6 +53,7 @@ defineClass("Tdropdown", "panjs.ui.dropdown.TdropdownBase.html", {
 	{
 		if (this._readonly != value)
 		{
+			this._readonly = value;
 			if (value == true)
 			{
 				this.button.addClass("readonly");
@@ -139,10 +152,15 @@ defineClass("Tdropdown", "panjs.ui.dropdown.TdropdownBase.html", {
 	{
 		if (!this._isReady()) return;
 
-		var cell = $(e.target).closest( "a" )
-		if (cell[0].nodeName == "A")
-			this.setSelectedItem(cell.prop("data"));
-		this._close();
+		if (this._readonly){
+			e.preventDefault();
+			return;	
+		}else{
+			var cell = $(e.target).closest( "a" )
+			if ((cell.length>0) && (cell[0].nodeName == "A"))
+				this.setSelectedItem(cell.prop("data"));
+			this._close();			
+		}
 		return false;
 	},
 	

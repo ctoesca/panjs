@@ -91,11 +91,55 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				return r;
 		},
 		swap: function(sourceItem, destItem){
-			var indx1 = this.getItemIndex(sourceItem);
-			var indx2 = this.getItemIndex(destItem);
-			this._items[indx1] = destItem;
-			this._items[indx2] = sourceItem;
+			if (sourceItem != destItem)
+			{
+				var indx1 = this.getItemIndex(sourceItem);
+				var indx2 = this.getItemIndex(destItem);
+				
+
+				this._items[indx1] = destItem;
+				this._items[indx2] = sourceItem;				
+			}
 		},
+
+		moveAfter: function(item, destItem){
+			if (item != destItem)
+			{
+				var indx1 = this.getItemIndex(item);
+				var indx2 = this.getItemIndex(destItem);
+						
+				if (indx1 < indx2){
+		    		this.moveItem( item, indx2 );
+		    	} else if (indx1 > indx2){
+		    		this.moveItem( item, indx2+1);
+		    	}
+			}
+		},
+		moveItem: function (item, toIndex ) 
+		{
+			var fromIndex = this.getItemIndex(item);
+
+			if (fromIndex != toIndex)
+			{
+			    var element = this._items[fromIndex];
+	    		this._items.splice(fromIndex, 1);
+	    		this._items.splice(toIndex, 0, element);
+
+				this.dispatchEvent(new Tevent(Tevent.ITEM_MOVED, {
+					item: item,
+					fromIndex: fromIndex,
+					toIndex: toIndex
+				}));		
+				this.dispatchEvent(new Tevent(Tevent.CHANGE, {
+					action: "ITEM_MOVED",
+					item: item,
+					fromIndex: fromIndex,
+					toIndex: toIndex
+				}));		
+			}
+
+		},
+
 		getByKey: function(key) {
 				return this._byId[key];
 		},

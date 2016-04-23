@@ -39,6 +39,8 @@ Tevent.DATA_LOADED = "data-loaded";
 Tevent.REFRESH = "refresh";
 Tevent.REPLACE = "replace";
 Tevent.ITEM_CLICKED = "item-clicked";
+Tevent.ITEM_MOVED = "item-moved";
+
 Tevent.OPEN = "open";
 Tevent.CLOSE = "close";
 Tevent.READY = "ready";

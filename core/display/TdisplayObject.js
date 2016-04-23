@@ -53,6 +53,7 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 		return true;
 	},
 	free: function(){
+		
 		TdisplayObject._super.free.call(this);
 		this.container.remove();
 		/*<ENV:dev>*/
@@ -83,6 +84,7 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 		
 		this.container[0].owner = this;
 		this.container[0].compo = this;
+		
 		
   		//logger.debug("init TdisplayObject: ",this.className,", id=",this.id);
   	},

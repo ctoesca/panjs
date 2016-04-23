@@ -22,7 +22,9 @@ defineClass("Telement", "panjs.core.display.TdisplayObjectContainer",
 	
 		if (this.enableHashManager == true){
 			uses("panjs.core.managers.Trouter");
-
+			if (typeof args.hashKey != "undefined")
+				this.hashKey = args.hashKey;
+			
 			if (this.hashKey == null)
 				if (this.id>1)
 					this.hashKey = this.className+this.id;
@@ -41,6 +43,7 @@ defineClass("Telement", "panjs.core.display.TdisplayObjectContainer",
 		this.container.addClass(styleClass);
 		this.container.attr("data-compo", this.classPath);
 		this.container.attr("data-class-name", this.className);
+		this.container.attr("data-loaded", true);
 
 		if (typeof args != "undefined")
 		{
@@ -54,7 +57,9 @@ defineClass("Telement", "panjs.core.display.TdisplayObjectContainer",
 
 				if (this.content != null)
 				{
+					
 					if (this.sourceElement.innerHTML.trim() != ""){
+
 						this.content[0].innerHTML = this.sourceElement.innerHTML;
 						if (typeof args.owner != "undefined"){
 							this.owner = args.owner;

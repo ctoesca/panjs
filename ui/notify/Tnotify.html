@@ -19,8 +19,11 @@
 TnotifyPosition = function(){};
 TnotifyPosition.TOP_LEFT = "top-left";
 TnotifyPosition.TOP_RIGHT = "top-right";
+TnotifyPosition.TOP_CENTER = "top-center";
 TnotifyPosition.BOTTOM_LEFT = "bottom-left";
 TnotifyPosition.BOTTOM_RIGHT = "bottom-right";
+TnotifyPosition.BOTTOM_CENTER = "bottom-center";
+
 
 defineClass("Tnotify", "panjs.core.display.Telement", { 
 
@@ -32,47 +35,56 @@ defineClass("Tnotify", "panjs.core.display.Telement", {
 	type: 'success',
 	delay: 5000,
 	playSound: false,
+	_audio: null,
+	_soundPath: null,
+
 	constructor: function(args){ 
-		
-		
+				
 		this._super.constructor.call(this,args);	
 		
-		this.audio = new Audio(panjs.namespaces["panjs.core"].path+'/../lib/sound/chat_message_notify.ogg');
-
 		this.injectParam("message", args.message,false, this.message);	
 		this.injectParam("closehandler", args.closehandler,false, null);
-		this.injectParam("position", args.closehandler,false, this.defaultPosition);	
+		this.injectParam("position", args.position,false, this.defaultPosition);	
 		this.injectParam("type", args.type,false, this.type);
 		this.injectParam("playSound", args.playSound,false, this.playSound);	
 		this.injectParam("delay", args.delay,false, this.delay);	
+		this.injectParam("soundPath", args.soundPath,false, this._soundPath);
 
+		if (this.soundPath == null)
+			this.soundPath = panjs.namespaces["panjs.core"].path+'/../lib/sound/chat_message_notify.ogg';
+
+		this._audio = new Audio(this.soundPath);
 	},	
 
 	show: function()
 	{
 		if (this.playSound)
-			this.audio.play();
+			this._audio.play();
+		var placement = {
+			from: this.position.split("-")[0],
+			align: this.position.split("-")[1]
+		};
+
+		var settings = {
+				//settings
+				delay: this.delay,
+				type: this.type,
+				newest_on_top: true,
+				//showProgressbar: true,
+				placement: placement
+		};
+
+		if (this._onClose)
+			settings.onClosed = this._onClose.bind(this);
 
 		$.notify( 
 			{
 				// options
 				message: this.message
-			},{
-				//settings
-				delay: this.delay,
-				type: this.type,
-				animate:{
-					enter: "animated fadeInDown", 
-					exit: "animated fadeOutUp" 
-				},
-				onClosed: this._onClose.bind(this),
-				//showProgressbar: true,
-				placement: {
-					from: "top",
-					align: "right"
-				}
-			}
+			},
+			settings
 		);
+		return this;
 	},
 
 	_onClose: function(e)
@@ -85,44 +97,61 @@ defineClass("Tnotify", "panjs.core.display.Telement", {
 		
 	},
 
-	getCloseEvent: function(action)
-	{
-		var evt =  new Tevent(Tevent.CLOSE);
-	},
-
 	close: function(e, action)
 	{	
 	}
 });
 
 
-Tnotify.show = function(message, closehandler, position, type)
+
+Tnotify._getOptions = function(args)
 {
-	if (arguments.length<4)
-	 	var type = 'success';
-	 
-	var n = new Tnotify({type: type, message: message, closehandler: closehandler||null, position: position||TnotifyPosition.TOP_RIGHT});
-	n.show();
-	
-	return n;
+	var opt = {};
+
+	if (args.length>1)
+	{
+		var typeArg2 = typeof args[1];
+
+		if (typeArg2 == 'object')
+			opt = args[1];
+		if (typeArg2 == 'string')
+			opt.position = args[1];
+	}
+
+	opt.message = args[0];
+
+	return opt;
 }
-Tnotify.success = function(message, closehandler, position)
+
+Tnotify.show = function(message)
 {
-	var n = new Tnotify({type:'success', message: message, closehandler: closehandler||null, position: position||TnotifyPosition.TOP_RIGHT});
-	n.show();
-	return n;
+	var opt = Tnotify._getOptions(arguments); 
+	return new Tnotify(opt).show();
 }
-Tnotify.info = function(message, closehandler, position)
+
+Tnotify.success = function(message)
 {
-	var n = new Tnotify({type:'info', message: message, closehandler: closehandler||null, position: position||TnotifyPosition.TOP_RIGHT});
-	n.show();
-	return n;
+	var opt = Tnotify._getOptions(arguments);
+	opt.type = "success";		
+	return new Tnotify(opt).show();
 }
-Tnotify.error = function(message, closehandler, position)
+Tnotify.info = function(message)
 {
-	var n = new Tnotify({type:'danger', message: message, closehandler: closehandler||null, position: position||TnotifyPosition.TOP_RIGHT});
-	n.show();
-	return n;
+	var opt = Tnotify._getOptions(arguments);
+	opt.type = "info"; 
+	return new Tnotify(opt).show();
+}
+Tnotify.error = function(message)
+{
+	var opt = Tnotify._getOptions(arguments);
+	opt.type = "danger"; 
+	return new Tnotify(opt).show();
+}
+Tnotify.warn = function(message)
+{
+	var opt = Tnotify._getOptions(arguments);
+	opt.type = "warning"; 
+	return new Tnotify(opt).show();
 }
 //]]>
 </script>

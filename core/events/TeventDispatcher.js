@@ -16,6 +16,8 @@ defineClass("TeventDispatcher", "panjs.core.Tobject", {
 	},
 	
 	free: function(){
+		logger.trace("FREE className=%1 id=%2", this.className, this.id);
+
 		this.removeAllListeners();
 	},
 	

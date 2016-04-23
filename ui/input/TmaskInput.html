@@ -27,7 +27,8 @@
 defineClass("TmaskInput", "panjs.core.display.Telement", { 
 
 	baseElement: "input",
-	errorText: null,
+	errorText: "",
+	ERR_INCORRECT_VALUE: "Valeur incorrecte",
 	mask: /.*/,
 	placeholder: "",
 	required: false,
@@ -188,7 +189,7 @@ defineClass("TmaskInput", "panjs.core.display.Telement", {
 		else
 		if (!this.mask.test(v)) 
 		{
-			isOk = "Valeur incorrecte";			
+			isOk = this.ERR_INCORRECT_VALUE;			
 		}
 
 		return isOk;

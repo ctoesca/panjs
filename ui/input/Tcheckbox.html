@@ -18,6 +18,11 @@
   opacity: .35;
   cursor: default;
 }
+
+.Tcheckbox.readonly input.css-checkbox + label.css-label {
+  cursor: default;
+}
+
 .Tcheckbox .requiredField
 {
 	color: #CC0000;
@@ -63,7 +68,9 @@ defineClass("Tcheckbox", "panjs.core.display.Telement", {
 	title: null,
 	required: false,
 	_checked: false,
+	_readonly: false,
 	eventsDisabled: false,
+	data: null, /* sert à stocket une info associée à cette checkbox */
 
 	selected : false,
 	constructor: function(args){
@@ -78,12 +85,23 @@ defineClass("Tcheckbox", "panjs.core.display.Telement", {
 			this.title = args.title;
 		if (defined(args, "value"))
 			this.value = args.value;
+		
+		if (defined(args, "data"))
+			this.data = args.data;
+
 		if (defined(args, "required"))
 			this.required = args.required;
+		
 		if (defined(args, "checked"))
 			this._checked = args.checked;
-		if (defined(args, "label"))
+		
+		if (defined(args, "label")){
 			this.label = args.label;
+		}else{
+			if (defined(args,"elem"))
+				this.label = args.elem.innerHTML;
+		}
+
 		if (defined(args, "enabled"))
 			this.enable(args.enabled);
 
@@ -94,13 +112,12 @@ defineClass("Tcheckbox", "panjs.core.display.Telement", {
 		this.input.on("change", this.onChanged.bind(this));
 		this.input.on("click", this.onClick.bind(this));
 
-		if (defined(args,"elem"))
-			this.label = args.elem.innerHTML;
-
 		if (this.value !=  null)
 			this.input.attr("value", this.value);
+		
 		if (this.title !=  null)
 			this.labelElement.attr("title", this.title);
+
 		if (this.required == true)
 			this.label += '<i class="glyphicon glyphicon-asterisk requiredField"/>';
 		
@@ -108,9 +125,26 @@ defineClass("Tcheckbox", "panjs.core.display.Telement", {
 
 		this.labelElement.html(this.label);
 	},
+
+	setReadonly: function(v){
+		this._readonly = v;
+		this.container.toggleClass("readonly", v);
+	},
+		
 	onClick: function(e){
-		this.dispatchEvent(new Tevent(Tevent.CLICK, this.val()));
+
+		if (this._readonly)
+			return false;
+
+		var v = this.val();	
+		var e = new Tevent(Tevent.CLICK, v);
+
+		this.dispatchEvent(e);	
+		if (e.defaultPrevented)
+			return false;
+
 	},	
+
 	onChanged: function(e){
 
 		if (!this.eventsDisabled){

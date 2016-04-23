@@ -2,7 +2,7 @@ var defaultSettings = {
 		appVersion: "1.0.0",
 		logLevel	: "DEBUG",
 		env			: "dev",
-		version 	: "0.9.3",
+		version 	: "1.0.0",
 		addIdClass  : false,
 		preserveElementsId: false,
 		setSourceInComponents: false,
@@ -20,9 +20,9 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 
 (function(panjs){
 
-	var iever = getIEVersion();
-    if ((iever < 9) && (iever >0))
-    	alert("Internet Explorer "+iever+" is not supported");
+	panjs._iever  = getIEVersion();
+    if ((panjs._iever < 9) && (panjs._iever >0))
+    	alert("Internet Explorer "+panjs._iever+" is not supported");
 
 	if (!panjs.appName)
 		throw "Config ERROR: panjs.appName is missing";
@@ -234,6 +234,12 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 
 
 	/* public functions */
+	panjs.addNamespace = function(classPath, url) {
+		panjs.namespaces[classPath] = {
+			path: url,
+			name: classPath
+		}
+	}
 	panjs._setDOMId = function(DOMel, originalId, classPath) {
 
 		if (originalId){
@@ -273,13 +279,15 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 		return panjs._classes[classPath].Class;
 
 	};
+	
+	
 	panjs.getInstance = function(classPath, args) {
 
 		var _class = panjs.getClass(classPath);
 		return new _class(args);
 
 	};
-
+	panjs.createObject =panjs.getInstance;
 
 	panjs.unload = function(classPath) {
 		//var className = panjs._getClassNameFromClassPath(classPath);
@@ -292,7 +300,7 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 		}
 	};
 	
-
+	
 	panjs.createComponent = function(classPath, args, sendData) {
 		
 		_stackLevel++;
@@ -460,7 +468,7 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 			}
 		}
 
-		logger.info("READY. Panjs version: "+panjs.version);
+		
 		if (arguments.length == 2)
 			onReady();
 	}
@@ -758,6 +766,11 @@ defineClass("Tlogger", "panjs.core.Tobject", {
 		this.injectParam("_level", args.level, false, Tlogger.INFO);
 		this.injectParam("name", args.name, false);
 		this.creationDate = new Date().getTime();
+
+
+		
+
+
 		this.setLevel(this._level);	
 		this.razTime();
 
@@ -802,37 +815,27 @@ defineClass("Tlogger", "panjs.core.Tobject", {
 		return new Date().getTime() - this.creationDate;
 	},
 	_trace: function() {
-		var m = this._getMessage("TRACE", arguments);
-		if (console.trace)
-			console.trace(m);
-		else
-			console.log(m);
+		console.trace( this._getMessage("TRACE", arguments) );
 	},
 	_debug: function() {
-		var m = this._getMessage("DEBUG", arguments);
-		if (console.debug)
-			console.debug(m);
-		else
-			console.log(m);
+		console.debug( this._getMessage("DEBUG", arguments) );
 	},
 	_info: function() {
-		var m = this._getMessage("INFO", arguments);
-		if (console.info)
-			console.info(m);
-		else
-			console.log(m);
+		console.info( this._getMessage("INFO", arguments) );
 	},
 	_warn: function() {
-		var m = this._getMessage("WARN", arguments);
-		if (console.warn)
-			console.warn(m);
-		else
-			console.log(m);
+		console.warn( this._getMessage("WARN", arguments) );
 	},
 	_error: function() {
-		console.error(this._getMessage("ERROR", arguments));
+		console.error( this._getMessage("ERROR", arguments) );
 	},
-
+	_fallback: function(){
+		
+		if (typeof console != "undefined"){
+			var m = this.logger._getMessage(this.levelStr, arguments);
+			console.log(m);
+		}
+	},
 	parse: function() {
 		
 		if (typeof arguments[0] == "string")
@@ -864,11 +867,43 @@ defineClass("Tlogger", "panjs.core.Tobject", {
 	},
 	setLevel: function(value) {
 		this._level = value;
-		this.trace = this._trace;
-		this.debug = this._debug;
-		this.info = this._info;
-		this.warn = this._warn;
-		this.error = this._error;
+		
+		if (typeof console != "undefined"){ //IE9...
+			
+			if (typeof console.trace == "undefined")
+				this.trace = this._fallback.bind( {levelStr:"TRACE", logger:this});
+			else
+				this.trace = this._trace;
+			
+			if (typeof console.debug == "undefined")
+				this.debug = this._fallback.bind( {levelStr:"DEBUG", logger:this});
+			else
+				this.debug = this._debug;
+			
+			if (typeof console.info == "undefined")
+				this.info = this._fallback.bind( {levelStr:"INFO", logger:this});
+			else
+				this.info = this._info;
+			
+			if (typeof console.warn == "undefined")
+				this.warn = this._fallback.bind( {levelStr:"WARN", logger:this});
+			else
+				this.warn = this._warn;
+			
+			if (typeof console.error == "undefined")
+				this.error = this._fallback.bind( {levelStr:"ERROR", logger:this});			
+			else
+				this.error = this._error;
+		}else{
+
+			this.trace = this._fallback.bind( {levelStr:"TRACE", logger:this});
+			this.debug = this._fallback.bind( {levelStr:"DEBUG", logger:this});
+			this.info = this._fallback.bind( {levelStr:"INFO", logger:this});
+			this.warn = this._fallback.bind( {levelStr:"WARN", logger:this});
+			this.error = this._fallback.bind( {levelStr:"ERROR", logger:this});
+		}
+
+
 
 		if (value >= Tlogger.DEBUG)
 			this.trace = function() {};
@@ -881,6 +916,7 @@ defineClass("Tlogger", "panjs.core.Tobject", {
 
 		if (value >= Tlogger.ERROR)
 			this.warn = function() {};
+
 	}
 });
 Tlogger.TRACE = 10;
@@ -915,6 +951,8 @@ defineClass("Tloader", "panjs.core.Tobject", {
 	loadedCss: null,
 	_lessIsLoaded: null,
 	randomId: "",
+	_addedcss:"",
+	_stylenode: null,
 
 	constructor: function(args) {
 
@@ -1168,6 +1206,8 @@ defineClass("Tloader", "panjs.core.Tobject", {
 					logger.debug("Load style %1", classPath);
 					this.addStyleNode(styleNodes[i]);
 				}
+				var parentClassName = Class.prototype.parentClassName;
+
 
 				if (defined(bodyNode)) {
 					/*<ENV:prod>*/
@@ -1175,7 +1215,6 @@ defineClass("Tloader", "panjs.core.Tobject", {
 						/*</ENV:prod>*/
 
 						var html = getXml(bodyNode);
-						var parentClassName = Class.prototype.parentClassName;
 
 						if (defined(window[parentClassName].prototype.html)) {
 							if (window[parentClassName].prototype.html.contains('<!--CONTENT-->'))
@@ -1196,10 +1235,18 @@ defineClass("Tloader", "panjs.core.Tobject", {
 					}
 					/*</ENV:prod>*/
 				}
-				/*else
+				else
 				{         
-					//html et bodyNode are inherited            
-				}*/
+					//html et bodyNode are inherited       
+					if (defined(window[parentClassName].prototype.html))
+					{ 
+						html = window[parentClassName].prototype.html;
+						Class.prototype.html = html;
+						Class.prototype.bodyNode = bodyNode;
+					}
+					
+				}
+
 				if (panjs.setSourceInComponents)
 					Class.prototype.source = data.data;
 				
@@ -1355,24 +1402,71 @@ defineClass("Tloader", "panjs.core.Tobject", {
 
 		return r;
 	},
+	
+	/*
+	Fonctionne partout sauf sur IE9 (et +?) car il semble que le nombre de noeud <style> soit limité dnas <HEAD> 
+	!! Voir avec IE10 si ça fonctionne.
+	*/
 	addStyle: function(css, type) {
+
+		if (panjs._iever >0)
+		{
+			this.addStyleIE(css, type)
+		}else{
+
+			if (css.trim() == "")
+				return;
+			if (arguments.length < 2)
+				var type = "text/css";
+
+			$('<style type="' + type + '">' + css + '</style>').appendTo('head');
+
+			if (type == "text/less") {
+				if (this.lessIsLoaded()) {
+					less.refresh();
+
+					logger.debug(panjs.messages.LESS_INJECTED);
+				} else {
+					logger.warn(panjs.messages.LESS_NOT_LOADED);
+
+				}
+			}
+		}
+	},
+
+	addStyleIE: function(css, type) {
+		/* fusion des style text/css + deplacement du <STYLE> à la fin 
+		!! pb possible si load fichier css qui est sensé écraser le style INLINE car <LINK> sera toujours placé avant <STYLE> !		
+		De plus, les style LESS ne sont pas placé à la fin: il faut les convertir puis les placer dans <STYLE> css
+		*/
 		if (css.trim() == "")
 			return;
 
 		if (arguments.length < 2)
 			var type = "text/css";
 
-		$('<style type="' + type + '">' + css + '</style>').appendTo('head');
-
-
 		if (type == "text/less") {
+			
+			var el = $('<style type="' + type + '">' + css + '</style>');
+			el.appendTo('head');
+
 			if (this.lessIsLoaded()) {
 				less.refresh();
-
 				logger.debug(panjs.messages.LESS_INJECTED);
 			} else {
 				logger.warn(panjs.messages.LESS_NOT_LOADED);
 
+			}
+		}else{
+			if (this._stylenode == null)
+			{
+				var el = $('<style type="' + type + '">' + css + '</style>');
+				el.appendTo('head');
+				this._stylenode = el[0];
+			}else{
+				this._addedcss += "\n"+css;
+				this._stylenode.innerHTML = this._addedcss;
+				$(this._stylenode).appendTo('head');
 			}
 		}
 	},
@@ -1384,6 +1478,7 @@ defineClass("Tloader", "panjs.core.Tobject", {
 			type = 'text/css';
 
 		var css = node.textContent;
+
 		this.addStyle(css, type);
 
 	},
@@ -1440,3 +1535,5 @@ panjs.loader.init();
 if (panjs.stats.active)
 	panjs.initCaptures();
 /*</ENV:dev>*/
+
+logger.info("READY. Panjs version: "+panjs.version);

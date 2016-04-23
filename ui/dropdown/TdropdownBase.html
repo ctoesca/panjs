@@ -15,9 +15,6 @@
 <html>        
 <head>
 
-<style>	
-
-</style>
 
 <script data-subtype="text/x-class-definition">
 //<![CDATA[
@@ -42,12 +39,14 @@ defineClass("TdropdownBase", "panjs.core.display.Telement", {
 	_filterFunction: null,
 
 	_itemsCount: 0,
+	_maxWidth: null,
 
 	/* METHODES */
 	constructor: function(args){
 		TdropdownBase._super.constructor.call(this,args);
 		if (args)
 		{
+			this.injectParam("_maxWidth", args.maxWidth, false);	
 			this.injectParam("labelField", args.labelfield,false);	
 			this.injectParam("leftIcon", args.leftIcon,false);	
 			this.injectParam("valueField", args.valueField,false);	
@@ -67,6 +66,7 @@ defineClass("TdropdownBase", "panjs.core.display.Telement", {
 		{
 			this.button.prepend($(this.leftIcon+" "));
 		}
+		
 	},
 	
 	setPlaceholder: function(v){
