@@ -131,12 +131,77 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 	};
 
 	/*<ENV:dev>*/
-	
-	panjs.initCaptures = function(){
+
+	var _captures = {};
+	var _capturesTimer = null;
+	var _capturesStarted = false;
+
+	var _sendCaptures = function() {
+		
+		if ((this.stats.active == false)||(!_capturesStarted))
+			return;
+
+		var baseUrl =  panjs.stats.url;
+		var fullUrl = baseUrl;
+		var username = panjs.stats.username;
+		var password = panjs.stats.password;
+
+		var _capturesArray = [];
+		for (var k in _captures){
+			_capturesArray.pushArray(_captures[k]);
+			logger.debug("Sending "+_captures[k].length+" ["+k+"] stats");
+		}
+		var count = _capturesArray.length;
+
+		if (count > 0){
+			var req = $.ajax({ 
+
+			        url: fullUrl,
+			        async:true,   
+			        type: "post",
+			        data: JSON.stringify(_capturesArray),
+			        username: username, 
+			        password: password,
+			        success: function(data, textStatus, jqXHR){
+			             logger.debug("Send "+count+" stats: success");
+			        },
+			        error: function(jqXHR, textStatus, errorThrown){
+			         	logger.error("Send " + count+" stats: failure: "+jqXHR.responseText);
+			        }
+			});			
+			_captures = {};
+		}
+		
+	}
+
+	panjs.stopCaptures = function(){
+		
+		if (_capturesTimer != null)
+			_capturesTimer.stop();
+		_captures = {};
+		_capturesStarted = false;
+		logger.error("captures stopped");
+	}
+
+	panjs.startCaptures = function(){
+		
+		if (this.stats.active == false)
+			return;
+		if (_capturesTimer == null){
+			uses("panjs.core.helpers.Ttimer");
+			_capturesTimer = new Ttimer({delay:5000, onTimer:_sendCaptures.bind(this) } );
+		}
+		
+		_capturesTimer.start();
+		_capturesStarted = true;
+	}
+
+	panjs.razCaptures = function(){
 		
 		if (this.stats.active == false)
 			return;
 
+		_captures = {};
 		var appName = panjs.appName;
 		var baseUrl =  panjs.stats.url;
 		var fullUrl = baseUrl+'/init';
@@ -157,24 +222,19 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 		        username: username, 
 		        password: password,
 		        success: function(data, textStatus, jqXHR){
-		             logger.debug("initCaptures: success");
+		             logger.debug("razCaptures: success");
 		        },
 		        error: function(jqXHR, textStatus, errorThrown){
-		         	logger.error("initCaptures: failure: "+jqXHR.responseText);
+		         	logger.error("razCaptures: failure: "+jqXHR.responseText);
 		        }
 		});
 	}
+
+
 	panjs.capture = function(message, opt)
 	{
-		if (this.stats.active == false)
+		if ((this.stats.active == false)||(!_capturesStarted))
 			return;
-
-		var appName = panjs.appName;
-		var baseUrl =  panjs.stats.url;
-		var fullUrl = baseUrl;
-		var username = panjs.stats.username;
-		var password = panjs.stats.password;
-		var groupId = 1;
 
 		var data = {
 		  message: message,
@@ -182,8 +242,8 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 		  componentId: null,
 		  fromClassName: null,
 		  fromClassPath: null,
-		  appName: appName,
-		  groupId: groupId,
+		  appName: panjs.appName,
+		  groupId: 1,
 		  fromId: null,
 		  isStatic: null,
 		  timestamp: new Date().getTime()
@@ -203,21 +263,11 @@ panjs = array_replace_recursive(defaultSettings, panjs);
 		if  (data.message == "createComponent")
 			data.isStatic = false;
 
-		var req = $.ajax({ 
+		if (typeof _captures[message] == "undefined")
+			_captures[message] = [];
 
-		        url: fullUrl,
-		        async:true,   
-		        type: "post",
-		        data: JSON.stringify(data),
-		        username: username, 
-		        password: password,
-		        success: function(data, textStatus, jqXHR){
-		             logger.debug("Send stats: success");
-		        },
-		        error: function(jqXHR, textStatus, errorThrown){
-		         	logger.error("Send stats: failure: "+jqXHR.responseText);
-		        }
-		    });
+		_captures[message].push(data);
+
 
 	}
 	/*</ENV:dev>*/
@@ -1474,7 +1524,7 @@ panjs.loader.init();
 
 /*<ENV:dev>*/
 if (panjs.stats.active)
-	panjs.initCaptures();
+	panjs.startCaptures();
 /*</ENV:dev>*/
 
 logger.info("READY. Panjs version: "+panjs.version);
