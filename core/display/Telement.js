@@ -19,7 +19,9 @@ defineClass("Telement", "panjs.core.display.TdisplayObjectContainer",
 		
 		Telement._super.constructor.call(this,args);
 		
-	
+		if (typeof args.enableHashManager != "undefined")
+			this.enableHashManager = args.enableHashManager;
+
 		if (this.enableHashManager == true){
 			uses("panjs.core.managers.Trouter");
 			if (typeof args.hashKey != "undefined")
