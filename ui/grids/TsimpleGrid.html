@@ -1,7 +1,6 @@
 <html>        
 <head>
 
-
 <!--
 Attention, le fait de valoriser "cellClass" sur une colonne est consommateur de CPU:
 la classe est ajoutée sur chaque TD correspondante.
@@ -27,6 +26,11 @@ Exemple:
 -->
 <style type="text/css">
 
+.tableContainer.fixed-header {
+
+    overflow: auto;
+    max-height: 500px;    
+}
 
 .TsimpleGrid tr.over {
   	/*border: 2px dashed #000;*/
@@ -182,6 +186,8 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 	itemRendererFactory: null,
 	caption: null,
 	dragSrcEl: null,
+	fixedHeader: false,
+
 
 	/* METHODES */	
 	constructor: function(args){
@@ -204,6 +210,9 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 
 		this._allowSelection = args["allow-selection"] || args["allowSelection"]|| this._allowSelection;
 		this.selectedDataField = args["selected-data-field"] || this.selectedDataField;
+
+		this.fixedHeader = args["fixedHeader"] || this.fixedHeader;
+
 		
 		if (args["caption"])
 			this.caption = args["caption"];
@@ -266,6 +275,17 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		this.setAllowSelection(this._allowSelection);
 			
 		this._setEvents();
+		
+		if (this.fixedHeader)
+		{
+			this.tableContainer[0].addEventListener("scroll",function(){
+		   		var translate = "translate(0,"+(this.scrollTop)+"px)";
+		   		this.querySelector("thead").style.transform = translate;
+			});	
+			this.tableContainer.addClass("fixed-header");
+		}
+		
+		
 
 	},
 	setWaiting: function(v){
@@ -675,11 +695,12 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 			}
 			
 			this.tbody.html("");
+			this.thead.html("");
 			this._isEmpty = true;
 		}
-
+		
 	},
-	
+
 	_addHeader: function(col)
 	{
 		var th = $('<th colIndx="'+col.index+'"></th>');
@@ -772,7 +793,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		for (var i=0; i< this._cols.length; i++)
 		{
 			var _col = this._cols[i];
-			var _th = this.table.getElement('th[colIndx="'+_col.index+'"]');
+			var _th = this.trHeader.getElement('th[colIndx="'+_col.index+'"]');
 
 			if (_th != null){
 				this._updateHeader(_th, _col);
@@ -841,11 +862,11 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 	{			
 		if (this.caption!=null && this.caption.trim()!=""){
 			this.trCaption = $("<tr><th class='caption' colspan='" + this._cols.length + "'>" + this.caption + "</th></tr>");
-			this.tbody.append(this.trCaption);
+			this.thead.append(this.trCaption);
 		}			
 
-		this.trHeader = $('<tr>');
-		this.tbody.append(this.trHeader);
+		this.trHeader = $('<tr class="header" >');
+		this.thead.append(this.trHeader);
 		this.visibleColsCount = 0;
 		for (var i =0; i< this._cols.length; i++)
 		{
@@ -865,6 +886,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 	refresh: function()
 	{
 		this._createTable();
+		
 	},
 	
 	_createTable: function()
@@ -908,7 +930,8 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 
 		var s2 = new Date().getTime();
 		renderTime = renderTime + (s2 - s1);
-		logger.debug("table renderTime = "+renderTime+" ms");
+		logger.debug("table renderTime = "+renderTime+" ms");		
+
 	},
 
 	_setTr: function( tr, obj , trIsEmpty)
@@ -1374,14 +1397,18 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 
 <i class="fa fa-spinner fa-spin fa-5x tableWaiting" id="tableWaiting" ></i>
 
-<div id="tableContainer" style="height: 100%" >
+<div id="tableContainer" style="" class="tableContainer">
 	
 	 <table class="table table-striped table-condensed table-bordered" id="table">
+	 	  <thead id="thead">
+
+	 	  </thead>
           <tbody id="tbody">
           
           </tbody>                 
      </table>
  </div>
+
     <!--CONTENT-->
     
 
