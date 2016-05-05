@@ -75,7 +75,7 @@ defineClass("Tnotify", "panjs.core.display.Telement", {
 		};
 
 		if (this._onClose)
-			settings.onClosed = this._onClose.bind(this);
+			settings.onClose = this._onClose.bind(this);
 
 		$.notify( 
 			{

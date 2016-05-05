@@ -1,0 +1,241 @@
+ <html>        
+ <head>
+
+  <style type="text/less">
+    .TsideTabNav
+    {
+      .nav-sidebar { 
+        width: 100%;
+        padding: 8px 0; 
+        border-right: 1px solid #ddd;
+
+
+      }
+      .nav-sidebar a {
+        color: #333;
+        -webkit-transition: all 0.2s linear;
+        -moz-transition: all 0.2s linear;
+        -o-transition: all 0.2s linear;
+        transition: all 0.2s linear;
+        -webkit-border-radius: 4px 0 0 4px; 
+        -moz-border-radius: 4px 0 0 4px; 
+        border-radius: 4px 0 0 4px; 
+      }
+      .nav-sidebar .active a { 
+        cursor: default;
+        background-color: #428bca; 
+        color: #fff; 
+        text-shadow: 1px 1px 1px #666; 
+      }
+      .nav-sidebar a:focus {
+        background-color: transparent;   
+      }
+      .nav-sidebar .active a:focus {
+        background-color: #428bca;   
+      }
+
+      .nav-sidebar .active a:hover {
+        background-color: #428bca;   
+      }
+      .nav-sidebar .text-overflow a,
+      .nav-sidebar .text-overflow .media-body {
+        white-space: nowrap;
+        overflow: hidden;
+        -o-text-overflow: ellipsis;
+        text-overflow: ellipsis; 
+      }
+
+      /* Right-aligned sidebar */
+      .nav-sidebar.pull-right { 
+        border-right: 0; 
+        border-left: 1px solid #ddd; 
+      }
+      .nav-sidebar.pull-right a {
+        -webkit-border-radius: 0 4px 4px 0; 
+        -moz-border-radius: 0 4px 4px 0; 
+        border-radius: 0 4px 4px 0; 
+      }
+      @media (min-width:1200px) {
+        .nav-sidebar.fixed {
+         position: absolute
+       }
+     }
+
+   }
+
+ </style>
+
+ <script data-subtype="text/x-class-definition">
+//<![CDATA[      
+uses("panjs.core.helpers.Ttimer");
+defineClass("TsideTabNav", "panjs.core.display.Telement", { 
+  baseElement: "div",
+  enableHashManager: true,
+  defaultState: "commandes",
+  hashKey: "sideNav",
+  navOffset: null,
+  timerNavPosition: null,
+  _navBarTargetPosition: null,
+  _positionning: false,
+
+  constructor: function(args){	
+
+
+    this._super.constructor.call(this,args);   
+alert(this.content.find("a").length);
+
+this.content.empty();
+   this.container.find("a").on("click", this.onNavClick.bind(this));
+
+
+    this.on(Tevent.STATE_CHANGED, this._onStateChanged.bind(this)); 
+
+    this.setState(this.getHash() || this.defaultState);
+
+    this.timerNavPosition = new Ttimer({delay: 500, onTimer: this.onTimerNavPosition.bind(this)});
+
+    $(document).scroll(function() {
+      this.refreshNavbarPosition();
+        //this.timerNavPosition.start();
+      }.bind(this));
+  },
+
+  onTimerNavPosition: function(){
+    this.refreshNavbarPosition();
+  },
+  refreshNavbarPosition: function()
+  {
+
+    var cssPosition = this.navbar.css("position");
+    if ( cssPosition != "absolute")
+    {
+      this.timerNavPosition.stop();
+      return;
+    }
+
+    if (this.navOffset == null)
+      this.navOffset = this.container.offset().top - 60;
+    var scrollPosition = $(document).scrollTop();
+    var position = 0;
+    if (scrollPosition > this.navOffset)
+      position = scrollPosition - this.navOffset;
+
+    if (this._navBarTargetPosition == position)
+    {
+      this.timerNavPosition.stop();
+    }else{
+
+      this._navBarTargetPosition = position;
+      if (this._positionning){
+        return;
+      }
+      this._positionning = true;
+      this.navbar.css("top", position+"px");
+      this._positionning = false;
+          /*this.navbar.animate({top: position+"px"}, 400, 'swing', function(){          
+            this._positionning = false;
+            logger.error("OKKKKKK");
+          }.bind(this));*/
+}
+},
+
+inactiveAllLinks: function(){
+ this.nav.find("li").removeClass("active");
+},
+
+onNavClick: function(e){
+  var state = $(e.target).attr("href").rightOf("#");
+
+  this.setHash(state);
+  return false;
+},
+
+onHashChange: function(hash){
+  var state = this.defaultState;
+  if (hash != null)
+    state = hash;
+
+  this.setState( [state] );
+},
+
+_onStateChanged: function(e)
+{
+
+  if (e.data.newStates.length > 0){
+    state = e.data.newStates[0];
+    this.inactiveAllLinks();
+
+    var a = this.nav.getElement('a[href="#'+state+'"]');
+    a.parent().addClass("active");
+  }
+
+
+
+}
+
+});
+//]]>
+</script>
+
+</head>
+<body>	
+	<!--CONTENT-->
+<div class="container-fluid">
+      
+    <div class="row">
+
+        <div class="col-lg-2" style="padding-left: 2px;padding-right: 2px;" >
+            <nav class="nav-sidebar fixed" id="navbar">
+                <ul class="nav" id="nav">
+    
+                    <li class="active"><a href="#commandes"><i class="fa fa-shopping-cart"></i> Commandes</a></li>
+                      <li><a href="#types_commandes">Types commandes</a></li>
+
+                    <li class="nav-divider"></li>
+                    <li><a href="#projets">Projets</a></li>
+
+                    <li class="nav-divider"></li>
+                     <li><a href="#ref_logiciels"><i class="glyphicon glyphicon-cd"></i> Références logiciels</a></li>
+                    <li><a href="#type_logiciels">Type logiciels</a></li>
+                    <li><a href="#editeurs_logiciels">Editeurs</a></li>
+                   
+                    
+                    <li class="nav-divider"></li>
+                     <li><a href="#ref_materiels"><i class="fa fa-server"></i> Références matériel</a></li>
+                    <li><a href="#marques_materiels">Marques matériel</a></li>
+                    <li><a href="#type_materiels">Types matériel</a></li>
+                   
+
+
+                   
+                </ul>
+            </nav>
+
+
+        </div>
+
+
+        <div class="col-lg-10">
+
+         <div id="listeCommandes" data-compo="cmdb.components.tables.TlisteCommandes.html" data-autoload="false" data-include-in="commandes"/>
+         <div id="listeTypesLogiciels" data-compo="cmdb.components.tables.TlisteTypeLogiciel.html" data-autoload="false" data-include-in="type_logiciels"/>
+         <div id="listeEditeursLogiciels" data-compo="cmdb.components.tables.TlisteEditeurLogiciel.html" data-autoload="false" data-include-in="editeurs_logiciels"/>
+         <div id="listeReferencesLogiciels" data-compo="cmdb.components.tables.TlisteRefLogiciel.html" data-autoload="false" data-include-in="ref_logiciels"/>
+
+        <div id="listeMarquesMateriels" data-compo="cmdb.components.tables.TlisteMarques.html" data-autoload="false" data-include-in="marques_materiels"/>
+        <div  id="listeTypesMateriels"  data-compo="cmdb.components.tables.TlisteTypemateriel.html" data-autoload="false" data-include-in="type_materiels"/>
+        <div  id="listeRefMateriels"  data-compo="cmdb.components.tables.TlisteRefMat.html" data-autoload="false" data-include-in="ref_materiels"/>
+         <div  id="listeTypesCommandes"  data-compo="cmdb.components.tables.TlisteTypesCommandes.html" data-autoload="false" data-include-in="types_commandes"/>
+           <div  id="listeProjets"  data-compo="cmdb.components.tables.TlisteProjets.html" data-autoload="false" data-include-in="projets"/>
+
+
+
+        </div>
+    </div>
+</div>
+
+
+
+ 
+</body>
+</html> 

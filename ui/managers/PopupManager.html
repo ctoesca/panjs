@@ -163,7 +163,7 @@ defineStaticClass("PopupManager", "panjs.core.events.TeventDispatcher", {
 				this.popups[i].window.detach();
 
 				compo.off(Tevent.CLOSE, this._onCompoClose);
-			
+				
 				this.popups.splice(i,1);	
 				
 				var lastModal = this._getLastModal();
@@ -236,6 +236,11 @@ defineStaticClass("PopupManager", "panjs.core.events.TeventDispatcher", {
 	_onCompoClose: function(e)
 	{
 		//$(document.body).css("overflow-y", "auto");
+		var compo = e.currentTarget;
+
+		compo.off(Tevent.CLOSE, this._onCompoClose);
+		compo.dispatchEvent(e);
+		
 		this.removePopup(e.currentTarget);
 
 	},

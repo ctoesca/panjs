@@ -136,11 +136,13 @@ defineClass("TrestClient", "panjs.core.events.TeventDispatcher",
 		var urlParams = "";
 		if (url.lastIndexOf("?") != -1){
 			urlParams = url.rightOf("?");
-			url = url. leftOf("?");
+			url = url.leftOf("?");
 		}
 		
-		urlParams += "&"+this.extraUrlParams;
-		
+
+		if ((this.extraUrlParams != null)&& (this.extraUrlParams!="null"))
+			urlParams += "&"+this.extraUrlParams;
+
 		if (defined(params))
 		{
 			if (typeof params == "object")
@@ -155,8 +157,10 @@ defineClass("TrestClient", "panjs.core.events.TeventDispatcher",
 			}
 		}
 
-		//
+
 		urlParams = encodeURI(urlParams);
+		
+
 		urlParams = urlParams.replace(/#/g, '%23');
 
 		var path = this.baseUrl+url+"?"+urlParams;

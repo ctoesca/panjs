@@ -409,7 +409,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 							
 							
 							itemModels[i].model.replaceItem(itemModel, item);
-							//logger.debug("updateModel: Objet "+this.className+" modifié");
+							logger.debug("updateModel: Objet "+this.className+" modifié");
 
 						/*}else
 						{

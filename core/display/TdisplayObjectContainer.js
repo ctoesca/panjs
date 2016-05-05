@@ -155,6 +155,7 @@ defineClass("TdisplayObjectContainer", "panjs.core.display.TdisplayObject", {
                 includeIn: includeIn,
                 excludeFrom: excludeFrom
             };
+
             this._statesElements.push(obj);
 
         }
