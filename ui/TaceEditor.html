@@ -37,9 +37,6 @@ defineClass("TaceEditor", "panjs.core.display.Telement", {
      	if (defined(args, "height"))
      		this.height = args.height;
 
-     	if (defined(args, "mode"))
-     		this.mode = args.mode;
-
 		if (defined(args, "style"))
 			this.container.attr("style", args.style);
 		
@@ -89,7 +86,12 @@ defineClass("TaceEditor", "panjs.core.display.Telement", {
 	},
 	getSource: function(){
 		return this.editor.getValue();
+	},
+	free: function(){
+		this.editor.destroy()
+		this._super.free.call(this);
 	}
+
 	
 
 	

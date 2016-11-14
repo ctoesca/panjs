@@ -110,9 +110,22 @@ defineClass("TeventDispatcher", "panjs.core.Tobject", {
 		this._listeners[type].push(l);
 	},
 
+	once: function(type, listener, bind, data)
+	{
+		if (this._getListenerIndex(type, listener) > -1)
+			return;
+		if (arguments.length <3 ) 
+			this.on(type, listener);
+		else if (arguments.length <4 )
+			this.on(type, listener, bind);
+		else
+			this.on(type, listener, bind, data);
+		
+	},
+
 	
 	offByCtx: function(ctx){
-		for (type in this._listeners)
+		for (var type in this._listeners)
 		{
 			var listeners = this._listeners[type];
 			for (var i=0; i< listeners.length; i++)
@@ -136,7 +149,7 @@ defineClass("TeventDispatcher", "panjs.core.Tobject", {
 	},
 	removeAllListeners: function()
 	{
-		for (type in this._listeners)
+		for (var type in this._listeners)
 		{
 			this._listeners[type].length = 0;
 			this._listeners[type] = null;

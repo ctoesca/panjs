@@ -262,7 +262,7 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 					}));
 				}
 		},
-
+	
 		replaceItem: function(item, newItem, silent) {
 				if (item == newItem)
 						return;
@@ -289,7 +289,7 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				}
 		},
 		_addItemAt: function(indx, item, silent) {
-
+	
 				if (this.key != null) {
 						if (typeof this._byId[item[this.key]] != "undefined") {
 								throw "Key already in collection: " + item[this.key];
@@ -299,6 +299,7 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 
 				this._items.splice(indx, 0, item);
 				this.length = this._items.length;
+
 				if (!silent){
 					this.dispatchEvent(new Tevent(Tevent.ADDED, {
 							item: item,
@@ -323,23 +324,25 @@ defineClass("TarrayCollection", "panjs.core.events.TeventDispatcher", {
 				}
 		},
 
-		addItemsAt: function(items, indx, silent) {
-				if (indx > this.length) {
-						this.addItems(items, silent);
-				} else {
-						var position = indx;
-						for (var i = 0; i < items.length; i++) {
-								this._source.push(items[i]);
-								if ((this.filterFunction == null) || (this.filterFunction(items[i]))) {
-										var indx = this.getItemIndex(items[i]);
-										if (indx > -1) {
-												position++;
-												this._addItemAt(position, items[i], silent);
-										}
+		addItemsAt: function(items, indx, silent) 
+		{
+				if (indx > this.length) 
+						indx = this.length;
 
-								}
+				var position = indx;
+				for (var i = 0; i < items.length; i++) {
+						this._source.push(items[i]);
+						if ((this.filterFunction == null) || (this.filterFunction(items[i]))) {
+						
+							var indx = this.getItemIndex(items[i]);
+							if (indx == -1) {
+
+									position++;
+									this._addItemAt(position, items[i], silent);
+							}
+
 						}
-				}
+				}			
 		},
 
 		addItems: function(items, silent) {

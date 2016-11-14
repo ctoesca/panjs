@@ -15,6 +15,23 @@
 	text-align: left;
 }
 
+.TmultiSelect .btn .caret {
+	margin-left: 0;
+	float: right;
+	margin-top: 10px;
+}
+
+@-moz-document url-prefix() {
+	.TmultiSelect .btn .caret {
+		float: right;
+		margin-top: -15px;
+		margin-left: 6px;
+	}
+	.TmultiSelect .btn{
+		line-height: 1.37;
+	}
+}
+
 </style>
 
 <script data-subtype="text/x-class-definition">
@@ -27,8 +44,7 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 	_opened: false,
 	_localDataProvider: null,
 	_enabled: true,
-
-
+	
 	constructor: function(args){
 		
 		this._super.constructor.call(this,args);
@@ -49,7 +65,7 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 			allSelectedText: "Tout sélectionné",
 			includeSelectAllOption: true,
 			disableIfEmpty: true,
-			numberDisplayed: 3,
+			numberDisplayed: 2,
 			maxHeight: 600,
 			enableClickableOptGroups: true,
 
@@ -61,6 +77,7 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 
 			//buttonText: this._buttonText
 		};
+		
 
 		for (var k in args){
 			this._opt[k] = args[k];
@@ -199,7 +216,8 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 
 		this.container.find('option:selected').each(function(indx, el) {
 		 	var item = this._dataProvider.getByProp(this._opt.valueField, $(el).val());
-           	r.push(item);
+		 	if (item != null)
+           		r.push(item);
         }.bind(this));
    
 		return r;
@@ -221,6 +239,7 @@ defineClass("TmultiSelect", "panjs.core.display.Telement", {
 		}
 
 		this.selectElem.multiselect('select', values); /* Pas d'evt onChange par défaut. mettre arg triggerOnChange ?*/
+
 	},
 
 	selectAll:function(){

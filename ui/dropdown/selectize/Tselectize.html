@@ -6,16 +6,22 @@
   <script type="text/javascript" src="../../../lib/selectize/0.12.1/dist/js/standalone/selectize.min.js"></script>
 
 <style>
+
 .Tselectize .selectize-dropdown .optgroup {
 	border-style:none;
 }
 .Tselectize .selectize-dropdown-content {
   max-height: 300px;
 }
+.Tselectize .selectize-input input{
+	width: 100%;
+}
 </style>
 <script data-subtype="text/x-class-definition">
 //<![CDATA[
-              
+
+uses("panjs.core.helpers.Ttimer");          
+
 defineClass("Tselectize", "panjs.core.display.Telement", { 
 	/* PROPRIETES */
 	baseElement: "select",
@@ -37,6 +43,7 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 	openOnClick: false,
 
 	/* PRIVATE */
+	_dataProvider: null,
 	_data: null,
 	_control:null,
 	_dataProvider: null,
@@ -47,9 +54,19 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 	_isAdded: false,
 	_dpTemp: null,
 
+	_visible: true,
+	_isLoading: false,
+
+	ontimerAdded: null,
+	_isLoadingIsSet: false,
+	error: null,
+
 	constructor: function(args){
 		
 		this._super.constructor.call(this,args);
+		
+		this.container.hide();
+
 		this._postCreateActions = [];
 
 		this.injectParam("width", args["width"],false);
@@ -67,7 +84,7 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 		this.injectParam("closeAfterSelect", args["closeAfterSelect"]);
 		this.injectParam("openOnClick", args["openOnClick"]);
 
-		
+		this.timerAdded = new Ttimer({delay: 30, onTimer: this.ontimerAdded.bind(this)});
 		
 
 		panjs.loader.loadCssFile(panjs.namespaces["panjs.core"].path+"/../lib/selectize/0.12.1/dist/css/selectize."+this.theme+".css");
@@ -79,54 +96,118 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 		if (this.width != null)
 			this.container.css("width", this.width);
 
-	
+		
      	this.setPlaceholder(this.placeholder);
 
 	},
+
 	_onAdded: function(){		
 		this._isAdded = true;	
 		if (this._dpTemp != null)
 			this.setDataProvider(this._dpTemp);
 		this._dpTemp = null;
 	},
+	
 	setPlaceholder: function(v){
-		
 		this.container.attr("placeholder",v);
-		if (this._control != null)
+		/*Pb
+		if (this._control != null){
+			this._control.$control.getElement("input").attr("placeholder",v);
      		this._control.$control_input.attr("placeholder", v);
+		}*/
 	},
+
 	_transformItem: function(item){
 		return  item;
 	},
+	
+	ontimerAdded: function(){
+		
+		if (this.container.parent().length>0){
+			this.timerAdded.stop();
+			this._setIsLoading(this._isLoading);
+		}
+		
+	},
+
 	_setIsLoading: function(v){
-		//!! A REVOIR
-		if (v){	
-				this._createComponent([]);	
+		
+		if (this.container.parent().length == 0){
+			this.timerAdded.start();
+			return;
+		}
 
-				this.setPlaceholder("Chargement en cours");
+		if (this._control != null)
+		{
+			if (v){	
 				this._control.$control.append( $('<i class="fa fa-spin fa-cog"></i>') );
-		}
-		else{
-				if (this._control != null){
-
-					var i = this._control.$control.getElement('i');
-					if (i) i.remove();
-					this.setPlaceholder(this.placeholder);
+				this.setPlaceholder("Chargement en cours...");
+				this.enabled(false);
+			}
+			else{
+				var i = this._control.$control.getElement('i.fa-spin');
+				if (i) i.remove();
+				this.setPlaceholder(this.placeholder);
+				this.enabled(true);
+			}
+			if (this.loader){
+					this.loader.remove();
+					this.loader = null;
+			}
+		}else{
+			
+			if (v)
+			{	
+				if (!this.loader)
+				{
+					this.loader = $('<div class="form-control"><i class="fa fa-spin fa-cog"></i> Chargement en cours...</div>');
+					this.container.after( this.loader );
 				}
-				
-
+				this.enabled(false);
+			}
+			else{
+				if (this.loader){
+					this.loader.remove();
+					this.loader = null;
+				}
+				this.enabled(true);
+			}
 		}
+		
+
+	},
+
+	setError: function(v){
+		if (this.error)
+			this.error.remove();
+
+		if (v){
+			this.error = $('<pre class="alert alert-danger" style="padding: 5px;">'+v+'</pre>');	
+			this.container.after(this.error);		
+		}
+		
 	},
 	setIsLoading: function(v){
 		//!! A REVOIR
 		//affichage du composant pour pouvoir afficher l'icone de chargement
 		//setDataProvider() détruit et recrée le composant = setIsLoading(false)
-		if (this._control == null)
-		setTimeout(function(){
-			this._setIsLoading(v);
-		}.bind(this), 0);	
-		else
-			this._setIsLoading(v);
+
+		//if (this._control != null)
+		
+
+		if (this._isLoading != v)
+		{
+			this._setIsLoading(v);	
+			this._isLoading = v;	
+			this._isLoadingIsSet = true;
+		}
+		
+		
+	},
+
+	getDataProvider: function()
+	{
+		return this._dataProvider;
 	},
 	setDataProvider: function(dp)
 	{	
@@ -142,6 +223,7 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 		}else{
 			this._dpTemp = dp;
 		}
+		
 	},
 
 	_setIsReady: function(value){
@@ -184,9 +266,15 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 
 		this._control = this.container.selectize(opt)[0].selectize;
 
+		
+
 		if (this._inlineStyle)
 		this._control.$wrapper.attr("style", this._inlineStyle);	
 
+		if (!this._visible)
+			this.hide();
+		
+		
 
 		if (this.openOnClick){
 			this._control.$wrapper.getElement(".selectize-input").on("click", function(e){	
@@ -195,8 +283,11 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 		}
 
 
-		this.setPlaceholder(this.placeholder);
 		
+		if (this._isLoadingIsSet)
+			this._setIsLoading(this._isLoading);
+		else
+			this.setPlaceholder(this.placeholder);
 
 		return this._control;	
 	},
@@ -241,6 +332,8 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 			r.render.item = this.renderItem;
 		if (typeof this.renderOption != "undefined")
 			r.render.option = this.renderOption;
+		if (typeof this.renderOptgroupHeader != "undefined")
+			r.render.optgroup_header = this.renderOptgroupHeader;
 
 		return r;
 	},
@@ -339,14 +432,18 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 	},
 	getSelectedItems: function()
 	{		
-		
-		var selId = this._control.getValue();	
 		var r = [];
 
-		if (selId != null)
-		for (var i=0; i<selId.length; i++){
-			r.push( this._dataProvider.getByProp(this.valueField, selId[i]));
+		if (this._control != null){
+
+			var selId = this._control.getValue();	
+	
+			if (selId != null)
+			for (var i=0; i<selId.length; i++){
+				r.push( this._dataProvider.getByProp(this.valueField, selId[i]));
+			}
 		}
+
 		return r;
 	},
 
@@ -389,34 +486,45 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 	},
 	
 	enabled: function(value){
+
 		if (arguments.length >0)
 		{
 			this._enabled = value;
-			if (value)
-				this._control.enable(value);
-			else
-				this._control.disable(value);
+			
+			if (this._control != null)
+			{
+				if (value)
+					this._control.enable(value);
+				else
+					this._control.disable(value);
+			}
 		}
 		else{
 			return this._enabled;
 		}
+
 	},
 	show: function(){
 		if (this._control != null)
-		this._control.$control.show();
+			this._control.$wrapper.show();
+		
+		this._visible = true;
 	},
 	hide: function(){
 		if (this._control != null)
-		this._control.$control.hide();
+			this._control.$wrapper.hide();	
+		this._visible = false;
 	},
 	free: function(){
 		this._super.free.call(this);
-		this._control.destroy();
+		if (this._control != null)
+			this._control.destroy();
 	}
 });
 //]]>
 </script>
 
 </head>
+
 </html> 
 

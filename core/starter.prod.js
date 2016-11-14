@@ -2,7 +2,7 @@ var defaultSettings = {
 		appVersion: "1.0.0",
 		logLevel	: "DEBUG",
 		env			: "dev",
-		version 	: "1.0.0",
+		version 	: "1.0.3",
 		addIdClass  : false,
 		preserveElementsId: false,
 		setSourceInComponents: false,
@@ -937,12 +937,14 @@ defineClass("Tloader", "panjs.core.Tobject", {
 				dataType: "html",
 				processData: false,
 				context: this,
+ 	
 
 				beforeSend: function(request) {
 					//Sur accès GSM, les proxies des providers "optimisent" et modifient les pages html, les rendant non valides, et injectent du script etc.
 					//no-transform évite ça
 
 					//request.setRequestHeader("Cache-Control", "no-transform");
+
 				},
 				success: function(data, textStatus, jqXHR) {
 

@@ -34,15 +34,13 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 	container:null,
 	id:null,
 	owner:null,
-
 	visible:true,	//Etat de départ
 	autoload: true,
-	
 	baseElement:null,
-	
 	_realVisible: false,
 	args: null,
-	
+	_resizeFunction: null,
+
 	/* Si on ne sait pas si l'objet est un objet jquery ou pas, 
 		la fonction isLoaded() et load() doivent pouvoir être appelées.
 	*/
@@ -52,9 +50,19 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 	isLoaded:function(){
 		return true;
 	},
+	onWindowResize: function(f){
+        if (this._resizeFunction)
+             $(window).off("resize", this._resizeFunction);
+         
+        this._resizeFunction = f
+        $(window).on("resize", f);
+    },
 	free: function(){
-		
+
 		TdisplayObject._super.free.call(this);
+
+		if (this._resizeFunction)
+            $(window).off("resize", this._resizeFunction);
 		this.container.remove();
 		/*<ENV:dev>*/
         panjs.capture("free",{classPath: this.classPath, componentId: this.id});

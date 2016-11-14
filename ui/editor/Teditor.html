@@ -1,10 +1,10 @@
 <html>        
 <head>
 <script>
-	var CKEDITOR_BASEPATH = panjs.namespaces["panjs.core"].path+'/../lib/ckeditor/4.5.1/';
+	var CKEDITOR_BASEPATH = panjs.namespaces["panjs.core"].path+'/../lib/ckeditor/4.5.9/';
 </script>
-<script src="../../lib/ckeditor/4.5.1/ckeditor.js"></script>
-<script src="../../lib/ckeditor/4.5.1/adapters/jquery.js"></script>
+<script src="../../lib/ckeditor/4.5.9/ckeditor.js"></script>
+<script src="../../lib/ckeditor/4.5.9/adapters/jquery.js"></script>
 
 
 <style type="text/less">
@@ -23,6 +23,7 @@ defineClass("Teditor", "panjs.core.display.Telement", {
 	textarea: null,
 	editorId: null,
 	baseHref: null,
+
 	extraPlugins: 'colorbutton,colordialog', //'closebtn,savebtn,colorbutton,preview,colordialog'
 	removePlugins: 'save,forms,language,showblocks,showborders,smiley,wsc,find,bidi,about,a11yhelp,selectall,pastetext,flash',
 	_onInstanceReady: null,
@@ -61,6 +62,7 @@ defineClass("Teditor", "panjs.core.display.Telement", {
 		    { name: 'Marker: Yellow', element: 'span', styles: { 'background-color': 'Yellow' } }
 		]);*/
 
+
 		this.container.getElement("textarea").ckeditor(
 			function(e){
 				this.dispatchEvent( new Tevent("READY", this));
@@ -80,13 +82,14 @@ defineClass("Teditor", "panjs.core.display.Telement", {
 
 	free: function(){
 
-		this._super.free.call(this);
+		
 		CKEDITOR.removeAllListeners();
 		if (this.editor){
+			
 			this.editor.destroy();
 			this.editor = null;	
 		}
-		
+		this._super.free.call(this);
 	},
 	getConfig: function(){
 		return {
@@ -185,6 +188,11 @@ defineClass("Teditor", "panjs.core.display.Telement", {
 	getContent: function() {
 
 		return  this.editor.getData();
+	},
+
+	setHeight: function(h){
+		this.editorElem.css("height", h);
+		this.editor.resize();
 	}
 
 });

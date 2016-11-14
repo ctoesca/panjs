@@ -1,4 +1,4 @@
-#panJS v1.0.1
+#panJS v1.0.2
 > A 40 ko javascript framework 
 <p><a href="http://www.nexilearn.com/panjs/doc/change-log/"><b>Change log</b></a>.</p>
 <p><b><a href="http://www.nexilearn.com/panjs/doc/69/">API documentation</a></b></p>
@@ -16,7 +16,7 @@
 
 <img alt="Licence Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" />
 <br/>
-Panjs de Christophe Toesca est mis à disposition selon les termes de la licence Creative Commons Attribution - Pas d'Utilisation Commerciale - Pas de Modification 4.0 International. Les autorisations au-delà du champ de cette licence peuvent être obtenues à christophe.toesca&#64;gmail.com.
+Panjs de Christophe Toesca est mis à disposition selon les termes de la licence Creative Commons Attribution - Pas d'Utilisation Commerciale - Pas de Modification 4.0 International. Les autorisations au-delà du champ de cette licence peuvent être obtenues à cette adresse: https://github.com/ctoesca.
 
 ## Feature Highlights
 
@@ -102,7 +102,7 @@ You put a component in HTML page (or in another HTML component) like this:
             logLevel: "DEBUG",
             env: "dev", // dev or prod
             appName: "myapp"
-            appVersion: "0.1", 
+            appVersion: "1.0.2", 
             
             namespaces:{
               "core": {path: "../core"},    //panjs "core" directory

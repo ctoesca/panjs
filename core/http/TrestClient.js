@@ -12,7 +12,7 @@ defineClass("TrestClient", "panjs.core.events.TeventDispatcher",
 	*/
 	exitCodeFieldName: null, 
 	errorTextFieldName: null, 
-	
+	 
 	extraUrlParams: null,
 	
 	constructor: function(args){	
@@ -118,9 +118,14 @@ defineClass("TrestClient", "panjs.core.events.TeventDispatcher",
 		
 		if (arguments.length < 8)
 			var dataType = this.dataType;
-		
-		if ((dataType == "json")&&((method=="POST")||(method=="PUT")))
+
+		var contentType = null;
+		if ((dataType == "json")&&((method=="POST")||(method=="PUT"))){
 			data = JSON.stringify(data);
+			/* jquery remplace '??' par un Id aléatoire! (ex: jQuery21105193407278801687_1471892858224 ). pas corrigé dans jquery 3.1.0*/
+			data = data.replace(/\?\?/g, '\\u003f\\u003f');
+			contentType = "application/json; charset=utf-8";
+		}
 
 		/*
 			Construction des paramètres de l'url
@@ -167,12 +172,14 @@ defineClass("TrestClient", "panjs.core.events.TeventDispatcher",
 
 		logger.debug("TrestClient._call requestId %1 , method:%2, path: %3, dataType=%4", token.requestId, method, path, dataType);
 		
+
 		var req = $.ajax({ 
 				url: path,
 				async:true,
 				data:data,
 				context:this,
 				type: method,
+				contentType: contentType,
 				xhrFields: {
    				   withCredentials: true
    				},

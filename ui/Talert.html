@@ -27,20 +27,23 @@ defineClass("Talert", "panjs.ui.TtitleWindow.html", {
 	message: "",
 	buttons: null,
 	closeHandler: null,
+	showCloseButton: false,
 
 	constructor: function(args){ 
 		
 		this._title = "Demande de confirmation";
+		
 		this.iconHtml = '<i class="fa fa-2x fa-question" ></i>';
+		this.injectParam("iconHtml", args.iconHtml,false, this.iconHtml);
 
 		this._super.constructor.call(this,args);	
 	
 		this.iconContainer.css("color", "#F87217");
-
 		this.injectParam("message", args.message,false, this.message);	
-		this.injectParam("_data", args.data,false, this._data);
-		this.injectParam("closeHandler", args.closehandler,false, null);
+		this.injectParam("_data", args.data,false, this._data)
+		this.injectParam("closeHandler", args.closeHandler,false, null);
 		this.injectParam("buttons", args.buttons,false, [Talert.OK]);
+		this.injectParam("showCloseButton", args.showCloseButton,false, this.showCloseButton);	
 
 		if (typeof this.buttons == "string"){
 			var f = function(v)
@@ -58,8 +61,9 @@ defineClass("Talert", "panjs.ui.TtitleWindow.html", {
 			if (b != null)
 				b.show();
 		}
-	
-		this.buttonClose.remove();
+
+		if (!this.showCloseButton)
+			this.buttonClose.remove();
 
 		this.body.html(this.message);
 	},	
@@ -88,7 +92,7 @@ defineClass("Talert", "panjs.ui.TtitleWindow.html", {
 		var evt =  new Tevent(Tevent.CLOSE);
 	},
 
-	close: function(e, action)
+	close: function(evt, action)
 	{	
 		var evt =  new Tevent(Tevent.CLOSE);
 	
@@ -112,35 +116,38 @@ Talert.YES = "Oui";
 Talert.NO = "Non";
 Talert.CANCEL = "Annuler";
 
-Talert.show = function(message, buttons, closeHandler, data, iconhtml, title, fade)
+Talert.show = function(message, opt)
 {
+	if (arguments.length == 1)
+		var opt = {};
+	
+	var opt2 = {};
+	if ((arguments.length > 1)&& (typeof opt.fade != "undefined"))
+		opt2.fade = opt.fade;
+
 	uses("panjs.ui.managers.PopupManager.html");
 	//message = message.replace(/\n/g,'<br/>');
-	
-	var p = PopupManager.createPopup(Talert, 
-	{
-		message:message,
-		buttons: buttons,
-		closehandler: closeHandler,
-		data: data,
-		iconhtml: iconhtml,
-		title: title
-	}, 
-	{ 
-		fade: fade
-	});
+	opt.message = message;
+	var p = PopupManager.createPopup(Talert, opt, opt2);
 	return p;
 }
-Talert.confirm = function(message,closeHandler, buttons, data )
+Talert.confirm = function(message,closeHandler, buttons, data, iconHtml, title )
 {
-	if (!defined(iconhtml))
-		var iconhtml = '<i class="fa fa-2x fa-question" style="font-size:200%; color:#f0ad4e"/>';
+	if (!defined(iconHtml))
+		var iconHtml = '<i class="fa fa-2x fa-question" style="font-size:200%; color:#f0ad4e"/>';
 
 	var _title = "Demande de confirmation";
 	if ((typeof title != "undefined") && (title != null))
 		_title = title;
 
-	return Talert.show(message, buttons, closeHandler, data, iconhtml, _title, false);	
+	return Talert.show(message, {
+		buttons: buttons, 
+		closeHandler:closeHandler, 
+		data: data, 
+		iconHtml:iconHtml, 
+		title:_title, 
+		fade: false
+	});	
 }
 
 Talert.confirmYesNo = function(message,closeHandler, data)
@@ -156,50 +163,83 @@ Talert.confirmYesNoCancel = function(message,closeHandler, data)
 	return Talert.confirm(message, closeHandler, [Talert.YES, Talert.NO, Talert.CANCEL], data)
 }
 
-Talert.warn = function(message, buttons, closeHandler, data, iconhtml, title, fade)
+Talert.warn = function(message, title, closeHandler, data,  iconHtml, fade)
 {
-	if (!defined(iconhtml))
-		var iconhtml = '<i class="glyphicon glyphicon-exclamation-sign" style="font-size:200%; color:#f0ad4e"/>';
+	if (!defined(iconHtml))
+		var iconHtml = '<i class="glyphicon glyphicon-exclamation-sign" style="font-size:200%; color:#f0ad4e"/>';
 
 	var _title = "Avertissement";
 	if ((typeof title != "undefined") && (title != null))
 		_title = title;
 
-	return Talert.show(message, buttons, closeHandler, data, iconhtml, _title, fade);	
+	var buttons = [Talert.OK];
+	return Talert.show(message, {
+		buttons: buttons, 
+		closeHandler:closeHandler, 
+		data: data, 
+		iconHtml:iconHtml, 
+		title:_title, 
+		fade: fade,
+		showCloseButton: true
+	});	
 }
-Talert.info = function(message, buttons, closeHandler, data, iconhtml, title, fade)
+Talert.info = function(message, title, closeHandler, data, iconHtml, fade)
 {
-	if (!defined(iconhtml))
-		var iconhtml = '<i class="glyphicon glyphicon-info-sign" style="font-size:200%; color:#428bca"/>';
+	if (!defined(iconHtml))
+		var iconHtml = '<i class="glyphicon glyphicon-info-sign" style="font-size:200%; color:#428bca"/>';
 	
 	var _title = "Info";
 	if ((typeof title != "undefined") && (title != null))
 		_title = title;
-	
-	return Talert.show(message, buttons, closeHandler, data, iconhtml, _title, fade);	
+	var buttons = [Talert.OK];
+	return Talert.show(message, {
+		buttons: buttons, 
+		closeHandler:closeHandler, 
+		data: data, 
+		iconHtml:iconHtml, 
+		title:_title, 
+		fade: fade,
+		showCloseButton: true
+	});	
 }
-Talert.success = function(message, buttons, closeHandler, data, iconhtml, title, fade)
+Talert.success = function(message, title, closeHandler, data, iconHtml, fade)
 {
-	if (!defined(iconhtml))
-		var iconhtml = '<i class="fa fa-check" style="font-size:200%; color:#5CB85C;"/>';
+	if (!defined(iconHtml))
+		var iconHtml = '<i class="fa fa-check" style="font-size:200%; color:#5CB85C;"/>';
 	
 	var _title = "Succès";
 	if ((typeof title != "undefined") && (title != null))
 		_title = title;
-	
-	return Talert.show(message, buttons, closeHandler, data, iconhtml, _title, fade);	
+	var buttons = [Talert.OK];
+	return Talert.show(message, {
+		buttons: buttons, 
+		closeHandler:closeHandler, 
+		data: data, 
+		iconHtml:iconHtml, 
+		title:_title, 
+		fade: fade,
+		showCloseButton: true
+	});	
 }
 
-Talert.error = function(message, buttons, closeHandler, data, iconhtml, title, fade)
+Talert.error = function(message, title, closeHandler, data, iconHtml, fade)
 {
-	if (!defined(iconhtml))
-		var iconhtml = '<i class="glyphicon glyphicon-remove" style="font-size:200%;color:#d9534f"/>';
+	if (!defined(iconHtml))
+		var iconHtml = '<i class="glyphicon glyphicon-remove" style="font-size:200%;color:#d9534f"/>';
 
 	var _title = "Erreur";
 	if ((typeof title != "undefined") && (title != null))
 		_title = title;
-	
-	return Talert.show(message, buttons, closeHandler, data, iconhtml, _title, fade);	
+	var buttons = [Talert.OK];
+	return Talert.show(message, {
+		buttons: buttons, 
+		closeHandler:closeHandler, 
+		data: data, 
+		iconHtml:iconHtml, 
+		title:_title, 
+		fade: fade,
+		showCloseButton: true
+	});	
 }
 //]]>
 </script>

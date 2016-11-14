@@ -24,6 +24,8 @@ Exemple:
 
 
 -->
+
+
 <style type="text/css">
 
 .tableContainer.fixed-header {
@@ -64,10 +66,6 @@ Exemple:
 .TsimpleGrid tr.moving {
 	opacity: 0.5;
 }
-
-
-
-
 
 
 
@@ -118,6 +116,7 @@ Exemple:
 }
 
 
+
 .TsimpleGrid .scrollWait
 {
 	/*overflow: auto;
@@ -148,6 +147,22 @@ Exemple:
  display:none;
 }
 
+/* PB header en mode fixe (perte de style) */
+/*.TsimpleGrid thead th, .TsimpleGrid thead tr{
+    position:relative;
+}*/
+.TsimpleGrid td .glyphicon {
+	position:inherit;
+}
+
+.TsimpleGrid .load-more-container{
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    padding: 10px;
+}
+
+
 </style>
 
 <script data-subtype="text/x-class-definition">
@@ -166,13 +181,10 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 	_isEmpty: true,
 	_tableClass: null, //Style affecté sut la table
 	loaded: false,
-	sectionRecordsCount: 100,
 	linesCount: 0,
 	onBeforeRenderLine: null,
 	detailRowRenderer: null,
 
-	progressiveLoad: true,
-	_progressiveLoadHandledIsSet: false,
 	visibleColsCount: 0,
 
 	/* Selection */
@@ -187,7 +199,13 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 	caption: null,
 	dragSrcEl: null,
 	fixedHeader: false,
+	_progressiveLoadHandledIsSet: false,
 
+	
+	progressiveLoad: true,
+	pageSize: 100,
+	progressiveLoadLinkVisible: false,
+	progressiveLoadOnScroll: true,
 
 	/* METHODES */	
 	constructor: function(args){
@@ -202,9 +220,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		if (this._canDragRows)
 			this.table.addClass("draggableRows");
 
-		TsimpleGrid.ON_SORT_CHANGED = "ON_SORT_CHANGED";
-		TsimpleGrid.ON_CELL_CLICK = "ON_CELL_CLICK";
-		TsimpleGrid.ON_ROW_CLICK = "ON_ROW_CLICK";
+
 
 		this._tableClass = args["class"] || this._tableClass;
 
@@ -220,7 +236,12 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 
 		if (typeof args.maxHeight != "undefined")
 			this.setHeight(args.maxHeight);
-	
+		if (typeof args.pageSize != "undefined")
+			this.pageSize = args.pageSize;
+		if (typeof args.progressiveLoad != "undefined")
+			this.progressiveLoad = args.progressiveLoad;
+
+		
 		/*
 		Récup des colonnes définies dans <CONTENT>
 		*/
@@ -280,7 +301,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		{
 			this.tableContainer[0].addEventListener("scroll",function(){
 		   		var translate = "translate(0,"+(this.scrollTop)+"px)";
-		   		this.querySelector("thead").style.transform = translate;
+		   	
 			});	
 			this.tableContainer.addClass("fixed-header");
 		}
@@ -342,38 +363,65 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 	{
 		logger.debug("_onHide table");
 	},
-	_onBottom:function(e)
-	{
 
-		if($(window).scrollTop() + $(window).height() == getDocHeight()) {
-			
-			if (this._dataProvider == null)
+	_triggerShowMore: function(){
+		if (!this.progressiveLoad)
 			return;
 
-			if (this.linesCount == this._dataProvider.length)
-				return;
+		if (this._dataProvider == null)
+			return;
 
-			if ( this.container.is(":visible") == false)
-				return;
-						
-			this.scrollWait.show();
-			setTimeout(this.showMore.bind(this),500);		
-       	}
+		if ( this.container.is(":visible") == false)
+			return;
+
+		var evt = new Tevent( TsimpleGrid.ON_BEFORE_SHOWMORE, {visibleLinesCount: this.linesCount} );
+		this.dispatchEvent( evt )
+		if (evt.defaultPrevented)
+			return;
+
+		if (this.linesCount >= this._dataProvider.length)
+			return;
+
+		this.toggleScrollWait( true );
+		
+		setTimeout(this.showMore.bind(this),500);		
 	},
 
+	_onWindowScroll:function(e)
+	{	
+		if (($(window).scrollTop() + $(window).height() == getDocHeight()) && ($(window).scrollTop() != 0))
+			this._triggerShowMore()
+	},
+
+	_onTableScroll: function(e)
+	{
+		//logger.debug("SCROLLTOP="+this.tableContainer.scrollTop()+", tableContainer.height()="+this.tableContainer.height()+", table.height()="+this.table.height());
+
+		if(this.tableContainer.scrollTop() + this.tableContainer.height() >= this.table.height())
+			this._triggerShowMore()
+	},
+
+	toggleScrollWait: function(v){
+
+		if (v)
+			this.scrollWait.show();
+		else
+			this.scrollWait.hide();
+	},
 	showMore: function(count)
 	{	
+
 		if(arguments.length == 0)
-			var count = 999999;
+			var count = 999999;	
 
 		var start = this.linesCount;
 
-		var end = this.linesCount+this.sectionRecordsCount-1;
+		var end = this.linesCount+this.pageSize-1;
 		
 		if (end >= this._dataProvider.length)
 			end = this._dataProvider.length-1;
 		if (end<start){
-			this.scrollWait.hide();
+			this.toggleScrollWait( false );
 			return;
 		}
 		var debut = new Date();
@@ -390,8 +438,12 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		}
 
 		this.tbody[0].appendChild(docFragment);
-		this.scrollWait.hide();
+		this.toggleScrollWait( false );
 		logger.debug("Temps exécution showMore : "+(new Date() - debut)+" ms");
+
+
+		this.toggleLoadMoreLink( (this.linesCount < this._dataProvider.length)) 
+
 	},
 
 	getColByField: function(field)
@@ -408,15 +460,34 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 	
 	hideCol: function(col)
 	{
-		col.visible = false;
+		if (typeof col == 'string')
+		{
+			var cols = this.getColByField(col);
+			for (var i=0; i< cols.length; i++){
+				cols[i].visible = false;
+			}
+		}else{
+			col.visible = false;
+		}
+		
 		this._createTable();
 	},
 
 	showCol: function(col)
 	{
-		col.visible = true;
+		if (typeof col == 'string')
+		{
+			var cols = this.getColByField(col);
+			for (var i=0; i< cols.length; i++){
+				cols[i].visible = true;
+			}
+		}else{
+			col.visible = true;
+		}
+		
 		this._createTable();
 	},
+	
 	getColAt: function(indx)
 	{
 		if (!this._cols)
@@ -490,15 +561,18 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 
 			this._dataProvider = dataProvider;
 			if (!this.progressiveLoad){
-				this.sectionRecordsCount = 100000;
+				this.pageSize = 100000;
 			}else{
-				if (!this._progressiveLoadHandledIsSet){
-	      			$(window).scroll( this._onBottom.bind(this));
+				if (!this._progressiveLoadHandledIsSet && this.progressiveLoadOnScroll && this.progressiveLoad){
+	      			$(window).scroll( this._onWindowScroll.bind(this));
 	      			this._progressiveLoadHandledIsSet = true;
 
 	      			this.tableContainer.scroll( this._onTableScroll.bind(this));
 	      			
 	      		}
+
+	      
+
 			}
 
 			
@@ -511,26 +585,20 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		}
 
 		this._createTable();
+
+		
+		this.toggleLoadMoreLink( (this.linesCount < this._dataProvider.length))  
+
 	},
-	_onTableScroll: function(e)
-	{
-		//logger.debug("SCROLLTOP="+this.tableContainer.scrollTop()+", tableContainer.height()="+this.tableContainer.height()+", table.height()="+this.table.height());
 
-		if(this.tableContainer.scrollTop() + this.tableContainer.height() >= this.table.height()) {
-			
-			if (this._dataProvider == null)
-			return;
+	toggleLoadMoreLink: function(v){
 
-			if (this.linesCount == this._dataProvider.length)
-				return;
-
-			if ( this.container.is(":visible") == false)
-				return;
-						
-			this.scrollWait.show();
-			setTimeout(this.showMore.bind(this),500);		
-       	}
+		if (v && this.progressiveLoadLinkVisible && this.progressiveLoad)
+			this.loadMoreContainer.show( );
+		else
+			this.loadMoreContainer.hide( );
 	},
+
 	getDataProvider: function()
 	{
 		return this._dataProvider;
@@ -912,7 +980,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		for (var i =0; i< items.length; i++)
 		{
 			var d = items[i];
-			if (this.linesCount<this.sectionRecordsCount)
+			if (this.linesCount<this.pageSize)
 				this._addLine(d, docFragment, i);
 		}	
 
@@ -931,6 +999,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 		var s2 = new Date().getTime();
 		renderTime = renderTime + (s2 - s1);
 		logger.debug("table renderTime = "+renderTime+" ms");		
+
 
 	},
 
@@ -1054,12 +1123,15 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 					td.innerHTML = html;
 				}
 
-				if (col.cellClass != null){
+				if (typeof col.cellClass == "string"){
 					var c = td.getAttribute("class");
 					td.setAttribute("class", c+" "+col.cellClass);
+				}else if (typeof col.cellClass == "function"){
+					td.setAttribute("class", col.cellClass(obj, col.field, col ) );
 				}
-				
 
+				/*if (i==0)
+					$(td).addClass("fixed-col");*/
 				tr.appendChild(td);
 			}
 		}
@@ -1261,16 +1333,23 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 	{
 		if (!this._filterFunction(obj))
 			return false;
-		
-		indx ++;
+
+		if (indx > this.linesCount)
+			indx = this.linesCount;
+
 		var tr = document.createElement("tr");
 		tr.setAttribute("data-index", indx);
 
 		this._setTr(tr, obj, true);
 
-		var trAfter = this.tbody.getElement('tr:nth-child('+indx+')');
+		if (indx ==0){
+			this.tbody.prepend($(tr));
+		}
+		else{
+			var trAfter = this.tbody.getElement('tr:nth-child('+indx+')');
+			this.tbody.append($(tr));
+		}
 			
-		$(tr).insertAfter(trAfter);
 		this.linesCount ++;
 		return true;
 	},
@@ -1387,6 +1466,10 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 
 });
 
+TsimpleGrid.ON_SORT_CHANGED = "ON_SORT_CHANGED";
+TsimpleGrid.ON_CELL_CLICK = "ON_CELL_CLICK";
+TsimpleGrid.ON_ROW_CLICK = "ON_ROW_CLICK";
+TsimpleGrid.ON_BEFORE_SHOWMORE = "ON_BEFORE_SHOWMORE";
 
 //]]>
 </script>
@@ -1407,11 +1490,15 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
           
           </tbody>                 
      </table>
+
  </div>
 
-    <!--CONTENT-->
-    
+    <div class="load-more-container" id="loadMoreContainer" style="display:none">
+    	<a data-onclick="this._triggerShowMore"><i class="fa fa-plus"></i> Afficher plus de lignes</a>
+	</div>
 
-     <h2 id="scrollWait" style="display:none" class="scrollWait">Chargement en cours...</h2>
+    <h2 id="scrollWait" style="display:none" class="scrollWait">Chargement en cours...</h2>
+    <!--CONTENT-->
+
 </body>
 </html> 

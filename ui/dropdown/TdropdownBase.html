@@ -40,6 +40,7 @@ defineClass("TdropdownBase", "panjs.core.display.Telement", {
 
 	_itemsCount: 0,
 	_maxWidth: null,
+	_minWidth: null,
 
 	/* METHODES */
 	constructor: function(args){
@@ -47,6 +48,9 @@ defineClass("TdropdownBase", "panjs.core.display.Telement", {
 		if (args)
 		{
 			this.injectParam("_maxWidth", args.maxWidth, false);	
+			this.injectParam("_minWidth", args.minWidth, false);	
+			this.injectParam("_width", args.width, false);	
+			this.injectParam("_height", args.height, false);	
 			this.injectParam("labelField", args.labelfield,false);	
 			this.injectParam("leftIcon", args.leftIcon,false);	
 			this.injectParam("valueField", args.valueField,false);	
@@ -55,7 +59,7 @@ defineClass("TdropdownBase", "panjs.core.display.Telement", {
 			this.injectParam("nullLabelItem", args.nulllabelitem,false, this.nullLabelItem);
 			this.injectParam("labelFunction", args.labelFunction,false, this.labelFunction);
 			this.injectParam("capitalizeFirstLetter", args.capitalizeFirstLetter,false, this.capitalizeFirstLetter);
-			
+			  
 		}
 		this.setPlaceholder(this.placeholder);
 	

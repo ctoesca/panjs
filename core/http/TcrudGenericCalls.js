@@ -15,6 +15,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 	runningRequests: null,
 	lastRequestId : 0,
 	requests: null,
+	method: "GET",
 
 
 	constructor: function(args){
@@ -178,7 +179,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 	/*********************   GESTION FICHIERS DES RESSOURCES  ****/
 	/************************************************************/
 	
-	listFiles: function(id, success, failure)
+	listFiles: function(id, directory, success, failure)
 	{
 		var url = this.url+"/"+id+"/listFiles";
 		var token = this.createNewToken(success, failure);		
@@ -192,9 +193,9 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 	},
 
 	
-	deleteFile: function(id,filename, success, failure)
+	deleteFile: function(id,filepath, success, failure)
 	{
-		var url = this.url+"/"+id+"/files/"+filename;
+		var url = this.url+"/"+id+"/files/"+filepath;
 		var token = this.createNewToken(success, failure);
 		var data = null;
 		this.restClient.del(url, "" , data, this.onDeleteFileSuccess.bind(this), failure||this.defaultErrorHandler, token);
@@ -224,7 +225,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 	},
 
 
-	uploadFiles: function(id, formData, progressHandler, success, failure)
+	uploadFiles: function(id, path, formData, progressHandler, success, failure)
 	{
 		var url = this.apiUrl+this.url+'/'+id+'/files/upload?'+this.extraUrlParams;
 
@@ -327,6 +328,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 
 			token.extSuccess(item);	
 		}*/
+		return token;
 	},
 
 	_ongetById: function(evt, token)
@@ -355,6 +357,8 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 			this.restClient.post(this.url, "" , obj, this._onupdate.bind(this), failure||this.defaultErrorHandler, token);
 		else
 			this.restClient.put(this.url+"/"+obj[this.IDField], "" , obj, this._onupdate.bind(this), failure||this.defaultErrorHandler, token);
+
+		return token;
 	},
 
 	_onupdate: function(evt, token)
@@ -445,6 +449,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 		var data = null;
 
 		this.restClient.del(this.url+"/"+id, "" , data, this._onremove.bind(this), failure||this.defaultErrorHandler, token);
+		return token;
 	},
 
 	_onremove: function(evt, token)
@@ -508,9 +513,10 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 
 		return r;	
 	},
-
-	search: function(searchOptions, success, failure, opt)
+	_searchPOST: function(searchOptions, success, failure, opt)
 	{
+		/* typiquement, utilisé pour les requetes "elasticsearch" */
+		
 		var updateModel = true;
 		var nomModel = null;
 		var useCache = this.cached;
@@ -524,9 +530,73 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 				useCache = opt.useCache;
 		}
 		
+		var reqHashCode = (this.url+ JSON.stringify(searchOptions)).hashCode();
+
+		if (nomModel == null)
+			nomModel = reqHashCode;
+		
+
+		var model = this.getModel(nomModel, false);
+
+		var token = this.createNewToken(success, failure);		
+		token.updateModel = updateModel;
+		token.nomModel = nomModel;
+
+		
+		token.reqHashCode = reqHashCode;
+
+		var data = searchOptions;
+		
+		if ((useCache == false) || (model == null) )
+		{		
+			if (!this.sameSearchIsRunning(token)){
+
+				this.restClient.post(this.url+"/_search", "" , data, this._onsearch.bind(this), this._onsearchFailure.bind(this), token);	
+				
+			}else{				
+				logger.debug("LA REQUETE "+token.requestId+" ne sera pas envoyée une la même requête est déja en cours");
+			}
+			this.saveSearchRequest(token);		
+		}
+		else
+		{
+			logger.debug("UTILISATION DU CACHE SUR "+this.className);
+			var randomWait = randomBetween(10, 100);
+			callLater(
+				function(){
+					delete this.runningRequests[token.requestId];
+					token.extSuccess(model, token);
+				}.bind(this), 
+				randomWait, 
+				model
+			);  
+		}	
+		return token;
+	},
+
+	_searchGET: function(searchOptions, success, failure, opt)
+	{
+		var updateModel = true;
+		var nomModel = null;
+		var useCache = this.cached;
+		var returnArray = false;
+
+		if (arguments.length > 3){
+			if (typeof opt.updateModel != "undefined")
+				updateModel = opt.updateModel;
+			if (typeof opt.nomModel != "undefined")
+				nomModel = opt.nomModel;
+			if (typeof opt.useCache != "undefined")
+				useCache = opt.useCache;
+			if (typeof opt.returnArray != "undefined")
+				returnArray = opt.returnArray;
+		}
+		
+		
+
 		if (searchOptions == null)
 			searchOptions = "";
-		
+			
 		var q = "";
 		if (typeof searchOptions == "object"){
 			for (var k in searchOptions)
@@ -535,7 +605,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 		}else{
 			q = searchOptions;
 		}
-			
+
 		if (nomModel == null){
 			nomModel = q;
 		}
@@ -545,6 +615,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 		var token = this.createNewToken(success, failure);		
 		token.updateModel = updateModel;
 		token.nomModel = nomModel;
+		token.returnArray = returnArray;
 
 		var reqHashCode = (this.url+ q).hashCode();
 		token.reqHashCode = reqHashCode;
@@ -583,7 +654,10 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 			//token.extSuccess(data);
 		}	
 		return token;
+
 	},
+
+	
 	
 	_onsearchFailure: function(e, token){
 		
@@ -656,14 +730,24 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 								else
 								{	
 									//On renvoie une nouvelle collection
-									var model = new TarrayCollection();
-									model.setSource(evt.data.data);
-									model.total = evt.data.total;				
+									if (!localToken.returnArray){
+										var model = new TarrayCollection();
+										model.setSource(evt.data.data);
+										model.total = evt.data.total;														
+									}
 								}
-								
-								this._onsearchDefault(model, localToken, extraData);
-								var fin = new Date(); 			
-								logger.debug("Temps maj model (updateModel="+localToken.updateModel+") = "+ (fin - debut)+" ms") ;
+
+								var fin1 = new Date(); 			
+								logger.debug("Temps maj model (returnArray="+localToken.returnArray+", updateModel="+localToken.updateModel+") = "+ (fin1 - debut)+" ms") ;
+
+								if (localToken.returnArray)
+									this._onsearchDefault(evt.data.data, localToken, extraData);
+								else
+									this._onsearchDefault(model, localToken, extraData);
+
+								var fin2 = new Date(); 			
+								logger.debug("Temps callback (returnArray="+localToken.returnArray+", updateModel="+localToken.updateModel+") = "+ (fin2 - fin1)+" ms") ;
+
 							}	
 						}	
 						
@@ -673,7 +757,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 					this.removeSearchRequest(localToken);
 				}
 			
-		}	
+		}
 		
 			
 	}

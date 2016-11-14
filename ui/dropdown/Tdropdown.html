@@ -23,6 +23,17 @@
 			white-space: normal;
 			text-align: left;
 		}
+		span.caret{
+			float: right;
+    		margin-top: 8px;
+    		margin-left: 6px;
+		}
+
+		i.waiting{
+			line-height: 1.85;
+    		font-size: 1.3em;
+    		margin-left: 3px;
+		}
 }
 </style>
 
@@ -34,11 +45,12 @@ uses("panjs.core.collections.TarrayCollection");
 defineClass("Tdropdown", "panjs.ui.dropdown.TdropdownBase.html", { 
 	
 	errorElement: null,
+	loading: false,
 
 	/* METHODES */
 	constructor: function(args){
 		Tdropdown._super.constructor.call(this,args);
-
+	
 		this.container.addClass("btn-group");
 
 		if (this._maxWidth){
@@ -46,7 +58,34 @@ defineClass("Tdropdown", "panjs.ui.dropdown.TdropdownBase.html", {
 			this.container.css("max-width", this._maxWidth);
 			this.button.css("max-width", this._maxWidth);
 		}
+		if (this._minWidth){
 
+			this.container.css("min-width", this._minWidth);
+			this.button.css("min-width", this._minWidth);
+		}
+
+		if (this._width){
+
+			this.container.css("width", this._width);
+			this.button.css("width", this._width);
+		}
+	
+
+		if (this._height){
+			this.button.css("height", this._height);
+		}		
+
+		if (args.loading)
+			this.loading = args.loading;
+
+		
+		this.setIsLoading(this.loading);
+		
+
+	},
+	setIsLoading: function(v){
+		this.loading = v;
+		this.iconLoading.toggle(v);
 	},
 
 	setReadonly: function(value)
@@ -193,6 +232,7 @@ defineClass("Tdropdown", "panjs.ui.dropdown.TdropdownBase.html", {
     <span id="label"/> <span class="caret" id="caret"></span>
 
   </button>
+  <i id="iconLoading" class="fa fa-spin fa-cog waiting" style="display:none"></i>
   <ul class="dropdown-menu " role="menu" id="ul" >   
   </ul>
 <!--CONTENT-->

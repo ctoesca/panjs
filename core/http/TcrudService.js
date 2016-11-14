@@ -36,11 +36,18 @@ defineClass("TcrudService", "panjs.core.events.TeventDispatcher", {
 				caller.cached =  classe.cached || false;
 				caller.IDField =  classe.IDField || "id";
 				
+					
+				
 				this["caller"+classe.nom] = caller;
 				this["get"+classe.nom+"ById"] = caller.getById.bind(caller);
 				this["update"+classe.nom] = caller.update.bind(caller);
 				this["delete"+classe.nom] = caller.remove.bind(caller);
-				this["search"+classe.nom] = caller.search.bind(caller);
+
+				if (classe.method == "POST")
+					this["search"+classe.nom] = caller._searchPOST.bind(caller);
+				else
+					this["search"+classe.nom] = caller._searchGET.bind(caller);
+
 				this["getHisto"+classe.nom] = caller.getHisto.bind(caller);
 				this["uploadFiles"+classe.nom] = caller.uploadFiles.bind(caller);
 				this["uploadTextData"+classe.nom] = caller.uploadTextData.bind(caller);

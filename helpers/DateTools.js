@@ -6,7 +6,7 @@ defineStaticClass("DateTools", "panjs.core.Tobject",
         panjs.loadScriptSync(panjs.namespaces["panjs.core"].path+"/../lib/moment/2.9.0/min/moment.min.js");
         panjs.loadScriptSync(panjs.namespaces["panjs.core"].path+"/../lib/moment/2.9.0/locale/fr.js");
     },
-
+ 
     getFriendlyDate: function(date){
 
       var r = "";
@@ -17,7 +17,19 @@ defineStaticClass("DateTools", "panjs.core.Tobject",
       return r;
 
     },
+    getFriendlyFullDate: function(date){
 
+      var r = "";
+      if (date){
+        var now = moment();
+        var r = moment(date).format("LLLL");
+      }
+      return r;
+
+    },
+    formatDate: function(date, format){
+        return moment(date).format(format);
+    },
     getDateFromTimestamp: function(d, dateseparator){
         var r = "";
 
@@ -55,7 +67,7 @@ defineStaticClass("DateTools", "panjs.core.Tobject",
     createDateFromMysql: function(mysql_string)
     { 
         if (mysql_string != null)
-          return new Date(mysql_string.replace(" ", "T")); 
+          return moment(mysql_string, "YYYY-MM-DD HH:mm:ss");
         else
           return null;
     },

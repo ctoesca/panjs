@@ -139,7 +139,7 @@
 .Ttabnav li.active .close-tab-btn{
 	display: inline-block;
 }
-.Ttabnav label{
+.Ttabnav ul.nav-tabs label{
 	margin-bottom: auto;
     font-weight: normal;
     cursor: inherit;
@@ -530,7 +530,9 @@ defineClass("Ttabnav", "panjs.core.display.Telement", {
 
 		tab.subComponentsLoaded = true;
 	},
-
+	getSelectTabIndex: function(){
+		return this.selectedIndex;
+	},
 	selectTab: function(indx)
 	{
 
@@ -574,6 +576,20 @@ defineClass("Ttabnav", "panjs.core.display.Telement", {
 		tab.li.show();
 		tab.visible = true;
 		tab.elem.attr("data-visible", "true");
+	},
+
+	enableTab: function(indx, value)
+	{
+		var tab = this._tabs[indx];		
+		if (value)
+			tab.li.removeClass("disabled");
+		else
+			tab.li.addClass("disabled");
+	},
+	isTabEnabled: function(indx)
+	{
+		var tab = this._tabs[indx];		
+		return !tab.li.hasClass("disabled");
 	}
 	
 	

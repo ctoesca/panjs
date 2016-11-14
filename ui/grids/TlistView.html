@@ -149,23 +149,25 @@ defineClass("TlistView", "panjs.core.display.Telement", {
 			}
 			el.show();
 		}else{
-			if (el) el.hide();
+			if (el) el.remove();
 		}
 	},
 	_insertLineAt: function(item, indx)
 	{	
-		var el = this.container.find('li['+this._itemIdAttrName+']'); 
-		var LI = $(this.createLI(item));
+		if (this._itemIsVisible(item)){
+
+			var el = this.container.find('li['+this._itemIdAttrName+']'); 
+			var LI = $(this.createLI(item));
+				
+			if (el.length < indx+1){
+				this.container.append(LI);
+			}
+			else{
+				LI.insertBefore(el[indx]);
+			}
 			
-		if (el.length < indx+1){
-			this.container.append(LI);
-		}
-		else{
-			LI.insertBefore(el[indx]);
 		}
 
-		if (!this._itemIsVisible(item))
-			LI.css("display", "none");
 	},
 
 	_onItemUpdated: function(e)
@@ -177,7 +179,7 @@ defineClass("TlistView", "panjs.core.display.Telement", {
 	_onItemAdded: function(e)
 	{
 		var item = e.data.item;
-		var indx = e.data.index;
+		var indx = e.data.index;		
 		this._insertLineAt(item, indx);			
 	},
  
@@ -211,7 +213,7 @@ defineClass("TlistView", "panjs.core.display.Telement", {
 			var html = this.functionRenderer(item);
 			if (typeof html == "string"){
 				var LI = document.createElement('LI');		
-				LI.innerHTML = this.functionRenderer(item);	
+				LI.innerHTML = html;	
 			}else{
 				LI = html;
 			}
@@ -225,10 +227,10 @@ defineClass("TlistView", "panjs.core.display.Telement", {
 	},
 	_addLine: function(item, docFragment)
 	{
-		var LI = this.createLI(item);
-		docFragment.appendChild(LI);
-		if (!this._itemIsVisible(item))
-			$(LI).css("display", "none");
+		if (this._itemIsVisible(item)){
+			var LI = this.createLI(item);
+			docFragment.appendChild(LI);
+		}
 	},
 	render: function()
 	{				
