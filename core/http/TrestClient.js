@@ -120,7 +120,8 @@ defineClass("TrestClient", "panjs.core.events.TeventDispatcher",
 			var dataType = this.dataType;
 
 		var contentType = null;
-		if ((dataType == "json")&&((method=="POST")||(method=="PUT"))){
+		if ((arguments.length >=4) && (data != null)  && (dataType == "json")&& (method!="GET"))
+		{
 			data = JSON.stringify(data);
 			/* jquery remplace '??' par un Id aléatoire! (ex: jQuery21105193407278801687_1471892858224 ). pas corrigé dans jquery 3.1.0*/
 			data = data.replace(/\?\?/g, '\\u003f\\u003f');
@@ -229,7 +230,7 @@ defineClass("TrestClient", "panjs.core.events.TeventDispatcher",
 
 					if (defined(success))
 						success(e, token);
-				},
+				}.bind(this),
 				error: function( jqXHR, textStatus, errorThrown) {
 					
 					if (token.aborted){
@@ -290,11 +291,12 @@ defineClass("TrestClient", "panjs.core.events.TeventDispatcher",
 					if (e.data.status == 401){
 						e.data.responseText = "Vous n'êtes pas connecté.";
 					}
+					
 					this.dispatchEvent(e);
 
 					if (defined(failure))
 						failure(e, token)
-				}
+				}.bind(this)
 			});
 
 			return req;	

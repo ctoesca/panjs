@@ -362,8 +362,12 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 		else
 			return false;
 	},
-	selectAll: function(){
+	selectAll: function(silent){
 		this.setSelectedItems( this._dataProvider._items);
+	},
+	clearSelection: function(silent){
+		if (this._control)
+			this._control.setValue( [], silent);	
 	},
 	setSelectedValues:function(values, propname, silent)
 	{
@@ -452,6 +456,9 @@ defineClass("Tselectize", "panjs.core.display.Telement", {
 
 		if ((this._control != null))
 		{
+			if (arr == null)
+				arr = []
+			
 			var items = [];
 			for (var i=0; i<arr.length; i++)
 			{

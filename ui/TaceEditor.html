@@ -59,7 +59,8 @@ defineClass("TaceEditor", "panjs.core.display.Telement", {
     	this.editor.getSession().setMode("ace/mode/"+this.mode);
 
 
-    	
+    	if (this.readOnly)
+    		this.editor.setReadOnly(true)
 		
 		//$(window).resize(this.resizeAce.bind(this));	
 		//this.resizeAce();
@@ -77,6 +78,12 @@ defineClass("TaceEditor", "panjs.core.display.Telement", {
   		return this.editorElem.height($(window).height() - 1);
 	},*/
 
+	setReadOnly: function(v){
+		this.editor.setReadOnly( v )
+	},
+	getReadOnly: function(){
+		return this.editor.getReadOnly()
+	},
 
 	setSource: function(v)
 	{
@@ -84,6 +91,12 @@ defineClass("TaceEditor", "panjs.core.display.Telement", {
 		//this.container.getElement(".ace_scrollbar-v").css("overflow-y", "hidden");
 
 	},
+	enabled: function(v)
+	{
+		this.container.toggleClass("disabled", !v)  
+
+	},
+
 	getSource: function(){
 		return this.editor.getValue();
 	},

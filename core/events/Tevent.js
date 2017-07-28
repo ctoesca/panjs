@@ -52,6 +52,7 @@ Tevent.SHOWN = "shown";
 Tevent.HIDE = "hide";
 Tevent.HIDDEN = "hidden";
 Tevent.WAITING = "waiting";
+Tevent.VALIDATE = "validate";
 
 Tevent.BEFORE_DESTROY = "BEFORE_DESTROY";
 Tevent.DESTROY = "DESTROY";

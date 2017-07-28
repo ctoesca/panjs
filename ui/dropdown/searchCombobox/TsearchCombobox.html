@@ -125,7 +125,7 @@ defineClass("TsearchCombobox", "panjs.core.display.Telement", {
         {
             for (var i = 0; i< this._dataProvider.length; i++){
 
-                this._addItem(this._dataProvider._source[i]);
+                this._addItem(this._dataProvider._items[i]);
             }
         }
         this.setIsLoading(false);

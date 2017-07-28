@@ -25,7 +25,8 @@ defineClass("TcrudService", "panjs.core.events.TeventDispatcher", {
 		this.localStorageId = "localStorage_"+panjs.env;
 		
 		this.restClient = new TrestClient({extraUrlParams: this.extraUrlParams, baseUrl: this.apiUrl, dataType:"json"});
-	
+		
+
 		for (var i =0; i< this.objectClasses.length; i++)		
 		{
 			var classe = this.objectClasses[i];
@@ -61,9 +62,13 @@ defineClass("TcrudService", "panjs.core.events.TeventDispatcher", {
 				}
 				caller.onUpdate = this.onCallerUpdate.bind(this);
 				caller.onRemove = this.onCallerRemove.bind(this);
+				caller.restClient.on(Tevent.ERROR, this.onRestClientError.bind(this))
 			}
 
 		}
+	},
+	onRestClientError: function(e){
+		this.dispatchEvent(e)
 	},
 	_getCaller: function(objectClass){
 		var r = null;

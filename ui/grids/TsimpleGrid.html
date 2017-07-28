@@ -1024,7 +1024,7 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 			if (typeof this.detailRowRenderer == "function")
 			{
 				//functionRenderer
-				var content = this.detailRowRenderer(obj);
+				var content = this.detailRowRenderer(obj, detailTr);
 
 				if (typeof content == "object"){
 					var detailTd = $(content);
@@ -1097,7 +1097,11 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 									td = html;//!!on a créé le td pour rien.
 								}else
 								{
-									td.appendChild(html);
+									try{
+										td.appendChild(html);
+									}catch(err){
+										td.innerHTML = err.toString()
+									}
 								}								
 							}
 							else{
@@ -1392,13 +1396,15 @@ defineClass("TsimpleGrid", "panjs.core.display.Telement", {
 			if (typeof this.detailRowRenderer == "function")
 			{
 				//fonction
-				var content = this.detailRowRenderer(item);
+				var content = this.detailRowRenderer(item, detailTr);
 				if (typeof content == "object"){
 					detailTd = $(content);
+					detailTd.attr("colspan", this.visibleColsCount);
 				}
 				else{
 					detailTd = $('<td style="display:none" colspan="'+this.visibleColsCount+'">'+content+'</td>');
 				}
+
 			}else{
 				if (typeof this.detailRowRenderer == "string"){
 					//itemRenderer

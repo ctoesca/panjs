@@ -51,8 +51,6 @@ defineClass("VBox", "panjs.core.display.Telement", {
 			this.setHeight(args.height);
 		}
 
-		//this.container.css("background-color", '#'+Math.floor(Math.random()*16777215).toString(16));
-
 		$(window).resize( this.onWindowResize.bind(this));
 
 		this.timer = new Ttimer({delay:50});
@@ -60,15 +58,14 @@ defineClass("VBox", "panjs.core.display.Telement", {
 		this.timer.start();
       
 	},
+
 	onTimer: function(e){
 		var bodyheight = this.getNewBodyHeight();
 		if (bodyheight > 0)
 		{
-			this.timer.stop();
 			this.onWindowResize();
-			//logger.debug("margin-bottom = "+this.container.css("margin-bottom")+", marginTop="+this.container.css("margin-top"));
+			this.timer.stop();
 		}
-		//this.setBodyHeight(bodyheight);
 	},
 
 	addChild: function(el){
@@ -87,37 +84,27 @@ defineClass("VBox", "panjs.core.display.Telement", {
 
 	getNewBodyHeight: function(){
 				
-		var containerheight = this.container.height();	
-		
+		var containerheight = this.container.height();			
 		var bodyheight = containerheight;
-
-		//logger.debug("containerheight="+containerheight+", bodyheight="+bodyheight);
 		return bodyheight;
 	},
+
 	calcFixedHeight: function(){
 		var elements = this.content[0].children;
 		var r = 0;
 		for (var i=0; i< elements.length; i++){
 			if (elements[i].nodeType == 1){
 				var el = $(elements[i]);
-				var isFixedHeight =  (el.attr("height").endsWith("px"));
+				var isFixedHeight =  !el.attr("height") || (el.attr("height").endsWith("px"));
 				
-				if (isFixedHeight){
-
-					//var isFixedHeight = cssHeight.endsWith("px");
-
-					//logger.debug( el.attr("id")+" -> calcFixedHeight cssHeight = "+cssHeight+" isFixedHeight="+isFixedHeight);
-
-					//if (isFixedHeight)
-					logger.debug("Height = "+el.height());
-					r += parseInt( el.height() );	
-				}
-				
+				if (isFixedHeight)
+					r += parseInt( el.outerHeight() );					
 			}
 			
 		}
 		return r;
 	},
+
 	onWindowResize: function(e){	
 		logger.debug( "calcFixedHeight = "+this.calcFixedHeight() );
 		var bodyheight = this.getNewBodyHeight()- this.calcFixedHeight();
@@ -134,7 +121,6 @@ defineClass("VBox", "panjs.core.display.Telement", {
 					{
 						var top = parseInt( el.css("margin-top").leftOf("px") );
 						var newHeight = (bodyheight*parseFloat(cssHeight.leftOf('%')))/100 -top;
-						logger.debug("top = "+top+", newHeight = "+newHeight);
 				    	el.css("height", newHeight+"px");
 					}
 				}

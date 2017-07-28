@@ -73,6 +73,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 		//Recherche par propriété, dans tous les models 
 		var r = [];
 		for (var nomModel in this.data){
+
 			var model = this.data[nomModel];
 
 			var item = model.getByProp(this.IDField, id);
@@ -414,7 +415,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 							
 							itemModels[i].model.replaceItem(itemModel, item);
 							logger.debug("updateModel: Objet "+this.className+" modifié");
-
+							
 						/*}else
 						{
 							logger.debug("La date de modification de l'objet n'a pas changé: item.date_modif ="+item.date_modif+", itemModel.date_modif="+itemModel.date_modif);
@@ -459,11 +460,19 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 	},	
 
 
-	getHisto: function(id, success, failure)
+	getHisto: function(id, success, failure, opt)
 	{
-		var data = null;				
-		var token = this.createNewToken(success, failure);		
-		this.restClient.get(this.url+"/"+id+"/histo", "" , data, this._ongetHistoSuccess.bind(this), failure||this.defaultErrorHandler, token);	
+		if (typeof opt == "undefined"){
+			var opt = {
+				url : this.url+"/"+id+"/histo"
+			}
+		}else{
+			opt.url = this.url+"/"+id+"/histo"
+		}
+		if (typeof opt.nomModel == "undefined")
+			opt.nomModel = "Historique";
+
+		return this._searchGET("", success, failure, opt)
 	},
 	_ongetHistoSuccess: function(evt, token){
 		
@@ -580,6 +589,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 		var nomModel = null;
 		var useCache = this.cached;
 		var returnArray = false;
+		var url = this.url
 
 		if (arguments.length > 3){
 			if (typeof opt.updateModel != "undefined")
@@ -590,6 +600,8 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 				useCache = opt.useCache;
 			if (typeof opt.returnArray != "undefined")
 				returnArray = opt.returnArray;
+			if (typeof opt.url != "undefined")
+				url = opt.url;
 		}
 		
 		
@@ -607,7 +619,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 		}
 
 		if (nomModel == null){
-			nomModel = q;
+			nomModel = this.className+"?"+q;
 		}
 
 		var model = this.getModel(nomModel, false);
@@ -627,7 +639,7 @@ defineClass("TcrudGenericCalls", "panjs.core.events.TeventDispatcher", {
 			if (!this.sameSearchIsRunning(token)){
 
 			
-				this.restClient.get(this.url, q , data, this._onsearch.bind(this), this._onsearchFailure.bind(this), token);	
+				this.restClient.get(url, q , data, this._onsearch.bind(this), this._onsearchFailure.bind(this), token);	
 
 				
 			}else{				

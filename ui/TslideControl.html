@@ -86,7 +86,7 @@ display: inline;
 }
 
 .TslideControl .slideControlInput {
-	width:60px;
+	width:auto;
 	font-size:1.3em;
 
 	border:1px solid #ccc;
@@ -109,19 +109,32 @@ defineClass("TslideControl", "panjs.core.display.Telement", {
 	speed: 400,
 	step: 1,
 
-	_value: "50",	
+	_value: 50,	
 	_offset: 0,
 	_percentPosition: 0, 
 	_handleWidth: 0,
 	_containerWidth:0,
 	_mouseIsDown : false,
 
+	minValue: 0,
+	maxValue: 100,
+	inputWidth: null,
+	_refreshingInputWidth: false,
+
+
+
 	constructor: function(args){
 		this._super.constructor.call(this,args);
 		this.injectParam("speed", args.speed,false);
 		this.injectParam("_value", args.value,false);
 		this.injectParam("step", args.step,false);	
-	
+		this.injectParam("minValue", args.minValue,false);	
+		this.injectParam("maxValue", args.maxValue,false);	
+		this.injectParam("inputWidth", args.inputWidth,false);	
+
+		if (this.inputWidth != null)
+			this.input.width(this.inputWidth)
+
 		this._refreshSizeData();
 			
 		this.setValue(this._value, false, true);
@@ -134,22 +147,55 @@ defineClass("TslideControl", "panjs.core.display.Telement", {
 	},
 	setValue:function(value, animate, force)
 	{		
-		if (value > 100) value = 100;
-		if (value < 0) value = 0;
+		value = parseInt(value)
+
+		if (value > this.maxValue) value = this.maxValue;
+		if (value < this.minValue) value = this.minValue;
+
 		value = value - value % this.step;
 
 		if ((this._value == value)&&(force !== true))
 			return;
 
 		this._value = value;
-		this._percentPosition = value;
+
+		this._percentPosition = 100*value/this.maxValue;
 
 		this.input.val(value);
-	
+
 		if (animate !== false)
 			this.animate(this._percentPosition);
 		else
 			this.slideControlFill.width((this._percentPosition) + "%");
+		this.refreshInputWidth()
+
+		this.dispatchEvent(new Tevent(Tevent.CHANGE, { value: value}))
+	},
+
+	refreshInputWidth: function()
+	{
+
+		if ((this._refreshingInputWidth)||(this.inputWidth != null))
+			return;
+
+		this._refreshingInputWidth = true;
+		setTimeout( function(){
+			this._refreshingInputWidth = false;
+			var widthElem = $('<span style="display:none;font-size:1.3em;font-weight: bold;">'+this._value+'</span>')
+			$(document.body).append(widthElem)
+			var w = widthElem.width() + 24+2
+			widthElem.remove()
+
+			
+			this.input.animate({ width: w + "px"}, 100);
+
+		}.bind(this), 200)
+	},
+
+	setPercentValue:function(p, animate, force)
+	{
+		var value = p * this.maxValue/100 
+		this.setValue(value, animate, force)
 	},
 
 	_setEvents: function()
@@ -206,7 +252,7 @@ defineClass("TslideControl", "panjs.core.display.Telement", {
 		e.preventDefault();
 		$this._percentPosition = Math.round(((e.pageX - $this._offset.left + $this._handleWidth/2-8)/$this._containerWidth)*100);
 		if ($this._mouseIsDown) 
-			$this.setValue($this._percentPosition, false);
+			$this.setPercentValue($this._percentPosition, false);
 	},
 
 	_onContainerClick: function(e)
@@ -215,7 +261,7 @@ defineClass("TslideControl", "panjs.core.display.Telement", {
 		$this._refreshSizeData();
 		e.preventDefault();
 		$this._percentPosition = Math.round(((e.pageX - $this._offset.left + $this._handleWidth/2-8)/$this._containerWidth)*100);		
-		$this.setValue($this._percentPosition, true);
+		$this.setPercentValue($this._percentPosition, true);
 	}	
 });
 //]]>

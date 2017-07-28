@@ -34,13 +34,17 @@ defineClass("TtitleWindow", "panjs.core.display.Telement", {
 	_title: "",
 	iconHtml: "",
 	closeOnESC: false,
+	showCloseButton: true,
 
 	constructor: function(args){ 
 		this._super.constructor.call(this,args);
 		
 		this._setEvents();
 		this.container.addClass("modal-dialog");
-	
+		
+		if (typeof args.showCloseButton != "undefined")
+			this.showCloseButton = args.showCloseButton
+
 		if (defined(args))
 		{
 			this.injectParam("_title", args.title,false, this._title);	
@@ -49,7 +53,7 @@ defineClass("TtitleWindow", "panjs.core.display.Telement", {
 	
 		this.setTitle(this._title);
 		this.setIcon( this.iconHtml);
-
+		this.buttonClose.toggle(this.showCloseButton)
 	},	
 	setIcon: function(iconHtml){
 		if (iconHtml){

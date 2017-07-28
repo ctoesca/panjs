@@ -1,0 +1,63 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>  
+   <title>panjs - Tutorial</title>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+   <link rel="shortcut icon" href="favicon.png"/>
+   <META HTTP-EQUIV="CONTENT-LANGUAGE" CONTENT="en-EN,en"/>
+
+
+    <link rel="stylesheet" href="/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css"/>
+    <script src="/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <link href="/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet"/>
+
+    <script>
+    //<![CDATA[  
+      var panjs = {
+        logLevel: "INFO",
+        env: "dev", // dev or prod
+        appVersion: "1.0.0", //utilisé dans l'url des commposants htm, js et css (pas de cache si nouvelle version)
+        appName: "tutoriel",
+              
+        namespaces:{
+          "panjs.core": {path: "../../core"},
+          "panjs.ui": {path: "../../ui"},
+          "panjs.helpers"    : {path:  "../../helpers"},
+          "app": {path: "."},          
+          }
+        };  
+    //]]>
+    </script>
+
+    <script src="../../core/panjs_core_with_less.dev.min.js"></script>
+
+    <script>
+      $(document).ready(function() 
+      {
+        panjs.load($(document.body)) ;        
+      });
+
+    </script>
+
+</head>
+
+<body>
+
+  <div id="mainView" data-compo="app.VBox.html">  
+      <div style="background: green; border-style: solid;" height="50px">TOP</div>
+      <div style="background: yellow; border-style: solid" height="500px">BOTTOM</div>
+  </div> 
+
+
+
+</body>
+
+</html>
+
+
+
+
+

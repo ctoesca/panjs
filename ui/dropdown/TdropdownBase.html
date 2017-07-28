@@ -130,9 +130,14 @@ defineClass("TdropdownBase", "panjs.core.display.Telement", {
 		}	
 
 		if (this._selectedItem != null){
-			var it = this._dataProvider.getItemIndex(this._selectedItem);
+			if (this.valueField)
+				var it = this._dataProvider.getByProp(this.valueField, this._selectedItem[this.valueField]);
+			else
+				var it = this._dataProvider.getItemIndex(this._selectedItem);
 			if (it == -1)
-				 this.setSelectedItem(null);
+				this.setSelectedItem(null);
+			else
+				this.setSelectedItem(it);
 		}
 		
 		/*if (this._itemsCount == 0)

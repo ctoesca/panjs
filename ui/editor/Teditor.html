@@ -27,6 +27,7 @@ defineClass("Teditor", "panjs.core.display.Telement", {
 	extraPlugins: 'colorbutton,colordialog', //'closebtn,savebtn,colorbutton,preview,colordialog'
 	removePlugins: 'save,forms,language,showblocks,showborders,smiley,wsc,find,bidi,about,a11yhelp,selectall,pastetext,flash',
 	_onInstanceReady: null,
+	height: null,
 
 	constructor: function(args){
 		this._super.constructor.call(this,args);
@@ -36,12 +37,18 @@ defineClass("Teditor", "panjs.core.display.Telement", {
 		{
 			if (typeof args.baseHref != "undefined")
 				this.baseHref =  args.baseHref ;
+			
 			if (typeof args.extraPlugins != "undefined")
 				this.extraPlugins.pushArray(  args.extraPlugins );
+			
+			if (typeof args.fixedToolbar != "undefined")
+				this.removePlugins += ",fixed";
+
+			if (typeof args.height != "undefined")
+				this.height = args.height;
 		}
+
 		this.textarea = this.container.getElement("textarea");
-		
-		
 
 		Teditor.instanceCount ++;
 		this.editorId = "editor"+Teditor.instanceCount;
@@ -121,12 +128,21 @@ defineClass("Teditor", "panjs.core.display.Telement", {
 	{	
 		this.instanceIsReady = true;
 	    this.editor = evt.editor;
+	   	this.editor.on('change', this.onChange.bind(this) );
+	   	if (this.height)
+	   		this.setHeight(this.height)
 
 	         //editor.execCommand('maximize');
 	        // this.resize();
-	        //this.editor.resize( '100%', 700 );
+	     
+	    //this.editor.resize( '100%', 700 );
 
 	},
+
+	onChange: function(e){
+		this.dispatchEvent( new Tevent(Tevent.CHANGE));
+	},
+
 	setBaseHref: function(baseHref){
 	
 		this.editor.ckeditorGet().config.baseHref=baseHref;
@@ -152,7 +168,7 @@ defineClass("Teditor", "panjs.core.display.Telement", {
 		//	height = 500;
 		
  		this.editor.resize( '100%', height );
- 		logger.debug("HEIGHT EDITOR = "+height);
+ 		logger.error("HEIGHT EDITOR = "+height);
 
  		}catch(err){
  			logger.error("ERREUR RESIZE EDITOR: "+err);
@@ -187,12 +203,17 @@ defineClass("Teditor", "panjs.core.display.Telement", {
 
 	getContent: function() {
 
-		return  this.editor.getData();
+		var r = this.editor.getData();
+		//sur upload , des ??? peuvent être ajouté...
+		r = r.replace("???????","");
+		return r;
 	},
 
 	setHeight: function(h){
-		this.editorElem.css("height", h);
-		this.editor.resize();
+		/*if (this.textarea)
+			this.textarea.css("height", h);*/
+
+		this.editor.resize( '100%', h );
 	}
 
 });

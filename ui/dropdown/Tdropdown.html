@@ -150,26 +150,41 @@ defineClass("Tdropdown", "panjs.ui.dropdown.TdropdownBase.html", {
 		this.ul.on("click", this._onItemClick.bind(this));
 	},
 
+	itemLabelFunction: function(data){
+		var r = "";
+		if (data[this.labelField])
+		{
+			if (data.isNullItem)
+			{
+				r = this.nullLabelItem;
+			}else{
+
+				var r = data[this.labelField];
+
+				if (typeof r == "undefined")
+					r = "labelField incorrect";
+				if ((r != null) && this.capitalizeFirstLetter)
+					r = r.capitalizeFirstLetter();
+				else if (r == null)
+					r = this.nullLabelItem;
+
+			}
+		}
+
+		return r;
+	},
 	_addItem:function(obj)
 	{
 		//Ajoute: <li><a href="#">AFPA Bernes</a></li>
 		if (obj != null)
 		{
-			var t = obj[this.labelField];
-			if (typeof t == "undefined")
-				t = "labelField incorrect";
-
-			if (t != null)
+			var itemLabel = this.itemLabelFunction(obj)
+			if (itemLabel != null)
 			{
-				if (this.capitalizeFirstLetter)
-					t = t.capitalizeFirstLetter();
 				this._itemsCount ++;
-			}else
-			{
-				t = this.nullLabelItem;
 			}
 			
-			var li = $('<li><a style="height:25px;" href="#">'+t+'</a></li>');
+			var li = $('<li><a style="height:25px;" href="#">'+itemLabel+'</a></li>');
 			var a = li.getElement("a");
 
 			a.prop("data",obj);

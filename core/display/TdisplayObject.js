@@ -51,12 +51,18 @@ defineClass("TdisplayObject", "panjs.core.events.TeventDispatcher",
 		return true;
 	},
 	onWindowResize: function(f){
-        if (this._resizeFunction)
-             $(window).off("resize", this._resizeFunction);
-         
-        this._resizeFunction = f
-        $(window).on("resize", f);
+
+      if (f != this._resizeFunction){
+
+          if (this._resizeFunction)
+               $(window).off("resize", this._resizeFunction);
+           
+          this._resizeFunction = f
+          $(window).on("resize", f);
+
+      }
     },
+    
 	free: function(){
 
 		TdisplayObject._super.free.call(this);
